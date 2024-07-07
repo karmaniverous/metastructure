@@ -28,6 +28,7 @@ aws_accounts:
     id: '000000000002'
   test:
     id: '000000000003'
+github_org: karmaniverous
 master_aws_account: master
 terraform:
   aws_profile: KARMA_TERRAFORM

@@ -13,6 +13,7 @@ export const KarmaConfigSchema = z
         id: z.string(),
       }),
     ),
+    github_org: z.string(),
     master_aws_account: z.string(),
     terraform: z.object({
       aws_profile: z.string(),

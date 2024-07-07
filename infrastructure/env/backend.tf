@@ -7,7 +7,7 @@ file at every commit. See the README for more info!
 
 terraform {
   backend "s3" {
-    bucket               = "vcr-terraform"
+    bucket               = "terraform"
     encrypt              = true
     dynamodb_table       = "terraform"
     key                  = "terraform.tfstate"

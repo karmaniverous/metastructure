@@ -1,10 +1,4 @@
-[//]: # ' ******************* DO NOT EDIT THIS NOTICE ***************** '
-[//]: # ' This code and all related intellectual property is owned by   '
-[//]: # ' Veteran Crowd Rewards, LLC. It is not to be disclosed, copied '
-[//]: # ' or used without written permission.                           '
-[//]: # ' ************************************************************* '
-
-Thank you for your contribution to this VCR repo.
+Thank you for your contribution to this repo.
 Before submitting this PR, please make sure:
 
 - [ ] Your code builds clean without any errors or warnings

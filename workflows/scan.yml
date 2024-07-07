@@ -1,0 +1,29 @@
+# ******************* DO NOT EDIT THIS NOTICE *****************
+# This legal notice is added to every supported source code
+# file at every commit. See the README for more info!                          
+# *************************************************************
+name: Scan
+
+on:
+  workflow_call:
+
+jobs:
+  scan:
+    name: Run Security Scans
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Security Scan - Truffle Enterprise / SAST
+        uses: trufflesecurity/TruffleHog-Enterprise-Github-Action@main
+        with:
+          args: --quiet
+
+      - name: Security Scan - Truffle Open Source / SAST
+        uses: edplato/trufflehog-actions-scan@master
+        with:
+          scanArguments: '--regex --entropy=False --max_depth=10 --rules /regexes.json'

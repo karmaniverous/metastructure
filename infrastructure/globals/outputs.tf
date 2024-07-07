@@ -7,7 +7,7 @@ file at every commit. See the README for more info!
 
 output "namespace" {
   description = "Organization token prefixed to resource names."
-  value       = "vcr"
+  value       = "karma"
 }
 
 output "terraform_delegate_role_token" {
