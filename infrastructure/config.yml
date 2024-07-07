@@ -6,7 +6,7 @@
 app_environments:
   bali:
     aws_account: master
-    gha_on_push_branches: preview/bali
+    gha_on_push_branches: preview/**
   dev:
     aws_account: dev
     gha_on_push_branches: dev
@@ -18,7 +18,7 @@ app_environments:
     gha_on_push_branches: release/**
   seattle:
     aws_account: dev
-    gha_on_push_branches: preview/seattle
+    gha_on_push_branches: preview/**
 aws_accounts:
   dev:
     id: '000000000000'
