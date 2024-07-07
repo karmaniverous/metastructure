@@ -5,13 +5,6 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-/*
-******************* DO NOT EDIT THIS NOTICE *****************
-This legal notice is added to every supported source code
-file at every commit. See the README for more info!                          
-*************************************************************
-*/
-
 resource "aws_iam_policy" "serverless_delegate_oicd" {
   # gz 02/22/2023 TN-181
   # checkov:skip=CKV_AWS_289:Ensure IAM policies does not allow permissions management / resource exposure without constraints. 

@@ -5,13 +5,6 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-/*
-******************* DO NOT EDIT THIS NOTICE *****************
-This legal notice is added to every supported source code
-file at every commit. See the README for more info!                          
-*************************************************************
-*/
-
 resource "aws_s3_bucket" "s3_access_log" {
   bucket = "${module.globals.namespace}-log-s3-${terraform.workspace}"
   tags = {

@@ -5,13 +5,6 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-/*
-******************* DO NOT EDIT THIS NOTICE *****************
-This legal notice is added to every supported source code
-file at every commit. See the README for more info!                          
-*************************************************************
-*/
-
 output "namespace" {
   description = "Organization token prefixed to resource names."
   value       = "vcr"
