@@ -1,0 +1,63 @@
+{
+  "author": "Jason Williscroft",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.6.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/eslint-config-prettier": "^6.11.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.14.10",
+    "auto-changelog": "^2.4.0",
+    "chalk": "^5.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-tsdoc": "^0.3.0",
+    "fs-extra": "^11.2.0",
+    "handlebars": "^4.7.8",
+    "lefthook": "^1.6.18",
+    "license-check-and-add": "^4.0.5",
+    "pkg-dir": "^8.0.0",
+    "prettier": "^3.3.2",
+    "release-it": "^17.4.1",
+    "shx": "^0.3.4",
+    "tsx": "^4.16.2",
+    "typescript-eslint": "^7.15.0",
+    "yaml": "^2.4.5",
+    "zod": "^3.23.8"
+  },
+  "license": "BSD-3-Clause",
+  "name": "@karmaniverous/aws-infrastructure",
+  "release-it": {
+    "git": {
+      "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
+      "commitMessage": "chore: release v${version}",
+      "requireBranch": "dev"
+    },
+    "github": {
+      "release": true
+    },
+    "hooks": {
+      "after:init": [
+        "cd src",
+        "tflint"
+      ],
+      "after:release": [
+        "git switch -c release/${version}",
+        "git push -u origin release/${version}",
+        "git switch ${branchName}"
+      ]
+    },
+    "npm": {
+      "publish": false
+    }
+  },
+  "scripts": {
+    "init": "tsx src/init",
+    "notice": "license-check-and-add",
+    "release": "vc -c \"release-it\""
+  },
+  "type": "module",
+  "version": "0.0.0"
+}
+

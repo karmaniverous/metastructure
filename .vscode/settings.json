@@ -1,0 +1,16 @@
+{
+  "[markdown]": {
+    "editor.wordWrap": "bounded"
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  },
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  "javascript.updateImportsOnFileMove.enabled": "always"
+}

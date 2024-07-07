@@ -1,0 +1,40 @@
+# ******************* DO NOT EDIT THIS NOTICE *****************
+# This legal notice is added to every supported source code
+# file at every commit. See the README for more info!                          
+# *************************************************************
+# ******************* DO NOT EDIT THIS NOTICE *****************
+# This legal notice is added to every supported source code
+# file at every commit. See the README for more info!                          
+# *************************************************************
+app_environments:
+  bali:
+    aws_account: master
+    gha_on_push_branches: preview/bali
+  dev:
+    aws_account: dev
+    gha_on_push_branches: dev
+  prod:
+    aws_account: prod
+    gha_on_push_branches: main
+  release:
+    aws_account: prod
+    gha_on_push_branches: release/**
+  seattle:
+    aws_account: dev
+    gha_on_push_branches: preview/seattle
+aws_accounts:
+  dev:
+    id: '000000000000'
+  master:
+    id: '000000000001'
+  prod:
+    id: '000000000002'
+  test:
+    id: '000000000003'
+master_aws_account: master
+terraform:
+  aws_profile: KARMA_TERRAFORM
+  aws_region: us-east-1
+  backend_bucket: terraform-state
+  backend_table: terraform-state-lock
+  namespace: karma

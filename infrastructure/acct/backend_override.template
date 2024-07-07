@@ -1,0 +1,23 @@
+# ******************* DO NOT EDIT THIS NOTICE *****************
+# This legal notice is added to every supported source code
+# file at every commit. See the README for more info!                          
+# *************************************************************
+# ******************* DO NOT EDIT THIS NOTICE *****************
+# This legal notice is added to every supported source code
+# file at every commit. See the README for more info!                          
+# *************************************************************
+# DO NOT MODIFY THIS FILE!
+#
+# See dev environment setup instructions in README.
+
+terraform {
+  backend "s3" {
+    profile              = "VCR-TERRAFORM"
+    bucket               = "vcr-terraform"
+    encrypt              = true
+    dynamodb_table       = "terraform"
+    key                  = "terraform.tfstate"
+    region               = "us-east-1"
+    workspace_key_prefix = "acct"
+  }
+}

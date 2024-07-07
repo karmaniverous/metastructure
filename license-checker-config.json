@@ -1,0 +1,38 @@
+{
+  "defaultFormat": {
+    "eachLine": {
+      "prepend": "# "
+    }
+  },
+  "ignore": [
+    "*",
+    ".github/",
+    ".lefthook/",
+    "src/",
+    "license.txt",
+    "*/**/.terraform.lock.hcl",
+    "*/**/.terraform/*"
+  ],
+  "ignoreFile": "./.gitignore",
+  "license": "infrastructure/license.txt",
+  "licenseFormats": {
+    "acl|as|babelrc|c|cjs|config|cpp|css|cto|go|hcl|java|js|less|mjs|overrides|php|scss|tf|ts|tsx|variables": {
+      "append": "*/\n",
+      "prepend": "/*"
+    },
+    "hbs|html|xml|svg": {
+      "append": "-->\n",
+      "prepend": "<!--"
+    },
+    "md|mdx": {
+      "eachLine": {
+        "append": " '",
+        "prepend": "[//]: # ' "
+      }
+    },
+    "pu": {
+      "append": "'/\n",
+      "prepend": "/'"
+    }
+  }
+}
