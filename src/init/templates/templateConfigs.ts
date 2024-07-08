@@ -29,10 +29,6 @@ const templateConfigs: TemplateConfig[] = [
     path: 'infrastructure/globals/outputs.tf',
     template: 'terraform_globals_outputs.hbs',
   },
-  {
-    path: '.github/workflows/scan.yml',
-    template: 'github_workflow_scan.hbs',
-  },
 ];
 
 export default templateConfigs;
