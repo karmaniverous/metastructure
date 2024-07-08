@@ -21,7 +21,6 @@
     "pkg-dir": "^8.0.0",
     "prettier": "^3.3.2",
     "release-it": "^17.4.1",
-    "shx": "^0.3.4",
     "tsx": "^4.16.2",
     "typescript-eslint": "^7.15.0",
     "yaml": "^2.4.5",
@@ -31,7 +30,7 @@
   "name": "@karmaniverous/aws-infrastructure",
   "release-it": {
     "git": {
-      "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
+      "changelog": "nlx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
       "commitMessage": "chore: release v${version}",
       "requireBranch": "dev"
     },
@@ -40,8 +39,7 @@
     },
     "hooks": {
       "after:init": [
-        "cd src",
-        "tflint"
+        "nr lint"
       ],
       "after:release": [
         "git switch -c release/${version}",
@@ -55,11 +53,12 @@
   },
   "scripts": {
     "init": "tsx src/init",
-    "lint": "eslint infrastructure/** && prettier -c infrastructure",
-    "lint:fix": "eslint --fix infrastructure/** && prettier --write infrastructure",
+    "lint": "eslint src/** && prettier -c src",
+    "lint:fix": "eslint --fix src/** && prettier --write src",
     "license": "license-check-and-add",
-    "release": "vc -c \"release-it\""
+    "release": "release-it"
   },
   "type": "module",
   "version": "0.0.0"
 }
+

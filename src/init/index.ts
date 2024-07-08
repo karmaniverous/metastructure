@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 import yaml from 'yaml';
 
-import { type KarmaConfig, KarmaConfigSchema } from './config';
+import { type Config, ConfigSchema } from './config';
 import templateConfigs from './templates/templateConfigs';
 
 // Locate package root.
@@ -17,11 +17,11 @@ if (!pkgDir) {
 }
 
 // Load & parse project config.
-let config: KarmaConfig;
+let config: Config;
 try {
   process.stdout.write(chalk.black.bold('Parsing config.yml...'));
 
-  config = KarmaConfigSchema.parse(
+  config = ConfigSchema.parse(
     yaml.parse(
       await fs.readFile(resolve(pkgDir, './infrastructure/config.yml'), 'utf8'),
     ),
@@ -67,10 +67,12 @@ process.stdout.write(chalk.green.bold('Done!\n\n'));
 
 // Apply notices.
 process.stdout.write(chalk.black.bold('Applying license headers...\n'));
+let licenseOutput = '';
+try {
+  ({ stdout: licenseOutput } = await $`license-check-and-add add`);
+} catch {} // eslint-disable-line no-empty
 
-const { stdout: licenseOutput } = await $`license-check-and-add add || true`;
-
-console.log(chalk.black.dim(licenseOutput));
+if (licenseOutput) console.log(chalk.black.dim(licenseOutput));
 
 process.stdout.write(chalk.green.bold('Done!\n\n'));
 

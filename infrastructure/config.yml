@@ -5,7 +5,7 @@
 
 app_environments:
   bali:
-    aws_account: master
+    aws_account: dev
     gha_on_push_branches: preview/**
   dev:
     aws_account: dev
@@ -14,7 +14,7 @@ app_environments:
     aws_account: prod
     gha_on_push_branches: main
   release:
-    aws_account: prod
+    aws_account: test
     gha_on_push_branches: release/**
   seattle:
     aws_account: dev
@@ -31,7 +31,7 @@ aws_accounts:
 github_org: karmaniverous
 master_aws_account: master
 terraform:
-  aws_profile: KARMA_TERRAFORM
+  aws_profile: KARMA-TERRAFORM
   aws_region: us-east-1
   backend_bucket: terraform-state
   backend_table: terraform-state-lock

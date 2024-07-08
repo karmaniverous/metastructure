@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const KarmaConfigSchema = z
+export const ConfigSchema = z
   .object({
     app_environments: z.record(
       z.object({
@@ -46,4 +46,4 @@ export const KarmaConfigSchema = z
         });
   });
 
-export type KarmaConfig = z.infer<typeof KarmaConfigSchema>;
+export type Config = z.infer<typeof ConfigSchema>;
