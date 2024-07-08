@@ -1,6 +1,6 @@
 output "namespace" { 
     description = "Organization token prefixed to resource names." 
-    value = "karma" 
+    value = "{{terraform.namespace}}" 
 } 
 
 output "terraform_delegate_role_token" { 
@@ -10,10 +10,7 @@ output "terraform_delegate_role_token" {
 
 output "acct_ids" { 
     description = "Maps AWS account tokens to account ids." 
-    value = { 
-        dev = "000000000000" 
-        master = "000000000001"
-        prod = "000000000002" 
-        test = "000000000003" 
+    value = { {{#each aws_accounts}}
+        {{@key}} = "{{this.id}}" {{/each}} 
     } 
 }

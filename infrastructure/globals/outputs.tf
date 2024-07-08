@@ -18,10 +18,9 @@ output "terraform_delegate_role_token" {
 output "acct_ids" {
   description = "Maps AWS account tokens to account ids."
   value = {
-    dev    = "546652796775"
-    master = "945442616899"
-    prod   = "349507567318"
-    test   = "537756955768"
+    dev    = "000000000000"
+    master = "000000000001"
+    prod   = "000000000002"
+    test   = "000000000003"
   }
 }
-

@@ -1,0 +1,10 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches: {{#each (lodash 'uniq' (lodash 'map' app_environments 'gha_on_push_branches'))}}
+      - "{{this}}" {{/each}}
+
+jobs:
+  deploy-infrastructure:
+    uses: ./.github/workflows/_deploy_infrastructyre.yml

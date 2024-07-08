@@ -3,6 +3,7 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.6.0",
+    "@karmaniverous/handlebars": "^0.0.1",
     "@types/eslint__js": "^8.42.3",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/fs-extra": "^11.0.4",
@@ -13,8 +14,8 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tsdoc": "^0.3.0",
+    "execa": "^9.3.0",
     "fs-extra": "^11.2.0",
-    "handlebars": "^4.7.8",
     "lefthook": "^1.6.18",
     "license-check-and-add": "^4.0.5",
     "pkg-dir": "^8.0.0",
@@ -54,10 +55,11 @@
   },
   "scripts": {
     "init": "tsx src/init",
-    "notice": "license-check-and-add",
+    "lint": "eslint infrastructure/** && prettier -c infrastructure",
+    "lint:fix": "eslint --fix infrastructure/** && prettier --write infrastructure",
+    "license": "license-check-and-add",
     "release": "vc -c \"release-it\""
   },
   "type": "module",
   "version": "0.0.0"
 }
-

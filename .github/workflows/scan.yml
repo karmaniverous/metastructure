@@ -1,0 +1,13 @@
+name: Scan
+
+on:
+  push:
+    branches: 
+      - "preview/**" 
+      - "dev" 
+      - "main" 
+      - "release/**" 
+
+jobs:
+  scan:
+    uses: ./.github/workflows/_scan.yml

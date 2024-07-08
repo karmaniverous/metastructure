@@ -1,11 +1,11 @@
 terraform { 
     backend "s3" { 
         profile = "{{terraform.aws_profile}}" 
-        bucket = "{{terraform.namespace}}-{{terraform.backend_bucket_token}}"
+        bucket = "{{terraform.namespace}}-{{terraform.backend_bucket}}"
         encrypt = true 
         dynamodb_table = "{{terraform.backend_table}}" 
         key = "terraform.tfstate"
         region = "{{terraform.aws_region}}" 
-        workspace_key_prefix = "{{context}}" 
+        workspace_key_prefix = "{{config.context}}" 
     } 
 }
