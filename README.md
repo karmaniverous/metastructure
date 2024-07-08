@@ -19,7 +19,7 @@ This repo addresses the infrastructure corner of this triangle and is a VERY ear
 
 For a preview of the back-end corner, see [this repository](https://github.com/karmaniverous/aws-api-template). It will soon be experiencing a MAJOR facelift, including a complete TS refactor, a ton of config automation, and a couple years' worth of new patters and lessons learned.
 
-For a preview of the front end, see [this repository](https://github.com/karmaniverous/nextjs-template).
+For a preview of the front end, see [this repository](https://github.com/karmaniverous/nextjs-template). Same story: big update on the way.
 
 You will note that many of the key dependencies are my own, as along the way I've had to think through some VERY important problems (how DO we do configurable entity management in DynamoDB at scale?) and engineer generic solutions to the same. This project has a single architect and a single developer with 40 years of coding experience under his belt, and I hope it shows.
 
