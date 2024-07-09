@@ -14,7 +14,7 @@ resource "aws_iam_policy" "serverless_delegate" {
   # checkov:skip=CKV_AWS_290:Ensure IAM policies does not allow write access without constraints.
   # checkov:skip=CKV2_AWS_40:Ensure AWS IAM policy does not allow full IAM privileges.
   # checkov:skip=CKV_AWS_355:Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions.
-  name        = "${module.globals.namespace}-serverless-delegate"
+  name        = var.role_name
   description = "Policies required to deploy serverless applications."
   policy      = <<EOF
 {

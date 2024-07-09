@@ -6,7 +6,7 @@ file at every commit. See the README for more info!
 */
 
 resource "aws_s3_bucket" "s3_access_log" {
-  bucket = "${module.globals.namespace}-log-s3-${terraform.workspace}"
+  bucket = var.bucket_name
   tags = {
     ENV = terraform.workspace
   }
@@ -22,12 +22,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_access_log_sse
   }
 }
 
-# This SecureFrame test requires a policy that enforces upload encryption:
-# https://app.secureframe.com/tests/1164d64b-e7bb-4602-b658-77861223d76b/remediation
-#
-# However, there doesn't appear to be any way to force logging.s3.amazonaws.com
-# to deliver encrypted logs. When we put an enforcement policy in place like the 
-# one commented out below, the logs simply don't appear.
+# PCI requires a policy that enforces upload encryption, but there doesn't 
+# appear to be any way to force logging.s3.amazonaws.com to deliver encrypted 
+# logs. When we put an enforcement policy in place like the one commented out 
+# below, the logs simply don't appear.
 resource "aws_s3_bucket_policy" "s3_access_log_policy" {
   bucket = aws_s3_bucket.s3_access_log.bucket
   policy = jsonencode({

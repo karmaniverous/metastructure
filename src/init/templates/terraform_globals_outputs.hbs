@@ -8,9 +8,21 @@ output "terraform_delegate_role_token" {
     value = "terraform-delegate" 
 } 
 
-output "acct_ids" { 
+output "aws_accounts" { 
     description = "Maps AWS account tokens to account ids." 
     value = { {{#each aws_accounts}}
-        {{@key}} = "{{this.id}}" {{/each}} 
+        {{@key}} = {
+          id = "{{this.id}}" 
+        } {{/each}} 
     } 
+}
+
+output "app_environments" {
+  description = "Maps environment tokens to AWS account tokens."
+  value = { {{#each app_environments}}
+    {{@key}} = {
+      aws_account = "{{this.aws_account}}"
+      cognito_user_pool_name = "{{this.cognito_user_pool_name}}"
+    } {{/each}} 
+  }
 }

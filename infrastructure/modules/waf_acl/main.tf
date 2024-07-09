@@ -5,13 +5,21 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+module "globals" {
+  source = "../globals"
+}
+
+locals {
+  namespace = "${module.globals.namespace}-${terraform.workspace}-waf"
+}
+
 # Define env WAF ACL.
 resource "aws_wafv2_web_acl" "waf_acl" {
   default_action {
     allow {}
   }
   description = "${terraform.workspace} environment WAF ACL"
-  name        = "${module.globals.namespace}-waf-acl-${terraform.workspace}"
+  name        = "${local.namespace}-acl"
   scope       = "REGIONAL"
 
   rule {
@@ -40,42 +48,24 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     }
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "${module.globals.namespace}-waf-metric-${terraform.workspace}-AWSManagedRulesCommonRuleSet"
+      metric_name                = "${local.namespace}-metric-AWSManagedRulesCommonRuleSet"
       sampled_requests_enabled   = true
     }
   }
-
-  # rule {
-  #   name = "BlockCountryCodes"
-  #   action {
-  #     block {}
-  #   }
-  #   priority = 1
-  #   statement {
-  #     geo_match_statement {
-  #       country_codes = ["ID"]
-  #     }
-  #   }
-  #   visibility_config {
-  #     cloudwatch_metrics_enabled = true
-  #     metric_name                = "${module.globals.namespace}-waf-metric-${terraform.workspace}-BlockCountryCodes"
-  #     sampled_requests_enabled   = true
-  #   }
-  # }
 
   tags = {
     ENV = terraform.workspace
   }
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "${module.globals.namespace}-waf-metric-${terraform.workspace}"
+    metric_name                = "${local.namespace}-metric"
     sampled_requests_enabled   = true
   }
 }
 
 # Lookup env Cognito User Pool. 
 data "aws_cognito_user_pools" "cognito_user_pools" {
-  name = "api-user-v${var.service_major_versions.user}-${terraform.workspace}"
+  name = var.cognito_user_pool_name
 }
 
 # Associate WAF ACL with Cognito User Pool.

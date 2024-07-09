@@ -85,3 +85,29 @@ nr init
 ```
 
 The initialization script consumes `config.yml` to generate a bunch of key Terraform & GitHub Actions configurations. More on this later.
+
+## Bootstrapping AWS
+
+The initial assumption here is that we are starting from zero.
+
+Much of what follows is adamped from [AWS Multi-account Multi-region Bootstrapping with Terraform](https://levelup.gitconnected.com/aws-multi-account-multi-region-bootstrapping-with-terraform-39aeed097ad2). Please review that very excellent reference for a deeper dive.
+
+### Create the Master Account
+
+This needs to be done manually. Follow these steps:
+
+1. [Sign up for a new AWS account](https://signin.aws.amazon.com/signup?request_type=register). Use a unique email; you won't be able to use it again to create another account.
+
+1. Sign into the new account as the root user and choose your desired home region in the upper right corner of the AWS Console.
+
+1. Visit the IAM Identity Center page and enable IAM Identity Center with AWS Organizations (the default choice).
+
+1. On the **Settings > Identity Source** tab, customize your AWS access portal URL (not required but recommended).
+
+1. On the **Settings > Authentication** tab, enable _Send email OTP for users created from API_ and configure Multi-Factor Authentication.
+
+1. In the IAM console (_not_ IAM Identity Center!) create Policy `Terraform-Init` and paste in the contents of [`Terraform-Init-IAM-Policy.json`](./infrastructure/start/Terraform-Init-IAM-Policy.json). **Ignore any warnings! We'll delete this policy at the end of the bootstrapping process.**
+
+1. In the IAM console new IAM user with `terraform-init` and attach the `Terraform-Init` policy.
+
+1. From the `terraform-init` user page **Security Credentials** tab, create an access key and secret key (choose the _Other_ use case or AWS will hassle you with alternatives). Save these in a secure location.

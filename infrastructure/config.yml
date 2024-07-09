@@ -6,18 +6,23 @@
 app_environments:
   bali:
     aws_account: dev
+    cognito_user_pool_name: api-user-v0-bali
     gha_on_push_branches: preview/**
   dev:
     aws_account: dev
+    cognito_user_pool_name: api-user-v0-dev
     gha_on_push_branches: dev
   prod:
     aws_account: prod
+    cognito_user_pool_name: api-user-v0-prod
     gha_on_push_branches: main
   release:
     aws_account: test
+    cognito_user_pool_name: api-user-v0-release
     gha_on_push_branches: release/**
   seattle:
     aws_account: dev
+    cognito_user_pool_name: api-user-v0-seattle
     gha_on_push_branches: preview/**
 aws_accounts:
   dev:

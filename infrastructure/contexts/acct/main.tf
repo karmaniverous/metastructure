@@ -6,9 +6,11 @@ file at every commit. See the README for more info!
 */
 
 module "globals" {
-  source = "../../globals"
+  source = "../../modules/globals"
 }
 
-variable "service_major_versions" {
-  type = map(number)
+module "role_serverless_delegate" {
+  source    = "../../modules/role_serverless_delegate"
+  role_name = "${module.globals.namespace}-serverless-delegate"
 }
+

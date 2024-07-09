@@ -5,15 +5,12 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-# module "environment" {
-#   source = "./environment"
-# }
-
-module "s3_log_bucket" {
-  source = "./s3_log_bucket"
+variable "cognito_user_pool_name" {
+  description = "Name of Cognito user pool to be protected by WAF."
+  type        = string
 }
 
-module "waf_acl" {
-  source                 = "./waf_acl"
-  service_major_versions = var.service_major_versions
+variable "namespace" {
+  description = "Application namespace."
+  type        = string
 }

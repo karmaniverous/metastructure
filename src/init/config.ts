@@ -3,25 +3,32 @@ import { z } from 'zod';
 export const ConfigSchema = z
   .object({
     app_environments: z.record(
-      z.object({
-        aws_account: z.string(),
-        gha_on_push_branches: z.string().optional(),
-      }),
+      z
+        .object({
+          aws_account: z.string(),
+          cognito_user_pool_name: z.string(),
+          gha_on_push_branches: z.string().optional(),
+        })
+        .strict(),
     ),
     aws_accounts: z.record(
-      z.object({
-        id: z.string(),
-      }),
+      z
+        .object({
+          id: z.string(),
+        })
+        .strict(),
     ),
     github_org: z.string(),
     master_aws_account: z.string(),
-    terraform: z.object({
-      aws_profile: z.string(),
-      aws_region: z.string(),
-      backend_bucket: z.string(),
-      backend_table: z.string(),
-      namespace: z.string().optional(),
-    }),
+    terraform: z
+      .object({
+        aws_profile: z.string(),
+        aws_region: z.string(),
+        backend_bucket: z.string(),
+        backend_table: z.string(),
+        namespace: z.string().optional(),
+      })
+      .strict(),
   })
   .strict()
   .superRefine((data, ctx) => {

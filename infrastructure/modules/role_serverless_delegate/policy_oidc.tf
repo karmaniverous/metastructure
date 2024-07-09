@@ -11,7 +11,7 @@ resource "aws_iam_policy" "serverless_delegate_oicd" {
   # checkov:skip=CKV_AWS_290:Ensure IAM policies does not allow write access without constraints.
   # checkov:skip=CKV_AWS_287:Ensure IAM policies does not allow credentials exposure.
   # checkov:skip=CKV_AWS_355:Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions.
-  name        = "${module.globals.namespace}-serverless-delegate-oidc"
+  name        = "${var.role_name}-oidc"
   description = "Policies for Github OICD role"
   policy      = <<EOF
 {

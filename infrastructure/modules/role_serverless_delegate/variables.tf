@@ -5,7 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-module "role_serverless_delegate" {
-  source = "./role_serverless_delegate"
+variable "role_name" {
+  description = "Role name"
+  type        = string
 }
-
