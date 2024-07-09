@@ -5,56 +5,114 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-output "namespace" {
-  description = "Organization token prefixed to resource names."
-  value       = "karma"
-}
+# This file is generated via nr cli init. Do not edit it manually!
 
-output "terraform_delegate_role_token" {
-  description = "Combined with namespace to form terraform delegate role name."
-  value       = "terraform-delegate"
-}
-
-output "aws_accounts" {
-  description = "Maps AWS account tokens to account ids."
+output "accounts" {
+  description = "AWS accounts."
   value = {
     dev = {
-      id = "000000000000"
+      name                = "Core Development Account"
+      email               = "dev@karmanivero.us"
+      organizational_unit = "dev"
+    }
+    logging = {
+      name                = "Core Logging Account"
+      email               = "logging@karmanivero.us"
+      organizational_unit = "security"
+    }
+    prod = {
+      name                = "Core Production Account"
+      email               = "prod@karmanivero.us"
+      organizational_unit = "prod"
     }
     master = {
-      id = "000000000001"
+      name  = "Master Account"
+      email = "master@karmanivero.us"
     }
-    prod = {
-      id = "000000000002"
+    security = {
+      name                = "Core Security Account"
+      email               = "security@karmanivero.us"
+      organizational_unit = "security"
+    }
+    shared_services = {
+      name                = "Core Shared Services Account"
+      email               = "shared.services@karmanivero.us"
+      organizational_unit = "infrastructure"
     }
     test = {
-      id = "000000000003"
+      name                = "Core Test Account"
+      email               = "test@karmanivero.us"
+      organizational_unit = "test"
     }
   }
 }
 
-output "app_environments" {
-  description = "Maps environment tokens to AWS account tokens."
+output "environments" {
+  description = "Application environments."
   value = {
     bali = {
-      aws_account            = "dev"
+      account                = "dev"
       cognito_user_pool_name = "api-user-v0-bali"
+      gha_on_push_branches   = "preview/**"
     }
     dev = {
-      aws_account            = "dev"
+      account                = "dev"
       cognito_user_pool_name = "api-user-v0-dev"
+      gha_on_push_branches   = "dev"
     }
     prod = {
-      aws_account            = "prod"
+      account                = "prod"
       cognito_user_pool_name = "api-user-v0-prod"
+      gha_on_push_branches   = "main"
     }
     release = {
-      aws_account            = "test"
+      account                = "test"
       cognito_user_pool_name = "api-user-v0-release"
+      gha_on_push_branches   = "release/**"
     }
     seattle = {
-      aws_account            = "dev"
+      account                = "dev"
       cognito_user_pool_name = "api-user-v0-seattle"
+      gha_on_push_branches   = "preview/**"
     }
   }
 }
+
+output "organization" {
+  description = "Organization."
+  value = {
+    aws_profile    = "KARMA-TERRAFORM"
+    aws_region     = "us-east-1"
+    backend_bucket = "terraform-state"
+    backend_key    = "terraform.tfstate"
+    backend_table  = "terraform-state-lock"
+    github_org     = "karmaniverous"
+    master_account = "master"
+    namespace      = "karma"
+  }
+}
+
+output "organizational_units" {
+  description = "AWS organizational units."
+  value = {
+    dev = {
+      name = "Development"
+    }
+    infrastructure = {
+      name = "Infrastructure"
+    }
+    prod = {
+      name = "Production"
+    }
+    security = {
+      name = "Security"
+    }
+    test = {
+      name = "Test"
+    }
+    workload = {
+      name = "Workload"
+    }
+  }
+}
+

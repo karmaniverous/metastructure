@@ -1,28 +1,36 @@
-output "namespace" { 
-    description = "Organization token prefixed to resource names." 
-    value = "{{terraform.namespace}}" 
-} 
+# This file is generated via nr cli init. Do not edit it manually!
 
-output "terraform_delegate_role_token" { 
-    description = "Combined with namespace to form terraform delegate role name." 
-    value = "terraform-delegate" 
-} 
-
-output "aws_accounts" { 
-    description = "Maps AWS account tokens to account ids." 
-    value = { {{#each aws_accounts}}
-        {{@key}} = {
-          id = "{{this.id}}" 
+output "accounts" { 
+    description = "AWS accounts." 
+    value = { {{#each accounts}}
+        {{@key}} = { {{#each this}}
+          {{@key}} = "{{this}}" {{/each}}
         } {{/each}} 
     } 
 }
 
-output "app_environments" {
-  description = "Maps environment tokens to AWS account tokens."
-  value = { {{#each app_environments}}
-    {{@key}} = {
-      aws_account = "{{this.aws_account}}"
-      cognito_user_pool_name = "{{this.cognito_user_pool_name}}"
-    } {{/each}} 
-  }
+output "environments" { 
+    description = "Application environments." 
+    value = { {{#each environments}}
+        {{@key}} = { {{#each this}}
+          {{@key}} = "{{this}}" {{/each}}
+        } {{/each}} 
+    } 
 }
+
+output "organization" { 
+    description = "Organization." 
+    value = { {{#each organization}}
+      {{@key}} = "{{this}}" {{/each}}
+    } 
+}
+
+output "organizational_units" { 
+    description = "AWS organizational units." 
+    value = { {{#each organizational_units}}
+        {{@key}} = { {{#each this}}
+          {{@key}} = "{{this}}" {{/each}}
+        } {{/each}} 
+    } 
+}
+
