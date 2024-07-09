@@ -1,4 +1,5 @@
-terraform { 
+terraform { {{#if params.localState}} 
+    backend "local" {} {{else}}
     backend "s3" { 
         profile = "{{terraform.aws_profile}}" 
         bucket = "{{terraform.namespace}}-{{terraform.backend_bucket}}"
@@ -7,5 +8,5 @@ terraform {
         key = "terraform.tfstate"
         region = "{{terraform.aws_region}}" 
         workspace_key_prefix = "{{config.context}}" 
-    } 
+    } {{/if}}
 }

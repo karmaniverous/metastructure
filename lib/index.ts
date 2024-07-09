@@ -1,7 +1,7 @@
 import { Command } from '@commander-js/extra-typings';
 
-import { bootstrapCommand } from './bootstrap';
-import { initCommand } from './init';
+import { bootstrapCommand } from './bootstrapCommand';
+import { initCommand } from './initCommand';
 
 const cli = new Command()
   .name('nr cli')
