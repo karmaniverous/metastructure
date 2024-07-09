@@ -7,26 +7,26 @@ export interface TemplateConfig {
 const templateConfigs: TemplateConfig[] = [
   {
     context: 'acct',
-    path: 'infrastructure/contexts/acct/backend_override.tf',
+    path: 'iac/contexts/acct/backend_override.tf',
     template: 'terraform_backend_override.hbs',
   },
   {
     context: 'env',
-    path: 'infrastructure/contexts/env/backend_override.tf',
+    path: 'iac/contexts/env/backend_override.tf',
     template: 'terraform_backend_override.hbs',
   },
   {
     context: 'acct',
-    path: 'infrastructure/contexts/acct/providers_override.tf',
+    path: 'iac/contexts/acct/providers_override.tf',
     template: 'terraform_providers_override.hbs',
   },
   {
     context: 'env',
-    path: 'infrastructure/contexts/env/providers_override.tf',
+    path: 'iac/contexts/env/providers_override.tf',
     template: 'terraform_providers_override.hbs',
   },
   {
-    path: 'infrastructure/modules/globals/outputs.tf',
+    path: 'iac/modules/globals/outputs.tf',
     template: 'terraform_globals_outputs.hbs',
   },
 ];

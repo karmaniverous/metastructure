@@ -31,7 +31,7 @@ Stay tuned.
 
 This repository contains the Infrastructure-as-Code (IaC) source code and deployment machinery for the Application platform.
 
-The infrastructure is managed using Terraform, and all Terraform configuration code is located in the [`infrastructure`](./infrastructure/) directory.
+The infrastructure is managed using Terraform, and all Terraform configuration code is located in the [`infrastructure`](./iac/) directory.
 
 This repository also features extensive tooling to facilitate configuration and (soon) bootstrapping. The code driving this functionality is located in the [`src`](./src/) directory and should not be changed without careful consideration.
 
@@ -39,17 +39,17 @@ The Application's Serverless Framework and Next.js repos create their own AWS re
 
 ## Repo Structure
 
-All Terraform code is contained in the [`infrastructure`](./infrastructure/) directory, which features the following key elements:
+All Terraform code is contained in the [`infrastructure`](./iac/) directory, which features the following key elements:
 
-- The [`env`](./infrastructure/env/) directory contains ENVIRONMENT-specific configurations. There may be more than one environment associated with a given AWS account. Each environment has its own Terraform workspace within this directory. Enter `terraform workspace list` to see the current list, and note that the `default` workspace is not used.
+- The [`env`](./iac/env/) directory contains ENVIRONMENT-specific configurations. There may be more than one environment associated with a given AWS account. Each environment has its own Terraform workspace within this directory. Enter `terraform workspace list` to see the current list, and note that the `default` workspace is not used.
 
-- The [`acct`](./infrastructure/env/) directory contains ACCOUNT-specific configurations. Each AWS account has its own Terraform workspace within this directory. Enter `terraform workspace list` to see the current list, and note that the `default` workspace is not used.
+- The [`acct`](./iac/env/) directory contains ACCOUNT-specific configurations. Each AWS account has its own Terraform workspace within this directory. Enter `terraform workspace list` to see the current list, and note that the `default` workspace is not used.
 
-- The [`globals`](./infrastructure/globals/) directory is a Terraform module that exports configuration values common to all Terraform code.
+- The [`globals`](./iac/globals/) directory is a Terraform module that exports configuration values common to all Terraform code.
 
-- [`config.yml`](./infrastructure/config.yml) is the configuration file that drives project setup via the `nr init` script. In addition to global configs applicable to all contexts, this file captures key info about AWS accounts, application environments, GitHub branches, and the relationships between them.
+- [`config.yml`](./iac/config.yml) is the configuration file that drives project setup via the `nr init` script. In addition to global configs applicable to all contexts, this file captures key info about AWS accounts, application environments, GitHub branches, and the relationships between them.
 
-- [`license.txt`](./infrastructure/license.txt) contains the license text that is added to the header of all supported source code files.
+- [`license.txt`](./iac/license.txt) contains the license text that is added to the header of all supported source code files.
 
 ## Configuring Your Development Environment
 
@@ -106,7 +106,7 @@ This needs to be done manually. Follow these steps:
 
 1. On the **Settings > Authentication** tab, enable _Send email OTP for users created from API_ and configure Multi-Factor Authentication.
 
-1. In the IAM console (_not_ IAM Identity Center!) create Policy `Terraform-Init` and paste in the contents of [`Terraform-Init-IAM-Policy.json`](./infrastructure/start/Terraform-Init-IAM-Policy.json). **Ignore any warnings! We'll delete this policy at the end of the bootstrapping process.**
+1. In the IAM console (_not_ IAM Identity Center!) create Policy `Terraform-Init` and paste in the contents of [`Terraform-Init-IAM-Policy.json`](./iac/start/Terraform-Init-IAM-Policy.json). **Ignore any warnings! We'll delete this policy at the end of the bootstrapping process.**
 
 1. In the IAM console new IAM user with `terraform-init` and attach the `Terraform-Init` policy.
 

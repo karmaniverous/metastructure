@@ -14,7 +14,7 @@
     "*/**/.terraform/*"
   ],
   "ignoreFile": "./.gitignore",
-  "license": "infrastructure/license.txt",
+  "license": "iac/license.txt",
   "licenseFormats": {
     "acl|as|babelrc|c|cjs|config|cpp|css|cto|go|hcl|java|js|less|mjs|overrides|php|scss|tf|ts|tsx|variables": {
       "append": "*/\n",

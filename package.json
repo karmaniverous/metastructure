@@ -2,6 +2,7 @@
   "author": "Jason Williscroft",
   "description": "",
   "devDependencies": {
+    "@commander-js/extra-typings": "^12.1.0",
     "@eslint/js": "^9.6.0",
     "@karmaniverous/handlebars": "^0.0.1",
     "@types/eslint__js": "^8.42.3",
@@ -52,7 +53,7 @@
     }
   },
   "scripts": {
-    "init": "tsx src/init",
+    "cli": "tsx src",
     "lint": "eslint src/** && prettier -c src",
     "lint:fix": "eslint --fix src/** && prettier --write src",
     "license": "license-check-and-add",
