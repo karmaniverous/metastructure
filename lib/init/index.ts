@@ -7,7 +7,7 @@ import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 import yaml from 'yaml';
 
-import { type Config, ConfigSchema } from './config';
+import { type Config, ConfigSchema } from '../config';
 import templateConfigs from './templates/templateConfigs';
 
 export const initCommand = new Command()
@@ -16,6 +16,10 @@ export const initCommand = new Command()
   .enablePositionalOptions()
   .passThroughOptions()
   .action(async () => {
+    process.stdout.write(
+      chalk.black.bold('*** INITIALIZING INFRASTRUCTURE PROJECT ***\n\n'),
+    );
+
     // Locate package root.
     const pkgDir = await packageDirectory();
 
@@ -30,7 +34,7 @@ export const initCommand = new Command()
 
       config = ConfigSchema.parse(
         yaml.parse(
-          await fs.readFile(resolve(pkgDir, './iac/config.yml'), 'utf8'),
+          await fs.readFile(resolve(pkgDir, './src/config.yml'), 'utf8'),
         ),
       );
 
@@ -53,7 +57,7 @@ export const initCommand = new Command()
         // Load & compile template.
         const template = Handlebars.compile(
           await fs.readFile(
-            resolve(pkgDir, 'src/init/templates', templateConfig.template),
+            resolve(pkgDir, 'lib/init/templates', templateConfig.template),
             'utf8',
           ),
         );
@@ -89,7 +93,7 @@ export const initCommand = new Command()
     process.stdout.write(chalk.black.bold('Formatting files...\n'));
 
     const { stdout: formatOutput } =
-      await $`terraform fmt -recursive ${resolve(pkgDir, 'iac')}`;
+      await $`terraform fmt -recursive ${resolve(pkgDir, 'src')}`;
 
     console.log(chalk.black.dim(formatOutput));
 
@@ -102,5 +106,7 @@ export const initCommand = new Command()
 
     console.log(chalk.black.dim(lefthookOutput));
 
-    process.stdout.write(chalk.green.bold('Done!\n\n'));
+    process.stdout.write(chalk.green.bold('Done!\n'));
+
+    process.stdout.write('\n');
   });

@@ -53,9 +53,9 @@
     }
   },
   "scripts": {
-    "cli": "tsx src",
-    "lint": "eslint src/** && prettier -c src",
-    "lint:fix": "eslint --fix src/** && prettier --write src",
+    "cli": "tsx lib",
+    "lint": "eslint lib/** && prettier -c lib",
+    "lint:fix": "eslint --fix lib/** && prettier --write lib",
     "license": "license-check-and-add",
     "release": "release-it"
   },

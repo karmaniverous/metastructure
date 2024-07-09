@@ -8,13 +8,13 @@
     "*",
     ".github/",
     ".lefthook/",
-    "src/",
+    "lib/",
     "license.txt",
     "*/**/.terraform.lock.hcl",
     "*/**/.terraform/*"
   ],
   "ignoreFile": "./.gitignore",
-  "license": "iac/license.txt",
+  "license": "src/license.txt",
   "licenseFormats": {
     "acl|as|babelrc|c|cjs|config|cpp|css|cto|go|hcl|java|js|less|mjs|overrides|php|scss|tf|ts|tsx|variables": {
       "append": "*/\n",
