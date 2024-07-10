@@ -83,9 +83,6 @@ output "organization" {
   value = {
     aws_profile    = "KARMA-TERRAFORM"
     aws_region     = "us-east-1"
-    backend_bucket = "terraform-state"
-    backend_key    = "terraform.tfstate"
-    backend_table  = "terraform-state-lock"
     github_org     = "karmaniverous"
     master_account = "master"
     namespace      = "karma"

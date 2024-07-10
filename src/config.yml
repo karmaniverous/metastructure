@@ -1,6 +1,6 @@
 # ******************* DO NOT EDIT THIS NOTICE *****************
 # This legal notice is added to every supported source code
-# file at every commit. See the README for more info!
+# file at every commit. See the README for more info!                          
 # *************************************************************
 
 accounts:
@@ -55,9 +55,6 @@ environments:
 organization:
   aws_profile: KARMA-TERRAFORM
   aws_region: us-east-1
-  backend_bucket: terraform-state
-  backend_key: terraform.tfstate
-  backend_table: terraform-state-lock
   github_org: karmaniverous
   master_account: master
   namespace: karma
@@ -74,3 +71,61 @@ organizational_units:
     name: Test
   workload:
     name: Workload
+templates:
+  - target: src/modules/globals/outputs.tf
+    template: terraform_globals_outputs.hbs
+  - config:
+      context: acct
+    target: src/contexts/acct/backend.tf
+    template: terraform_backend.hbs
+  - config:
+      context: acct
+    target: src/contexts/acct/backend_override.tf
+    template: terraform_backend_override.hbs
+  - config:
+      context: acct
+    target: src/contexts/acct/providers_override.tf
+    template: terraform_providers_override.hbs
+  - config:
+      context: acct
+    target: src/contexts/acct/terraform.tf
+    template: terraform.hbs
+  - config:
+      context: bootstrap
+    target: src/contexts/bootstrap/backend.tf
+    template: terraform_backend.hbs
+  - config:
+      context: bootstrap
+    target: src/contexts/bootstrap/backend_override.tf
+    template: terraform_backend_override.hbs
+  - config:
+      context: bootstrap
+    target: src/contexts/bootstrap/providers_override.tf
+    template: terraform_providers_override.hbs
+  - config:
+      context: bootstrap
+    target: src/contexts/bootstrap/terraform.tf
+    template: terraform.hbs
+  - config:
+      context: env
+    target: src/contexts/env/backend.tf
+    template: terraform_backend.hbs
+  - config:
+      context: env
+    target: src/contexts/env/backend_override.tf
+    template: terraform_backend_override.hbs
+  - config:
+      context: env
+    target: src/contexts/env/providers_override.tf
+    template: terraform_providers_override.hbs
+  - config:
+      context: env
+    target: src/contexts/env/terraform.tf
+    template: terraform.hbs
+templates_path: src/templates
+terraform:
+  aws_version: '>= 5.56.1'
+  backend_bucket: terraform-state
+  backend_key: terraform.tfstate
+  backend_table: terraform-state-lock
+  terraform_version: '>= 1.9.0'

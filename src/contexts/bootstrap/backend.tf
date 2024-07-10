@@ -14,6 +14,6 @@ terraform {
     dynamodb_table       = "terraform-state-lock"
     key                  = "terraform.tfstate"
     region               = "us-east-1"
-    workspace_key_prefix = "acct"
+    workspace_key_prefix = "bootstrap"
   }
 }

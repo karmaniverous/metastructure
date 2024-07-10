@@ -5,6 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+
 output "id" {
   value = aws_s3_bucket.s3_access_log.id
 }

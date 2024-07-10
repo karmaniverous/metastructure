@@ -5,6 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+
 resource "aws_s3_bucket" "s3_access_log" {
   bucket = var.bucket_name
   tags = {

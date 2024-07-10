@@ -6,7 +6,6 @@ file at every commit. See the README for more info!
 */
 
 
-variable "role_name" {
-  description = "Role name"
-  type        = string
+output "role_name" {
+  value = aws_iam_role.role.name
 }

@@ -6,7 +6,13 @@ file at every commit. See the README for more info!
 */
 
 
-variable "role_name" {
-  description = "Role name"
-  type        = string
+terraform {
+  required_version = "~>1.4.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "= 4.59.0"
+    }
+  }
 }

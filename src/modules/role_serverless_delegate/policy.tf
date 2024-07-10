@@ -5,6 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+
 resource "aws_iam_policy" "serverless_delegate" {
   # gz 02/22/2023 TN-181
   # checkov:skip=CKV_AWS_287:Ensure IAM policies does not allow credentials exposure.

@@ -6,7 +6,6 @@ import { resolve } from 'path';
 import { type Config } from './Config';
 import { type ConsoleParams } from './ConsoleParams';
 import pkgDir from './pkgDir';
-import templateConfigs from './templateConfigs';
 
 interface ProcessTemplatesParams extends ConsoleParams {
   config?: Config;
@@ -21,34 +20,41 @@ export const processTemplates = async ({
   if (stdOut)
     process.stdout.write(chalk.black.bold('Processing templates...\n'));
 
-  for (const templateConfig of templateConfigs) {
-    if (stdOut)
-      process.stdout.write(
-        chalk.black.dim(`Generating ${templateConfig.path}...`),
-      );
+  if (config?.templates_path && config.templates?.length)
+    for (const templateConfig of config.templates) {
+      if (stdOut)
+        process.stdout.write(
+          chalk.black.dim(`Generating ${templateConfig.target}...`),
+        );
 
-    try {
-      // Load & compile template.
-      const template = Handlebars.compile(
-        await fs.readFile(
-          resolve(pkgDir, 'lib/templates', templateConfig.template),
-          'utf8',
-        ),
-      );
+      try {
+        // Load & compile template.
+        const template = Handlebars.compile(
+          await fs.readFile(
+            resolve(pkgDir, config.templates_path, templateConfig.template),
+            'utf8',
+          ),
+          { noEscape: true },
+        );
 
-      // Render template.
-      const rendered = template({ ...config, config: templateConfig, params });
+        // Render template.
+        const rendered = template({
+          ...config,
+          config: templateConfig.config,
+          params,
+        });
 
-      // Write to file.
-      await fs.outputFile(resolve(pkgDir, templateConfig.path), rendered);
+        // Write to file.
+        await fs.outputFile(resolve(pkgDir, templateConfig.target), rendered);
 
-      if (stdOut) process.stdout.write(chalk.green.dim(' Done!\n'));
-    } catch (error) {
-      if (stdOut) process.stdout.write(chalk.red(' Processing error!\n\n'));
-      console.log(chalk.red(error), '\n');
-      process.exit();
+        if (stdOut) process.stdout.write(chalk.green.dim(' Done!\n'));
+      } catch (error) {
+        if (stdOut) process.stdout.write(chalk.red(' Processing error!\n\n'));
+        console.log(chalk.red(error), '\n');
+        process.exit();
+      }
     }
-  }
+  else if (stdOut) process.stdout.write(chalk.black.dim('No templates.\n'));
 
   if (stdOut) process.stdout.write(chalk.green.bold('Done!\n\n'));
 };

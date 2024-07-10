@@ -24,9 +24,6 @@ export const ConfigSchema = z
       .object({
         aws_profile: z.string(),
         aws_region: z.string(),
-        backend_bucket: z.string(),
-        backend_key: z.string(),
-        backend_table: z.string(),
         github_org: z.string(),
         master_account: z.string(),
         namespace: z.string(),
@@ -39,6 +36,25 @@ export const ConfigSchema = z
         })
         .strict(),
     ),
+    templates: z
+      .object({
+        config: z.record(z.unknown()).optional(),
+        target: z.string(),
+        template: z.string(),
+      })
+      .strict()
+      .array()
+      .optional(),
+    templates_path: z.string().optional(),
+    terraform: z
+      .object({
+        aws_version: z.string(),
+        backend_bucket: z.string(),
+        backend_key: z.string(),
+        backend_table: z.string(),
+        terraform_version: z.string(),
+      })
+      .strict(),
   })
   .strict()
   // validate account.organizational_unit
@@ -80,6 +96,15 @@ export const ConfigSchema = z
         options: Object.keys(data.accounts),
         path: ['organization', 'master_account'],
         received: data.organization.master_account,
+      });
+  })
+  // validate templates_path
+  .superRefine((data, ctx) => {
+    if (data.templates && !data.templates_path)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `templates defined but missing templates_path`,
+        path: ['templates_path'],
       });
   });
 

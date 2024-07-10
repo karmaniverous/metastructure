@@ -5,6 +5,8 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+# This file is generated via nr cli init. Do not edit it manually!
+
 terraform {
   required_providers {
     aws = {

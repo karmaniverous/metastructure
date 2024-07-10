@@ -5,6 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+
 variable "bucket_name" {
   description = "Bucket name"
   type        = string

@@ -5,6 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
+
 locals {
   account_id = module.globals.aws_accounts[module.globals.app_environments[terraform.workspace].aws_account].id
 }
