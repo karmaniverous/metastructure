@@ -6,7 +6,12 @@ file at every commit. See the README for more info!
 */
 
 ###############################################################################
-# This file is generated via `nr cli config`. Do not edit it manually!
+###############################################################################
+####                                                                       ####
+####              THIS FILE WAS GENERATED WITH nr cli config               ####
+####                       DO NOT EDIT IT MANUALLY!                        ####
+####                                                                       ####
+###############################################################################
 ###############################################################################
 
 ###############################################################################
@@ -24,17 +29,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Core Development Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Core Development Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_dev_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_dev
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_dev_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Core Development Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_dev_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_dev_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ###############################################################################
@@ -52,17 +61,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Identity Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Identity Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_identity_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_identity
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_identity_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Identity Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_identity_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_identity_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ###############################################################################
@@ -80,17 +93,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Log Archive Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Log Archive Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_log_archive_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_log_archive
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_log_archive_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Log Archive Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_log_archive_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_log_archive_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ###############################################################################
@@ -108,17 +125,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Core Production Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Core Production Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_prod_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_prod
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_prod_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Core Production Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_prod_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_prod_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ###############################################################################
@@ -136,17 +157,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Core Shared Services Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Core Shared Services Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_shared_services_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_shared_services
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_shared_services_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Core Shared Services Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_shared_services_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_shared_services_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ###############################################################################
@@ -164,16 +189,20 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the Core Test Account
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the Core Test Account
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "shared_services_assume_test_terraform_deployment_role" {
-  source = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_test
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "shared_services_assume_test_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the Core Test Account 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "shared_services_assume_test_terraform_deployment_role_policy" {
+  role       = aws_iam_role.shared_services_assume_test_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 

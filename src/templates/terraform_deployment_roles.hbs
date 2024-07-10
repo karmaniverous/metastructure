@@ -1,5 +1,10 @@
 ###############################################################################
-# This file is generated via `nr cli config`. Do not edit it manually!
+###############################################################################
+####                                                                       ####
+####              THIS FILE WAS GENERATED WITH nr cli config               ####
+####                       DO NOT EDIT IT MANUALLY!                        ####
+####                                                                       ####
+###############################################################################
 ###############################################################################
 
 {{#each accounts}}
@@ -18,17 +23,21 @@ provider "aws" {
 }
 
 ###############################################################################
-# Create a Terraform deployment role based on the {{this.name}}
-# and allow it to be assumed by the Terraform state account.
+# Create a Terraform deployment role on the {{this.name}}
+# and allow it to be assumed from the Terraform state account.
 ###############################################################################
-module "{{../terraform.state_account}}_assume_{{@key}}_terraform_deployment_role" {
-  source   = "../../modules/cross-account-role"
-  providers = {
-    aws = aws.assume_{{@key}}
-  }
-  assume_role_policy_json = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
-  role_name               = module.global.config.terraform.deployment_role
-  role_policy_arn         = "arn:aws:iam::aws:policy/AdministratorAccess"
+resource "aws_iam_role" "{{../terraform.state_account}}_assume_{{@key}}_terraform_deployment_role" {
+  name               = module.global.config.terraform.deployment_role
+  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+}
+
+###############################################################################
+# Attach a role policy to the {{this.name}} 
+# Terraform deployment role. 
+###############################################################################
+resource "aws_iam_role_policy_attachment" "{{../terraform.state_account}}_assume_{{@key}}_terraform_deployment_role_policy" {
+  role       = aws_iam_role.{{../terraform.state_account}}_assume_{{@key}}_terraform_deployment_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 {{/each}}

@@ -5,9 +5,9 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-terraform { 
+terraform {
   required_version = "~>1.4.0"
- 
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
