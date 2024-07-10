@@ -6,17 +6,17 @@ file at every commit. See the README for more info!
 */
 
 
-module "globals" {
-  source = "../../modules/globals"
+module "global" {
+  source = "../../modules/global"
 }
 
 module "s3_log_bucket" {
   source      = "../../modules/s3_log_bucket"
-  bucket_name = "${module.globals.namespace}-log-s3-${terraform.workspace}"
+  bucket_name = "${module.global.namespace}-log-s3-${terraform.workspace}"
 }
 
 module "waf_acl" {
   source                 = "../../modules/waf_acl"
-  cognito_user_pool_name = module.globals.app_environments[terraform.workspace].cognito_user_pool_name
-  namespace              = module.globals.namespace
+  cognito_user_pool_name = module.global.app_environments[terraform.workspace].cognito_user_pool_name
+  namespace              = module.global.namespace
 }

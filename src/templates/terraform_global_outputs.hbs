@@ -2,6 +2,7 @@
 # This file is generated via nr cli init. Do not edit it manually!
 ###############################################################################
 
-provider "aws" { 
-    profile = "{{organization.aws_profile}}" 
+output "config" { 
+    description = "Global config." 
+    value = {{json2tf (lodash "omit" this "templates" "templatesPath") 4 2}} 
 }

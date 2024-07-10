@@ -5,13 +5,12 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-
-module "globals" {
-  source = "../../modules/globals"
+module "global" {
+  source = "../../modules/global"
 }
 
 module "role_serverless_delegate" {
   source    = "../../modules/role_serverless_delegate"
-  role_name = "${module.globals.namespace}-serverless-delegate"
+  role_name = "${module.global.config}-serverless-delegate"
 }
 

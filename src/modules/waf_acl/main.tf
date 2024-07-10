@@ -6,12 +6,12 @@ file at every commit. See the README for more info!
 */
 
 
-module "globals" {
-  source = "../globals"
+module "global" {
+  source = "../global"
 }
 
 locals {
-  namespace = "${module.globals.namespace}-${terraform.workspace}-waf"
+  namespace = "${module.global.namespace}-${terraform.workspace}-waf"
 }
 
 # Define env WAF ACL.

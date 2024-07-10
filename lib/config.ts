@@ -26,7 +26,13 @@ export const ConfigSchema = z
         aws_region: z.string(),
         github_org: z.string(),
         master_account: z.string(),
-        namespace: z.string(),
+        taxonomy: z
+          .object({
+            namespace: z.string().optional(),
+            project: z.string().optional(),
+          })
+          .strict()
+          .optional(),
       })
       .strict(),
     organizational_units: z.record(
@@ -49,9 +55,9 @@ export const ConfigSchema = z
     terraform: z
       .object({
         aws_version: z.string(),
-        backend_bucket: z.string(),
-        backend_key: z.string(),
-        backend_table: z.string(),
+        state_bucket: z.string(),
+        state_key: z.string(),
+        state_table: z.string(),
         terraform_version: z.string(),
       })
       .strict(),

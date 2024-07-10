@@ -40,7 +40,7 @@ export const processTemplates = async ({
         // Render template.
         const rendered = template({
           ...config,
-          config: templateConfig.config,
+          config: templateConfig.config ?? {},
           params,
         });
 

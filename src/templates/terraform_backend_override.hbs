@@ -1,13 +1,15 @@
+###############################################################################
 # This file is generated via nr cli init. Do not edit it manually!
+###############################################################################
 
 terraform { {{#if params.localState}} 
     backend "local" {} {{else}}
     backend "s3" { 
         profile = "{{organization.aws_profile}}" 
-        bucket = "{{organization.namespace}}-{{terraform.backend_bucket}}"
+        bucket = "{{organization.taxonomy.namespace}}-{{terraform.state_bucket}}"
         encrypt = true 
-        dynamodb_table = "{{terraform.backend_table}}" 
-        key = "{{terraform.backend_key}}"
+        dynamodb_table = "{{terraform.state_table}}" 
+        key = "{{terraform.state_key}}"
         region = "{{organization.aws_region}}" 
         workspace_key_prefix = "{{config.context}}" 
     } {{/if}}

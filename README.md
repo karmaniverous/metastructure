@@ -45,7 +45,7 @@ All Terraform code is contained in the [`infrastructure`](./src/) directory, whi
 
 - The [`acct`](./src/env/) directory contains ACCOUNT-specific configurations. Each AWS account has its own Terraform workspace within this directory. Enter `terraform workspace list` to see the current list, and note that the `default` workspace is not used.
 
-- The [`globals`](./src/globals/) directory is a Terraform module that exports configuration values common to all Terraform code.
+- The [`global`](./src/global/) directory is a Terraform module that exports configuration values common to all Terraform code.
 
 - [`config.yml`](./src/config.yml) is the configuration file that drives project setup via the `nr init` script. In addition to global configs applicable to all contexts, this file captures key info about AWS accounts, application environments, GitHub branches, and the relationships between them.
 

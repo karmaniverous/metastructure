@@ -8,8 +8,8 @@ file at every commit. See the README for more info!
 ###############################################################################
 # Import global config.
 ###############################################################################
-module "globals" {
-  source = "../../modules/globals"
+module "global" {
+  source = "../../modules/global"
 }
 
 ###############################################################################
@@ -36,7 +36,7 @@ resource "aws_organizations_organization" "org" {
 # Create organizational units.
 ###############################################################################
 resource "aws_organizations_organizational_unit" "organizational_units" {
-  for_each  = module.globals.accounts
+  for_each  = module.global.config.organizational_units
   name      = each.value.name
   parent_id = aws_organizations_organization.org.roots[0].id
 }
@@ -45,7 +45,7 @@ resource "aws_organizations_organizational_unit" "organizational_units" {
 # Create accounts.
 ###############################################################################
 resource "aws_organizations_account" "accounts" {
-  for_each = module.globals.accounts
+  for_each = module.global.config.accounts
   email    = each.value.email
   name     = each.value.name
   lifecycle {
