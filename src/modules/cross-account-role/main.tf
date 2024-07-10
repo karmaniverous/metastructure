@@ -5,7 +5,6 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-
 ###############################################################################
 # Create a role with an assume role policy. The assume role policy is used to
 # grant permission for another account or service to assume this role.

@@ -33,11 +33,14 @@ resource "aws_organizations_organization" "org" {
 }
 
 ###############################################################################
-# Create organizational units.
+# Create organizational units. 
 ###############################################################################
 resource "aws_organizations_organizational_unit" "organizational_units" {
-  for_each  = module.global.config.organizational_units
-  name      = each.value.name
+  for_each = module.global.config.organizational_units
+  name     = each.value.name
+
+  # Keeping the hierarchy flat for now. We'll connect them with their parents 
+  # later.
   parent_id = aws_organizations_organization.org.roots[0].id
 }
 
@@ -47,13 +50,10 @@ resource "aws_organizations_organizational_unit" "organizational_units" {
 resource "aws_organizations_account" "accounts" {
   for_each = module.global.config.accounts
   email    = each.value.email
-  name     = each.value.name
   lifecycle {
     prevent_destroy = true
   }
-  parent_id = aws_organizations_organizational_unit.organizational_units[each.value.organizational_unit].id
+  name      = each.value.name
+  parent_id = contains(keys(each.value), "organizational_unit") ? aws_organizations_organizational_unit.organizational_units[each.value.organizational_unit].id : null
 }
-
-
-
 

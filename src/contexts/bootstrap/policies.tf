@@ -6,6 +6,22 @@ file at every commit. See the README for more info!
 */
 
 ###############################################################################
+# Policy document that assigns the Terraform state account as principal in 
+# an assume role policy for cross account access.
+###############################################################################
+data "aws_iam_policy_document" "crossaccount_assume_from_terraform_state_account" {
+  statement {
+    sid     = "AssumeFromTerraformStateAccount"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
+    }
+  }
+}
+
+###############################################################################
 # A policy document that provides read/write access to the necessary resources to
 # manage Terraform state in S3 and locking in DynamoDB
 ###############################################################################
@@ -16,8 +32,8 @@ data "aws_iam_policy_document" "terraform_admin" {
     actions = ["s3:*"]
 
     resources = [
-      "arn:aws:s3:::${var.terraform_state_bucket_name}",
-      "arn:aws:s3:::${var.terraform_state_bucket_name}/*",
+      "arn:aws:s3:::${module.global.config.terraform.state_bucket}",
+      "arn:aws:s3:::${module.global.config.terraform.state_bucket}/*",
     ]
   }
 
@@ -33,7 +49,7 @@ data "aws_iam_policy_document" "terraform_admin" {
     ]
 
     resources = [
-      "arn:aws:dynamodb:*:${aws_organizations_account.deployment.id}:table/${var.terraform_state_dynamodb_table}",
+      "arn:aws:dynamodb:*:${aws_organizations_account.accounts[module.global.config.terraform.state_account].id}:table/${module.global.config.terraform.state_table}",
     ]
   }
 
@@ -64,7 +80,7 @@ data "aws_iam_policy_document" "terraform_reader" {
     ]
 
     resources = [
-      "arn:aws:s3:::${var.terraform_state_bucket_name}",
+      "arn:aws:s3:::${module.global.config.terraform.state_bucket}",
     ]
   }
 
@@ -76,7 +92,7 @@ data "aws_iam_policy_document" "terraform_reader" {
     ]
 
     resources = [
-      "arn:aws:s3:::${var.terraform_state_bucket_name}/*",
+      "arn:aws:s3:::${module.global.config.terraform.state_bucket}/*",
     ]
   }
 }

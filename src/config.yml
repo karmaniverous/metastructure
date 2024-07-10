@@ -6,30 +6,27 @@
 accounts:
   dev:
     name: Core Development Account
-    email: dev@karmanivero.us
+    email: jscroft+karma.dev.000@gmail.com
     organizational_unit: dev
-  logging:
-    name: Core Logging Account
-    email: logging@karmanivero.us
+  identity:
+    name: Identity Account
+    email: jscroft+karma.identity.000@gmail.com
+    organizational_unit: infrastructure
+  log_archive:
+    name: Log Archive Account
+    email: jscroft+karma.log_archive.000@gmail.com
     organizational_unit: security
   prod:
     name: Core Production Account
-    email: prod@karmanivero.us
+    email: jscroft+karma.prod.000@gmail.com
     organizational_unit: prod
-  master:
-    name: Master Account
-    email: master@karmanivero.us
-  security:
-    name: Core Security Account
-    email: security@karmanivero.us
-    organizational_unit: security
   shared_services:
     name: Core Shared Services Account
-    email: shared.services@karmanivero.us
+    email: jscroft+karma.log_archive.000@gmail.com
     organizational_unit: infrastructure
   test:
     name: Core Test Account
-    email: test@karmanivero.us
+    email: jscroft+karma.log_archive.000@gmail.com
     organizational_unit: test
 environments:
   bali:
@@ -53,80 +50,74 @@ environments:
     cognito_user_pool_name: api-user-v0-seattle
     gha_on_push_branches: preview/**
 organization:
-  aws_profile: KARMA-TERRAFORM
   aws_region: us-east-1
   github_org: karmaniverous
-  master_account: master
   taxonomy:
     namespace: karma
 organizational_units:
   dev:
-    name: Development
+    name: Dev Workloads OU
+    parent: workloads
   infrastructure:
-    name: Infrastructure
+    name: Infrastructure OU
   prod:
-    name: Production
+    name: Dev Workloads OU
+    parent: workloads
   security:
-    name: Security
+    name: Security OU
   test:
-    name: Test
-  workload:
-    name: Workload
+    name: Test Workloads OU
+    parent: workloads
+  workloads:
+    name: Workloads OU
 templates:
-  - target: src/modules/global/outputs.tf
-    template: terraform_global_outputs.hbs
-  - config:
-      context: acct
-    target: src/contexts/acct/backend.tf
+  - template: terraform_global_outputs.hbs
+    target: src/modules/global/outputs.tf
+  - target: src/contexts/acct/backend.tf
     template: terraform_backend.hbs
-  - config:
+    config:
       context: acct
+  - template: terraform_backend_override.hbs
     target: src/contexts/acct/backend_override.tf
-    template: terraform_backend_override.hbs
-  - config:
+    config:
       context: acct
+  - template: terraform_providers_override.hbs
     target: src/contexts/acct/providers_override.tf
-    template: terraform_providers_override.hbs
-  - config:
-      context: acct
+  - template: terraform.hbs
     target: src/contexts/acct/terraform.tf
-    template: terraform.hbs
-  - config:
-      context: bootstrap
+  - template: terraform_backend.hbs
     target: src/contexts/bootstrap/backend.tf
-    template: terraform_backend.hbs
-  - config:
+    config:
       context: bootstrap
+  - template: terraform_backend_override.hbs
     target: src/contexts/bootstrap/backend_override.tf
-    template: terraform_backend_override.hbs
-  - config:
+    config:
       context: bootstrap
+  - template: terraform_deployment_roles.hbs
+    target: src/contexts/bootstrap/deployment_roles.tf
+  - template: terraform_providers_override.hbs
     target: src/contexts/bootstrap/providers_override.tf
-    template: terraform_providers_override.hbs
-  - config:
-      context: bootstrap
+  - template: terraform.hbs
     target: src/contexts/bootstrap/terraform.tf
-    template: terraform.hbs
-  - config:
-      context: env
+  - template: terraform_backend.hbs
     target: src/contexts/env/backend.tf
-    template: terraform_backend.hbs
-  - config:
+    config:
       context: env
+  - template: terraform_backend_override.hbs
     target: src/contexts/env/backend_override.tf
-    template: terraform_backend_override.hbs
-  - config:
+    config:
       context: env
+  - template: terraform_providers_override.hbs
     target: src/contexts/env/providers_override.tf
-    template: terraform_providers_override.hbs
-  - config:
-      context: env
+  - template: terraform.hbs
     target: src/contexts/env/terraform.tf
-    template: terraform.hbs
 templates_path: src/templates
 terraform:
+  aws_profile: KARMA-INIT
   aws_version: '>= 5.56.1'
+  state_account: shared_services
   state_bucket: terraform-state
   state_key: terraform.tfstate
   state_table: terraform-state-lock
+  deployment_role: TerraformDeployment
   terraform_version: '>= 1.9.0'

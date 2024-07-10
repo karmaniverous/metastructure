@@ -5,7 +5,6 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-
 #
 # ONLY EDIT THIS FILE IN github.com/cloudposse/terraform-null-label
 # All other instances of this file should be a copy of that one

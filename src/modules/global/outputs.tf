@@ -6,7 +6,7 @@ file at every commit. See the README for more info!
 */
 
 ###############################################################################
-# This file is generated via nr cli init. Do not edit it manually!
+# This file is generated via `nr cli config`. Do not edit it manually!
 ###############################################################################
 
 output "config" {
@@ -15,36 +15,32 @@ output "config" {
     accounts = {
       dev = {
         name                = "Core Development Account"
-        email               = "dev@karmanivero.us"
+        email               = "jscroft+karma.dev.000@gmail.com"
         organizational_unit = "dev"
       }
-      logging = {
-        name                = "Core Logging Account"
-        email               = "logging@karmanivero.us"
+      identity = {
+        name                = "Identity Account"
+        email               = "jscroft+karma.identity.000@gmail.com"
+        organizational_unit = "infrastructure"
+      }
+      log_archive = {
+        name                = "Log Archive Account"
+        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "security"
       }
       prod = {
         name                = "Core Production Account"
-        email               = "prod@karmanivero.us"
+        email               = "jscroft+karma.prod.000@gmail.com"
         organizational_unit = "prod"
-      }
-      master = {
-        name  = "Master Account"
-        email = "master@karmanivero.us"
-      }
-      security = {
-        name                = "Core Security Account"
-        email               = "security@karmanivero.us"
-        organizational_unit = "security"
       }
       shared_services = {
         name                = "Core Shared Services Account"
-        email               = "shared.services@karmanivero.us"
+        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "infrastructure"
       }
       test = {
         name                = "Core Test Account"
-        email               = "test@karmanivero.us"
+        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "test"
       }
     }
@@ -76,37 +72,41 @@ output "config" {
       }
     }
     organization = {
-      aws_profile    = "KARMA-TERRAFORM"
-      aws_region     = "us-east-1"
-      github_org     = "karmaniverous"
-      master_account = "master"
+      aws_region = "us-east-1"
+      github_org = "karmaniverous"
       taxonomy = {
         namespace = "karma"
       }
     }
     organizational_units = {
       dev = {
-        name = "Development"
+        name   = "Dev Workloads OU"
+        parent = "workloads"
       }
       infrastructure = {
-        name = "Infrastructure"
+        name = "Infrastructure OU"
       }
       prod = {
-        name = "Production"
+        name   = "Dev Workloads OU"
+        parent = "workloads"
       }
       security = {
-        name = "Security"
+        name = "Security OU"
       }
       test = {
-        name = "Test"
+        name   = "Test Workloads OU"
+        parent = "workloads"
       }
-      workload = {
-        name = "Workload"
+      workloads = {
+        name = "Workloads OU"
       }
     }
     templates_path = "src/templates"
     terraform = {
+      aws_profile       = "KARMA-INIT"
       aws_version       = ">= 5.56.1"
+      deployment_role   = "TerraformDeployment"
+      state_account     = "shared_services"
       state_bucket      = "terraform-state"
       state_key         = "terraform.tfstate"
       state_table       = "terraform-state-lock"
@@ -114,7 +114,7 @@ output "config" {
     }
     config = {}
     params = {
-      localState = undefined
+      localState = true
     }
   }
 }

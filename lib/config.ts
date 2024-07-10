@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { z } from 'zod';
 
 export const ConfigSchema = z
@@ -22,10 +23,8 @@ export const ConfigSchema = z
     ),
     organization: z
       .object({
-        aws_profile: z.string(),
         aws_region: z.string(),
         github_org: z.string(),
-        master_account: z.string(),
         taxonomy: z
           .object({
             namespace: z.string().optional(),
@@ -39,6 +38,7 @@ export const ConfigSchema = z
       z
         .object({
           name: z.string(),
+          parent: z.string().optional(),
         })
         .strict(),
     ),
@@ -54,7 +54,10 @@ export const ConfigSchema = z
     templates_path: z.string().optional(),
     terraform: z
       .object({
+        aws_profile: z.string().optional(),
         aws_version: z.string(),
+        deployment_role: z.string(),
+        state_account: z.string(),
         state_bucket: z.string(),
         state_key: z.string(),
         state_table: z.string(),
@@ -76,7 +79,7 @@ export const ConfigSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
           message: `invalid organizational_unit`,
-          options: Object.keys(data.organizational_units),
+          options: _.keys(data.organizational_units),
           path: ['accounts', account, 'organizational_unit'],
           received: data.accounts[account].organizational_unit,
         });
@@ -88,20 +91,43 @@ export const ConfigSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
           message: `invalid account`,
-          options: Object.keys(data.accounts),
+          options: _.keys(data.accounts),
           path: ['environments', environment, 'account'],
           received: data.environments[environment].account,
         });
   })
-  // validate organization.master_account
+  // validate organizational_unit.parent
+  // TODO: validate circular dependencies
   .superRefine((data, ctx) => {
-    if (!(data.organization.master_account in data.accounts))
+    for (const organizational_unit in data.organizational_units) {
+      const parent = data.organizational_units[organizational_unit].parent;
+
+      if (
+        parent &&
+        (parent === organizational_unit ||
+          !(parent in data.organizational_units))
+      )
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          message: `invalid organizational_unit parent`,
+          options: _.without(
+            _.keys(data.organizational_units),
+            organizational_unit,
+          ),
+          path: ['organizational_units', organizational_unit, 'parent'],
+          received: parent,
+        });
+    }
+  })
+  // validate terraform.state_account
+  .superRefine((data, ctx) => {
+    if (!(data.terraform.state_account in data.accounts))
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_enum_value,
         message: `invalid account`,
-        options: Object.keys(data.accounts),
-        path: ['organization', 'master_account'],
-        received: data.organization.master_account,
+        options: _.keys(data.accounts),
+        path: ['terraform', 'state_account'],
+        received: data.terraform.state_account,
       });
   })
   // validate templates_path
