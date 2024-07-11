@@ -16,8 +16,9 @@ variable "delegated_policy_arns" {
 
 }
 
-variable "delegator_account_ids" {
+# TODO: Support more than just AWS principals.
+variable "delegator_principals" {
   type        = list(string)
-  description = "A list of the delegator account ids from which the delegator role will assume the delegated role."
+  description = "A list of the delegator AWS principals from which the delegator role will assume the delegated role."
 }
 

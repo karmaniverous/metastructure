@@ -33,6 +33,10 @@ output "config" {
         email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "security"
       }
+      master = {
+        name  = "Master Account"
+        email = "infra-abc@karmanivero.us"
+      }
       prod = {
         name                = "Core Production Account"
         email               = "jscroft+karma.prod.000@gmail.com"
@@ -77,9 +81,11 @@ output "config" {
       }
     }
     organization = {
-      aws_region = "us-east-1"
-      github_org = "karmaniverous"
-      namespace  = "karma"
+      aws_region     = "us-east-1"
+      github_org     = "karmaniverous"
+      id             = "o-3f4ig2op2b"
+      master_account = "master"
+      namespace      = "karma"
     }
     organizational_units = {
       dev = {

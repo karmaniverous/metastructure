@@ -42,10 +42,10 @@ provider "aws" {
 # {{this.name}}.
 ###############################################################################
 provider "aws" {
-  alias   = "{{@key}}"
+  alias   = "{{@key}}" {{#if (lodash "eq" @key ../organization.master_account)}} {{else}}
   assume_role {
     role_arn = "arn:aws:iam::${aws_organizations_account.accounts["{{@key}}"].id}:role/OrganizationAccountAccessRole"
-  }
+  } {{/if}}
   default_tags {
     tags = {
       Terraform = true

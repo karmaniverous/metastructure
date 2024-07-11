@@ -8,6 +8,7 @@ export const ConfigSchema = z
         .object({
           name: z.string(),
           email: z.string(),
+          id: z.string().optional(),
           organizational_unit: z.string().optional(),
         })
         .strict(),
@@ -25,6 +26,8 @@ export const ConfigSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
+        id: z.string().optional(),
+        master_account: z.string(),
         namespace: z.string().optional(),
       })
       .strict(),
@@ -93,6 +96,17 @@ export const ConfigSchema = z
           path: ['environments', environment, 'account'],
           received: data.environments[environment].account,
         });
+  })
+  // validate organization.master_account
+  .superRefine((data, ctx) => {
+    if (!(data.organization.master_account in data.accounts))
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_enum_value,
+        message: `invalid account`,
+        options: _.keys(data.accounts),
+        path: ['organization', 'master_account'],
+        received: data.organization.master_account,
+      });
   })
   // validate organizational_unit.parent
   // TODO: validate circular dependencies

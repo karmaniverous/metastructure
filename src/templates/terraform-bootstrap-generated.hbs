@@ -10,7 +10,8 @@
 {{#each accounts}}
 ###############################################################################
 # Create a Terraform deployment role on the {{this.name}}
-# and allow it to be assumed from the Terraform state account.
+# and allow it to be assumed from the Terraform deployment delegator role at
+# the Terraform state account.
 ###############################################################################
 module "{{@key}}_terraform_deployment_role" {
   source = "../../modules/delegated-role"
@@ -18,8 +19,16 @@ module "{{@key}}_terraform_deployment_role" {
     aws = aws.{{@key}}
   }
   delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_account_ids   = [aws_organizations_account.accounts["{{../terraform.state_account}}"].id]
+  delegator_principals   = ["arn:aws:iam::${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
   delegated_role_name    = module.global.config.terraform.deployment_role
 }
 
 {{/each}}
+###############################################################################
+# Import master account.
+###############################################################################
+import {
+  to = aws_organizations_account.accounts["{{organization.master_account}}"]
+  id = data.aws_caller_identity.current.account_id
+}
+

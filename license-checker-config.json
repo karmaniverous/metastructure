@@ -12,7 +12,8 @@
     "license.txt",
     "*/**/.terraform.lock.hcl",
     "*/**/.terraform/*",
-    "**/*.hbs"
+    "**/*.hbs",
+    "**/*.tfstate"
   ],
   "ignoreFile": "./.gitignore",
   "license": "src/license.txt",

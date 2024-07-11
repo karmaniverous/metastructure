@@ -16,6 +16,9 @@ accounts:
     name: Log Archive Account
     email: jscroft+karma.log_archive.000@gmail.com
     organizational_unit: security
+  master:
+    name: Master Account
+    email: infra-abc@karmanivero.us
   prod:
     name: Core Production Account
     email: jscroft+karma.prod.000@gmail.com
@@ -52,6 +55,8 @@ environments:
 organization:
   aws_region: us-east-1
   github_org: karmaniverous
+  id: o-3f4ig2op2b
+  master_account: master
   namespace: karma
 organizational_units:
   dev:
@@ -96,8 +101,8 @@ targets:
     template: terraform-providers.hbs
   src/contexts/bootstrap/providers_override.tf:
     template: terraform-providers-override.hbs
-  src/contexts/bootstrap/roles-deployment.tf:
-    template: terraform-bootstrap-roles-deployment.hbs
+  src/contexts/bootstrap/generated.tf:
+    template: terraform-bootstrap-generated.hbs
   src/contexts/bootstrap/terraform.tf:
     template: terraform.hbs
   src/contexts/env/backend.tf:

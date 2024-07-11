@@ -96,6 +96,20 @@ provider "aws" {
 
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
+# Master Account.
+###############################################################################
+provider "aws" {
+  alias = "master"
+  default_tags {
+    tags = {
+      Terraform = true
+    }
+  }
+  region = module.global.config.organization.aws_region
+}
+
+###############################################################################
+# Create a provider to assume the OrganizationAccountAccessRole role on the 
 # Core Production Account.
 ###############################################################################
 provider "aws" {

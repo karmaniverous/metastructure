@@ -33,6 +33,14 @@ resource "aws_organizations_organization" "org" {
 }
 
 ###############################################################################
+# Import organization.
+###############################################################################
+import {
+  to = aws_organizations_organization.org
+  id = module.global.config.organization.id
+}
+
+###############################################################################
 # Create organizational units. 
 ###############################################################################
 resource "aws_organizations_organizational_unit" "organizational_units" {
@@ -51,6 +59,7 @@ resource "aws_organizations_account" "accounts" {
   for_each = module.global.config.accounts
   email    = each.value.email
   lifecycle {
+    ignore_changes  = [email, name]
     prevent_destroy = true
   }
   name      = each.value.name
@@ -82,7 +91,7 @@ module "terraform_admin_role" {
     aws = aws.terraform_state_account
   }
   delegated_policy_arns = [aws_iam_policy.terraform_admin.arn]
-  delegator_account_ids = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
+  delegator_principals  = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
   delegated_role_name   = module.global.config.terraform.admin_role
 }
 
@@ -95,7 +104,7 @@ module "terraform_reader_role" {
     aws = aws.terraform_state_account
   }
   delegated_policy_arns = [aws_iam_policy.terraform_reader.arn]
-  delegator_account_ids = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
+  delegator_principals  = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
   delegated_role_name   = module.global.config.terraform.reader_role
 }
 

@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "delegators" {
 
     principals {
       type        = "AWS"
-      identifiers = var.delegator_account_ids
+      identifiers = var.delegator_principals
     }
   }
 }
