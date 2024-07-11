@@ -20,7 +20,7 @@ terraform {
     encrypt              = true
     dynamodb_table       = "terraform-state-lock"
     key                  = "terraform.tfstate"
-    region               = ""
+    region               = "us-east-1"
     workspace_key_prefix = "env"
   }
 }

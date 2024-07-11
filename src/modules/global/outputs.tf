@@ -105,10 +105,12 @@ output "config" {
       }
     }
     terraform = {
+      admin_role                = "TerraformAdmin"
       aws_profile               = "KARMA-INIT"
       aws_version               = ">= 5.56.1"
-      deployment_delegated_role = "TerraformDeploymentDelegated"
+      deployment_role           = "TerraformDeployment"
       deployment_delegator_role = "TerraformDeploymentDelegator"
+      reader_role               = "TerraformReader"
       state_account             = "shared_services"
       state_bucket              = "karma-terraform-state"
       state_key                 = "terraform.tfstate"

@@ -16,13 +16,8 @@ variable "delegated_policy_arns" {
 
 }
 
-variable "delegator_account_id" {
-  type        = string
-  description = "The id of the delegator account from which the delegator role will assume the delegated role."
-}
-
-variable "delegator_account_name" {
-  type        = string
-  description = "The name of the delegator account from which the delegator role will assume the delegated role."
+variable "delegator_account_ids" {
+  type        = list(string)
+  description = "A list of the delegator account ids from which the delegator role will assume the delegated role."
 }
 

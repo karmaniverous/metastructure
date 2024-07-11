@@ -49,10 +49,12 @@ export const ConfigSchema = z
     templates_path: z.string().optional(),
     terraform: z
       .object({
+        admin_role: z.string(),
         aws_profile: z.string().optional(),
         aws_version: z.string(),
-        deployment_delegated_role: z.string(),
+        deployment_role: z.string(),
         deployment_delegator_role: z.string(),
+        reader_role: z.string(),
         state_account: z.string(),
         state_bucket: z.string(),
         state_key: z.string(),

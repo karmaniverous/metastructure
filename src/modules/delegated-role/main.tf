@@ -9,14 +9,14 @@ file at every commit. See the README for more info!
 # Policy document that grants AssumeRole permission to principals from 
 # DelegatorAccount.
 ###############################################################################
-data "aws_iam_policy_document" "delegate" {
+data "aws_iam_policy_document" "delegators" {
   statement {
-    sid     = "AssumeRoleFrom${replace(title(var.delegator_account_name), "/-| /", "")}"
+    sid     = "DelegatorAccounts"
     actions = ["sts:AssumeRole"]
 
     principals {
       type        = "AWS"
-      identifiers = [var.delegator_account_id]
+      identifiers = var.delegator_account_ids
     }
   }
 }
@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "delegate" {
 ###############################################################################
 resource "aws_iam_role" "delegated" {
   name               = var.delegated_role_name
-  assume_role_policy = data.aws_iam_policy_document.delegate.json
+  assume_role_policy = data.aws_iam_policy_document.delegators.json
 }
 
 ###############################################################################

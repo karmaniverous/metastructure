@@ -57,3 +57,45 @@ resource "aws_organizations_account" "accounts" {
   parent_id = contains(keys(each.value), "organizational_unit") ? aws_organizations_organizational_unit.organizational_units[each.value.organizational_unit].id : null
 }
 
+###############################################################################
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on all other accounts.
+###############################################################################
+module "terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.terraform_state_account
+  }
+  delegated_roles = [for account in keys(module.global.config.accounts) : {
+    delegate_account_id = aws_organizations_account.accounts[account].id
+    delegated_role_name = module.global.config.terraform.deployment_role
+  } if account != module.global.config.terraform.state_account]
+  delegator_role_name = module.global.config.terraform.deployment_delegator_role
+}
+
+###############################################################################
+# Create a Terraform Admin role on the Terraform state account.
+###############################################################################
+module "terraform_admin_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.terraform_state_account
+  }
+  delegated_policy_arns = [aws_iam_policy.terraform_admin.arn]
+  delegator_account_ids = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
+  delegated_role_name   = module.global.config.terraform.admin_role
+}
+
+###############################################################################
+# Create a Terraform Reader role on the Terraform state account.
+###############################################################################
+module "terraform_reader_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.terraform_state_account
+  }
+  delegated_policy_arns = [aws_iam_policy.terraform_reader.arn]
+  delegator_account_ids = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
+  delegated_role_name   = module.global.config.terraform.reader_role
+}
+

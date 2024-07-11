@@ -5,23 +5,16 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-variable "delegate_account_id" {
-  type        = string
-  description = "The id of the delegate account where the delegator role will assume the delegated role."
-}
-
-variable "delegate_account_name" {
-  type        = string
-  description = "The name of the delegate account where the delegator role will assume the delegated role."
-}
-
-variable "delegated_role_name" {
-  type        = string
-  description = "The name of the delegated role that the delegator role will assume at the delegate account."
+variable "delegated_roles" {
+  description = "A list of maps containing the delegate account id and the delegated role name"
+  type = list(object({
+    delegate_account_id = string
+    delegated_role_name = string
+  }))
 }
 
 variable "delegator_role_name" {
+  description = "The name of the delegator role that will assume the delegated roles at the delegate accounts."
   type        = string
-  description = "The name of the delegator role that will assume the delegated role at the delegate account."
 }
 

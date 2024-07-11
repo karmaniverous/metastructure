@@ -11,14 +11,12 @@ file at every commit. See the README for more info!
 ###############################################################################
 data "aws_iam_policy_document" "delegator" {
   statement {
-    sid = "Assume${replace(title(var.delegate_account_name), "/-| /", "")}${replace(title(var.delegated_role_name), "/-| /", "")}Role"
+    sid = "AssumeDelegatedRole"
     actions = [
       "sts:AssumeRole"
     ]
 
-    resources = [
-      "arn:aws:iam::${var.delegate_account_id}:role/${var.delegated_role_name}",
-    ]
+    resources = [for r in var.delegated_roles : "arn:aws:iam::${r.delegate_account_id}:role/${r.delegated_role_name}"]
   }
 }
 
@@ -27,6 +25,6 @@ data "aws_iam_policy_document" "delegator" {
 # DelegatorAccount.
 ###############################################################################
 resource "aws_iam_role" "delegator" {
-  name               = var.delegated_role_name
+  name               = var.delegator_role_name
   assume_role_policy = data.aws_iam_policy_document.delegator.json
 }

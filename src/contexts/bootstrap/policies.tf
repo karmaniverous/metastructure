@@ -6,24 +6,8 @@ file at every commit. See the README for more info!
 */
 
 ###############################################################################
-# Policy document that assigns the Terraform state account as principal in 
-# an assume role policy for cross account access.
-###############################################################################
-data "aws_iam_policy_document" "crossaccount_assume_from_terraform_state_account" {
-  statement {
-    sid     = "AssumeFromTerraformStateAccount"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
-    }
-  }
-}
-
-###############################################################################
-# A policy document that provides read/write access to the necessary resources to
-# manage Terraform state in S3 and locking in DynamoDB
+# Create a Terraform Admin policy at the Terraform state account that permits
+# management & locking of Terraform state.
 ###############################################################################
 data "aws_iam_policy_document" "terraform_admin" {
   statement {
@@ -67,9 +51,16 @@ data "aws_iam_policy_document" "terraform_admin" {
   }
 }
 
+resource "aws_iam_policy" "terraform_admin" {
+  name        = module.global.config.terraform.admin_role
+  policy      = data.aws_iam_policy_document.terraform_admin.json
+  description = "Permits management & locking of Terraform state."
+  provider    = aws.terraform_state_account
+}
+
 ###############################################################################
-# A policy document that provides read access to the necessary resources to
-# list and read Terraform state from S3
+# Create a Terraform Reader policy at the Terraform state account that permits
+# read-only access to Terraform state.
 ###############################################################################
 data "aws_iam_policy_document" "terraform_reader" {
   statement {
@@ -96,3 +87,11 @@ data "aws_iam_policy_document" "terraform_reader" {
     ]
   }
 }
+
+resource "aws_iam_policy" "terraform_reader" {
+  name        = module.global.config.terraform.reader_role
+  policy      = data.aws_iam_policy_document.terraform_reader.json
+  description = "Permits management & locking of Terraform state."
+  provider    = aws.terraform_state_account
+}
+

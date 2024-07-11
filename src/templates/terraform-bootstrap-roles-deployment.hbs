@@ -1,0 +1,25 @@
+###############################################################################
+###############################################################################
+####                                                                       ####
+####              THIS FILE WAS GENERATED WITH nr cli config               ####
+####                       DO NOT EDIT IT MANUALLY!                        ####
+####                                                                       ####
+###############################################################################
+###############################################################################
+
+{{#each accounts}}
+###############################################################################
+# Create a Terraform deployment role on the {{this.name}}
+# and allow it to be assumed from the Terraform state account.
+###############################################################################
+module "{{@key}}_terraform_deployment_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.{{@key}}
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_ids   = [aws_organizations_account.accounts["{{../terraform.state_account}}"].id]
+  delegated_role_name    = module.global.config.terraform.deployment_role
+}
+
+{{/each}}

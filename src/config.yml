@@ -71,51 +71,55 @@ organizational_units:
     name: Workloads OU
 targets:
   src/modules/global/outputs.tf:
-    template: terraform_global_outputs.hbs
+    template: terraform-global-outputs.hbs
   src/contexts/acct/backend.tf:
-    template: terraform_backend.hbs
+    template: terraform-backend.hbs
     config:
       context: acct
   src/contexts/acct/backend_override.tf:
-    template: terraform_backend_override.hbs
+    template: terraform-backend-override.hbs
     config:
       context: acct
   src/contexts/acct/providers_override.tf:
-    template: terraform_providers_override.hbs
+    template: terraform-providers-override.hbs
   src/contexts/acct/terraform.tf:
     template: terraform.hbs
   src/contexts/bootstrap/backend.tf:
-    template: terraform_backend.hbs
+    template: terraform-backend.hbs
     config:
       context: bootstrap
   src/contexts/bootstrap/backend_override.tf:
-    template: terraform_backend_override.hbs
+    template: terraform-backend-override.hbs
     config:
       context: bootstrap
-  src/contexts/bootstrap/deployment_roles.tf:
-    template: terraform_bootstrap_deployment_roles.hbs
+  src/contexts/bootstrap/providers.tf:
+    template: terraform-providers.hbs
   src/contexts/bootstrap/providers_override.tf:
-    template: terraform_providers_override.hbs
+    template: terraform-providers-override.hbs
+  src/contexts/bootstrap/roles-deployment.tf:
+    template: terraform-bootstrap-roles-deployment.hbs
   src/contexts/bootstrap/terraform.tf:
     template: terraform.hbs
   src/contexts/env/backend.tf:
-    template: terraform_backend.hbs
+    template: terraform-backend.hbs
     config:
       context: env
   src/contexts/env/backend_override.tf:
-    template: terraform_backend_override.hbs
+    template: terraform-backend-override.hbs
     config:
       context: env
   src/contexts/env/providers_override.tf:
-    template: terraform_providers_override.hbs
+    template: terraform-providers-override.hbs
   src/contexts/env/terraform.tf:
     template: terraform.hbs
 templates_path: src/templates
 terraform:
+  admin_role: TerraformAdmin
   aws_profile: KARMA-INIT
   aws_version: '>= 5.56.1'
-  deployment_delegated_role: TerraformDeploymentDelegated
+  deployment_role: TerraformDeployment
   deployment_delegator_role: TerraformDeploymentDelegator
+  reader_role: TerraformReader
   state_account: shared_services
   state_bucket: '{{#if organization.namespace}}{{organization.namespace}}-{{/if}}terraform-state'
   state_key: terraform.tfstate
