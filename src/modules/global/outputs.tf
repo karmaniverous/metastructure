@@ -110,7 +110,7 @@ output "config" {
       deployment_delegated_role = "TerraformDeploymentDelegated"
       deployment_delegator_role = "TerraformDeploymentDelegator"
       state_account             = "shared_services"
-      state_bucket              = "terraform-state"
+      state_bucket              = "karma-terraform-state"
       state_key                 = "terraform.tfstate"
       state_table               = "terraform-state-lock"
       terraform_version         = ">= 1.9.0"

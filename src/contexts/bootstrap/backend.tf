@@ -16,7 +16,7 @@ file at every commit. See the README for more info!
 
 terraform {
   backend "s3" {
-    bucket               = "terraform-state"
+    bucket               = "karma-terraform-state"
     encrypt              = true
     dynamodb_table       = "terraform-state-lock"
     key                  = "terraform.tfstate"
