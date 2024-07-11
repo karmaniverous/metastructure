@@ -5,13 +5,7 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-
-provider "aws" {
-  default_tags {
-    tags = {
-      Terraform = true
-    }
-  }
-  region = "us-east-1"
+output "role_name" {
+  description = "Delegator role name."
+  value       = aws_iam_role.delegator.name
 }
-

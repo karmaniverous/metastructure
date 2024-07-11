@@ -106,20 +106,16 @@ output "config" {
         name = "Workloads OU"
       }
     }
-    templates_path = "src/templates"
     terraform = {
-      aws_profile       = "KARMA-INIT"
-      aws_version       = ">= 5.56.1"
-      deployment_role   = "TerraformDeployment"
-      state_account     = "shared_services"
-      state_bucket      = "terraform-state"
-      state_key         = "terraform.tfstate"
-      state_table       = "terraform-state-lock"
-      terraform_version = ">= 1.9.0"
-    }
-    config = {}
-    params = {
-      localState = true
+      aws_profile               = "KARMA-INIT"
+      aws_version               = ">= 5.56.1"
+      deployment_delegated_role = "TerraformDeploymentDelegated"
+      deployment_delegator_role = "TerraformDeploymentDelegator"
+      state_account             = "shared_services"
+      state_bucket              = "terraform-state"
+      state_key                 = "terraform.tfstate"
+      state_table               = "terraform-state-lock"
+      terraform_version         = ">= 1.9.0"
     }
   }
 }

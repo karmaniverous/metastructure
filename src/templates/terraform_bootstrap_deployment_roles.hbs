@@ -1,0 +1,54 @@
+###############################################################################
+###############################################################################
+####                                                                       ####
+####              THIS FILE WAS GENERATED WITH nr cli config               ####
+####                       DO NOT EDIT IT MANUALLY!                        ####
+####                                                                       ####
+###############################################################################
+###############################################################################
+
+{{#each accounts}}
+###############################################################################
+# Create a provider to assume the OrganizationAccountAccessRole role on the 
+# {{this.name}}.
+###############################################################################
+provider "aws" {
+  alias   = "{{@key}}"
+  assume_role {
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["{{@key}}"].id}:role/OrganizationAccountAccessRole"
+  }
+  profile = "{{../terraform.aws_profile}}" 
+  region  = module.global.config.organization.aws_region
+}
+
+###############################################################################
+# Create a delegated role for Terraform deployment on the {{this.name}}
+# and allow it to be assumed from the Terraform state account.
+###############################################################################
+module "{{@key}}_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.{{@key}}
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["{{../terraform.state_account}}"].id
+  delegator_account_name = "{{../terraform.state_account}}"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
+}
+
+###############################################################################
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the {{this.name}}.
+###############################################################################
+module "{{@key}}_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.{{../terraform.state_account}}
+  }
+  delegate_account_id   = aws_organizations_account.accounts["{{@key}}"].id
+  delegate_account_name = aws_organizations_account.accounts["{{@key}}"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
+}
+
+{{/each}}

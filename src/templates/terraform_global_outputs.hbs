@@ -9,5 +9,5 @@
 
 output "config" { 
     description = "Global config." 
-    value = {{json2tf (lodash "omit" this "templates" "templatesPath") 4 2}} 
+    value = {{json2tf (lodash "omit" this "config" "params" "targets" "templates_path") 4 2}} 
 }

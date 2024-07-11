@@ -42,21 +42,23 @@ export const ConfigSchema = z
         })
         .strict(),
     ),
-    templates: z
-      .object({
-        config: z.record(z.unknown()).optional(),
-        target: z.string(),
-        template: z.string(),
-      })
-      .strict()
-      .array()
+    targets: z
+      .record(
+        z
+          .object({
+            config: z.record(z.unknown()).optional(),
+            template: z.string(),
+          })
+          .strict(),
+      )
       .optional(),
     templates_path: z.string().optional(),
     terraform: z
       .object({
         aws_profile: z.string().optional(),
         aws_version: z.string(),
-        deployment_role: z.string(),
+        deployment_delegated_role: z.string(),
+        deployment_delegator_role: z.string(),
         state_account: z.string(),
         state_bucket: z.string(),
         state_key: z.string(),
@@ -132,10 +134,10 @@ export const ConfigSchema = z
   })
   // validate templates_path
   .superRefine((data, ctx) => {
-    if (data.templates && !data.templates_path)
+    if (data.targets && !data.templates_path)
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `templates defined but missing templates_path`,
+        message: `targets defined but missing templates_path`,
         path: ['templates_path'],
       });
   });

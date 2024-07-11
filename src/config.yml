@@ -70,54 +70,55 @@ organizational_units:
     parent: workloads
   workloads:
     name: Workloads OU
-templates:
-  - template: terraform_global_outputs.hbs
-    target: src/modules/global/outputs.tf
-  - target: src/contexts/acct/backend.tf
+targets:
+  src/modules/global/outputs.tf:
+    template: terraform_global_outputs.hbs
+  src/contexts/acct/backend.tf:
     template: terraform_backend.hbs
     config:
       context: acct
-  - template: terraform_backend_override.hbs
-    target: src/contexts/acct/backend_override.tf
+  src/contexts/acct/backend_override.tf:
+    template: terraform_backend_override.hbs
     config:
       context: acct
-  - template: terraform_providers_override.hbs
-    target: src/contexts/acct/providers_override.tf
-  - template: terraform.hbs
-    target: src/contexts/acct/terraform.tf
-  - template: terraform_backend.hbs
-    target: src/contexts/bootstrap/backend.tf
+  src/contexts/acct/providers_override.tf:
+    template: terraform_providers_override.hbs
+  src/contexts/acct/terraform.tf:
+    template: terraform.hbs
+  src/contexts/bootstrap/backend.tf:
+    template: terraform_backend.hbs
     config:
       context: bootstrap
-  - template: terraform_backend_override.hbs
-    target: src/contexts/bootstrap/backend_override.tf
+  src/contexts/bootstrap/backend_override.tf:
+    template: terraform_backend_override.hbs
     config:
       context: bootstrap
-  - template: terraform_deployment_roles.hbs
-    target: src/contexts/bootstrap/deployment_roles.tf
-  - template: terraform_providers_override.hbs
-    target: src/contexts/bootstrap/providers_override.tf
-  - template: terraform.hbs
-    target: src/contexts/bootstrap/terraform.tf
-  - template: terraform_backend.hbs
-    target: src/contexts/env/backend.tf
+  src/contexts/bootstrap/deployment_roles.tf:
+    template: terraform_bootstrap_deployment_roles.hbs
+  src/contexts/bootstrap/providers_override.tf:
+    template: terraform_providers_override.hbs
+  src/contexts/bootstrap/terraform.tf:
+    template: terraform.hbs
+  src/contexts/env/backend.tf:
+    template: terraform_backend.hbs
     config:
       context: env
-  - template: terraform_backend_override.hbs
-    target: src/contexts/env/backend_override.tf
+  src/contexts/env/backend_override.tf:
+    template: terraform_backend_override.hbs
     config:
       context: env
-  - template: terraform_providers_override.hbs
-    target: src/contexts/env/providers_override.tf
-  - template: terraform.hbs
-    target: src/contexts/env/terraform.tf
+  src/contexts/env/providers_override.tf:
+    template: terraform_providers_override.hbs
+  src/contexts/env/terraform.tf:
+    template: terraform.hbs
 templates_path: src/templates
 terraform:
   aws_profile: KARMA-INIT
   aws_version: '>= 5.56.1'
+  deployment_delegated_role: TerraformDeploymentDelegated
+  deployment_delegator_role: TerraformDeploymentDelegator
   state_account: shared_services
   state_bucket: terraform-state
   state_key: terraform.tfstate
   state_table: terraform-state-lock
-  deployment_role: TerraformDeployment
   terraform_version: '>= 1.9.0'

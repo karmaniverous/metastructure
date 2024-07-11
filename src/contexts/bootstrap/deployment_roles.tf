@@ -19,31 +19,42 @@ file at every commit. See the README for more info!
 # Core Development Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_dev"
-
+  alias = "dev"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.dev.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["dev"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Core Development Account
+# Create a delegated role for Terraform deployment on the Core Development Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_dev_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "dev_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.dev
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Core Development Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Core Development Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_dev_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_dev_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "dev_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["dev"].id
+  delegate_account_name = aws_organizations_account.accounts["dev"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 
 ###############################################################################
@@ -51,31 +62,42 @@ resource "aws_iam_role_policy_attachment" "shared_services_assume_dev_terraform_
 # Identity Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_identity"
-
+  alias = "identity"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.identity.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["identity"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Identity Account
+# Create a delegated role for Terraform deployment on the Identity Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_identity_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "identity_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.identity
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Identity Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Identity Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_identity_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_identity_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "identity_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["identity"].id
+  delegate_account_name = aws_organizations_account.accounts["identity"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 
 ###############################################################################
@@ -83,31 +105,42 @@ resource "aws_iam_role_policy_attachment" "shared_services_assume_identity_terra
 # Log Archive Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_log_archive"
-
+  alias = "log_archive"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.log_archive.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["log_archive"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Log Archive Account
+# Create a delegated role for Terraform deployment on the Log Archive Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_log_archive_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "log_archive_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.log_archive
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Log Archive Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Log Archive Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_log_archive_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_log_archive_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "log_archive_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["log_archive"].id
+  delegate_account_name = aws_organizations_account.accounts["log_archive"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 
 ###############################################################################
@@ -115,31 +148,42 @@ resource "aws_iam_role_policy_attachment" "shared_services_assume_log_archive_te
 # Core Production Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_prod"
-
+  alias = "prod"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.prod.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["prod"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Core Production Account
+# Create a delegated role for Terraform deployment on the Core Production Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_prod_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "prod_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.prod
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Core Production Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Core Production Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_prod_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_prod_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "prod_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["prod"].id
+  delegate_account_name = aws_organizations_account.accounts["prod"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 
 ###############################################################################
@@ -147,31 +191,42 @@ resource "aws_iam_role_policy_attachment" "shared_services_assume_prod_terraform
 # Core Shared Services Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_shared_services"
-
+  alias = "shared_services"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.shared_services.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Core Shared Services Account
+# Create a delegated role for Terraform deployment on the Core Shared Services Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_shared_services_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "shared_services_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Core Shared Services Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Core Shared Services Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_shared_services_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_shared_services_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "shared_services_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegate_account_name = aws_organizations_account.accounts["shared_services"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 
 ###############################################################################
@@ -179,30 +234,41 @@ resource "aws_iam_role_policy_attachment" "shared_services_assume_shared_service
 # Core Test Account.
 ###############################################################################
 provider "aws" {
-  alias = "assume_test"
-
+  alias = "test"
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts.test.id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["test"].id}:role/OrganizationAccountAccessRole"
   }
-
-  region = module.global.config.organization.aws_region
+  profile = "KARMA-INIT"
+  region  = module.global.config.organization.aws_region
 }
 
 ###############################################################################
-# Create a Terraform deployment role on the Core Test Account
+# Create a delegated role for Terraform deployment on the Core Test Account
 # and allow it to be assumed from the Terraform state account.
 ###############################################################################
-resource "aws_iam_role" "shared_services_assume_test_terraform_deployment_role" {
-  name               = module.global.config.terraform.deployment_role
-  assume_role_policy = data.aws_iam_policy_document.crossaccount_assume_from_terraform_state_account.json
+module "test_terraform_deployment_delegated_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.test
+  }
+  delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_account_id   = aws_organizations_account.accounts["shared_services"].id
+  delegator_account_name = "shared_services"
+  delegated_role_name    = module.global.config.terraform.deployment_delegated_role
 }
 
 ###############################################################################
-# Attach a role policy to the Core Test Account 
-# Terraform deployment role. 
+# Create a delegator role on the Terraform state account and allow it to assume 
+# the Terraform deployment role on the Core Test Account.
 ###############################################################################
-resource "aws_iam_role_policy_attachment" "shared_services_assume_test_terraform_deployment_role_policy" {
-  role       = aws_iam_role.shared_services_assume_test_terraform_deployment_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+module "test_terraform_deployment_delegator_role" {
+  source = "../../modules/delegator-role"
+  providers = {
+    aws = aws.shared_services
+  }
+  delegate_account_id   = aws_organizations_account.accounts["test"].id
+  delegate_account_name = aws_organizations_account.accounts["test"].name
+  delegated_role_name   = module.global.config.terraform.deployment_delegated_role
+  delegator_role_name   = module.global.config.terraform.deployment_delegator_role
 }
 

@@ -5,13 +5,11 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-
-provider "aws" {
-  default_tags {
-    tags = {
-      Terraform = true
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
     }
   }
-  region = "us-east-1"
 }
 

@@ -5,6 +5,11 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-variable "role_name" {}
-variable "assume_role_policy_json" {}
-variable "role_policy_arn" {}
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+

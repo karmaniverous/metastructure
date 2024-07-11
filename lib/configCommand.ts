@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { applyLicenseHeaders } from './applyLicenseHeaders';
 import { formatFiles } from './formatFiles';
 import { parseConfig } from './parseConfig';
-import { processTemplates } from './processTemplates';
+import { processTargets } from './processTargets';
 
 export const configCommand = new Command()
   .name('config')
@@ -21,7 +21,7 @@ export const configCommand = new Command()
     const config = await parseConfig({ stdOut: true });
 
     // Process templates.
-    await processTemplates({ localState, config, stdOut: true });
+    await processTargets({ localState, config, stdOut: true });
 
     // Apply license headers.
     await applyLicenseHeaders({ stdOut: true });

@@ -5,6 +5,11 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-output "role_name" {
-  value = aws_iam_role.role.name
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = <<-EOT
+    Additional tags (e.g. `{'BusinessUnit': 'XYZ'}`).
+    EOT
 }
+
