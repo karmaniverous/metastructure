@@ -25,13 +25,7 @@ export const ConfigSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
-        taxonomy: z
-          .object({
-            namespace: z.string().optional(),
-            project: z.string().optional(),
-          })
-          .strict()
-          .optional(),
+        namespace: z.string().optional(),
       })
       .strict(),
     organizational_units: z.record(

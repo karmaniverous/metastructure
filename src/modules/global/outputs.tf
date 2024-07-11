@@ -79,9 +79,7 @@ output "config" {
     organization = {
       aws_region = "us-east-1"
       github_org = "karmaniverous"
-      taxonomy = {
-        namespace = "karma"
-      }
+      namespace  = "karma"
     }
     organizational_units = {
       dev = {
