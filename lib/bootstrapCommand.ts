@@ -27,6 +27,8 @@ export const bootstrapCommand = new Command()
       await $$`nr cli config -l`;
       await $$`terraform init`;
       await $$`terraform apply`;
+
+      // TODO: Pull outputs back to config & delete destroyed accounts & OUs.
     }
 
     process.stdout.write('\n');

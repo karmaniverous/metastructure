@@ -15,6 +15,15 @@ file at every commit. See the README for more info!
 ###############################################################################
 
 ###############################################################################
+# Import master account.
+###############################################################################
+import {
+  to = aws_organizations_account.accounts["master"]
+  id = data.aws_caller_identity.current.account_id
+}
+
+
+###############################################################################
 # Create a Terraform deployment role on the Core Development Account
 # and allow it to be assumed from the Terraform deployment delegator role at
 # the Terraform state account.
@@ -25,9 +34,26 @@ module "dev_terraform_deployment_role" {
     aws = aws.dev
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
+
+###############################################################################
+# Create a Terraform deployment role on the Second Development Account
+# and allow it to be assumed from the Terraform deployment delegator role at
+# the Terraform state account.
+###############################################################################
+module "dev2_terraform_deployment_role" {
+  source = "../../modules/delegated-role"
+  providers = {
+    aws = aws.dev2
+  }
+  delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
+  delegated_role_name   = module.global.config.terraform.deployment_role
+}
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Identity Account
@@ -40,9 +66,10 @@ module "identity_terraform_deployment_role" {
     aws = aws.identity
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Log Archive Account
@@ -55,9 +82,10 @@ module "log_archive_terraform_deployment_role" {
     aws = aws.log_archive
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Master Account
@@ -70,9 +98,10 @@ module "master_terraform_deployment_role" {
     aws = aws.master
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Core Production Account
@@ -85,9 +114,10 @@ module "prod_terraform_deployment_role" {
     aws = aws.prod
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Core Shared Services Account
@@ -100,9 +130,10 @@ module "shared_services_terraform_deployment_role" {
     aws = aws.shared_services
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
+
 
 ###############################################################################
 # Create a Terraform deployment role on the Core Test Account
@@ -115,15 +146,8 @@ module "test_terraform_deployment_role" {
     aws = aws.test
   }
   delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["arn:aws:iam::${aws_organizations_account.accounts["shared_services"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
 
-###############################################################################
-# Import master account.
-###############################################################################
-import {
-  to = aws_organizations_account.accounts["master"]
-  id = data.aws_caller_identity.current.account_id
-}
 

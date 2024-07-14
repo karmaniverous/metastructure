@@ -56,11 +56,10 @@ resource "aws_organizations_organizational_unit" "organizational_units" {
 # Create accounts.
 ###############################################################################
 resource "aws_organizations_account" "accounts" {
-  for_each = module.global.config.accounts
+  for_each = local.current_accounts
   email    = each.value.email
   lifecycle {
-    ignore_changes  = [email, name]
-    prevent_destroy = true
+    ignore_changes = [email, name]
   }
   name      = each.value.name
   parent_id = contains(keys(each.value), "organizational_unit") ? aws_organizations_organizational_unit.organizational_units[each.value.organizational_unit].id : null
@@ -75,7 +74,7 @@ module "terraform_deployment_delegator_role" {
   providers = {
     aws = aws.terraform_state_account
   }
-  delegated_roles = [for account in keys(module.global.config.accounts) : {
+  delegated_roles = [for account in keys(local.current_accounts) : {
     delegate_account_id = aws_organizations_account.accounts[account].id
     delegated_role_name = module.global.config.terraform.deployment_role
   } if account != module.global.config.terraform.state_account]

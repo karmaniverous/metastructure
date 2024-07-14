@@ -43,6 +43,7 @@ provider "aws" {
   region = module.global.config.organization.aws_region
 }
 
+
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # Core Development Account.
@@ -59,6 +60,25 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
+
+
+###############################################################################
+# Create a provider to assume the OrganizationAccountAccessRole role on the 
+# Second Development Account.
+###############################################################################
+provider "aws" {
+  alias = "dev2"
+  assume_role {
+    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["dev2"].id}:role/OrganizationAccountAccessRole"
+  }
+  default_tags {
+    tags = {
+      Terraform = true
+    }
+  }
+  region = module.global.config.organization.aws_region
+}
+
 
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
@@ -77,6 +97,7 @@ provider "aws" {
   region = module.global.config.organization.aws_region
 }
 
+
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # Log Archive Account.
@@ -94,6 +115,7 @@ provider "aws" {
   region = module.global.config.organization.aws_region
 }
 
+
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # Master Account.
@@ -107,6 +129,7 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
+
 
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
@@ -125,6 +148,7 @@ provider "aws" {
   region = module.global.config.organization.aws_region
 }
 
+
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # Core Shared Services Account.
@@ -141,6 +165,7 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
+
 
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 

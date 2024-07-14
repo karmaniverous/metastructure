@@ -7,7 +7,24 @@
 ###############################################################################
 ###############################################################################
 
-{{#each accounts}}
+###############################################################################
+# Import master account.
+###############################################################################
+import {
+  to = aws_organizations_account.accounts["{{organization.master_account}}"]
+  id = data.aws_caller_identity.current.account_id
+}
+
+{{#each organizational_units}}{{#if this.id}}
+###############################################################################
+# Import organizational unit {{this.name}}.
+###############################################################################
+import {
+  to = aws_organizations_organizational_unit.organizational_units["{{@key}}"]
+  id = "{{this.id}}"
+}
+
+{{/if}}{{/each}}{{#each accounts}}{{#if (logic "not" this.destroy)}}
 ###############################################################################
 # Create a Terraform deployment role on the {{this.name}}
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -19,16 +36,8 @@ module "{{@key}}_terraform_deployment_role" {
     aws = aws.{{@key}}
   }
   delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals   = ["arn:aws:iam::${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}:role/${module.global.config.terraform.deployment_delegator_role}"]
+  delegator_principals   = ["${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}"]
   delegated_role_name    = module.global.config.terraform.deployment_role
 }
 
-{{/each}}
-###############################################################################
-# Import master account.
-###############################################################################
-import {
-  to = aws_organizations_account.accounts["{{organization.master_account}}"]
-  id = data.aws_caller_identity.current.account_id
-}
-
+{{/if}}{{/each}}

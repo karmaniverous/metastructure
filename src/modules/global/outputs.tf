@@ -19,37 +19,42 @@ output "config" {
   value = {
     accounts = {
       dev = {
+        email               = "jscroft+karma.dev.001@gmail.com"
         name                = "Core Development Account"
-        email               = "jscroft+karma.dev.000@gmail.com"
+        organizational_unit = "dev"
+      }
+      dev2 = {
+        email               = "jscroft+karma.dev2.001@gmail.com"
+        name                = "Second Development Account"
         organizational_unit = "dev"
       }
       identity = {
+        email               = "jscroft+karma.identity.001@gmail.com"
         name                = "Identity Account"
-        email               = "jscroft+karma.identity.000@gmail.com"
         organizational_unit = "infrastructure"
       }
       log_archive = {
+        email               = "jscroft+karma.log_archive.001@gmail.com"
         name                = "Log Archive Account"
-        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "security"
       }
       master = {
-        name  = "Master Account"
         email = "infra-abc@karmanivero.us"
+        name  = "Master Account"
       }
       prod = {
+        email               = "jscroft+karma.prod.001@gmail.com"
         name                = "Core Production Account"
-        email               = "jscroft+karma.prod.000@gmail.com"
         organizational_unit = "prod"
       }
       shared_services = {
+        email               = "jscroft+karma.log_archive.0010@gmail.com"
         name                = "Core Shared Services Account"
-        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "infrastructure"
       }
       test = {
+        email               = "jscroft+karma.log_archive.001@gmail.com"
         name                = "Core Test Account"
-        email               = "jscroft+karma.log_archive.000@gmail.com"
         organizational_unit = "test"
       }
     }
@@ -96,7 +101,7 @@ output "config" {
         name = "Infrastructure OU"
       }
       prod = {
-        name   = "Dev Workloads OU"
+        name   = "Prod Workloads OU"
         parent = "workloads"
       }
       security = {

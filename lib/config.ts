@@ -6,9 +6,10 @@ export const ConfigSchema = z
     accounts: z.record(
       z
         .object({
-          name: z.string(),
+          destroy: z.boolean().optional(),
           email: z.string(),
           id: z.string().optional(),
+          name: z.string(),
           organizational_unit: z.string().optional(),
         })
         .strict(),
@@ -34,6 +35,7 @@ export const ConfigSchema = z
     organizational_units: z.record(
       z
         .object({
+          id: z.string().optional(),
           name: z.string(),
           parent: z.string().optional(),
         })
@@ -67,6 +69,7 @@ export const ConfigSchema = z
       .strict(),
   })
   .strict()
+  // TODO: validate account email uniqueness
   // validate account.organizational_unit
   .superRefine((data, ctx) => {
     for (const account in data.accounts)
@@ -86,6 +89,7 @@ export const ConfigSchema = z
         });
   })
   // validate environment.account
+  // TODO: can't be a destroyed account
   .superRefine((data, ctx) => {
     for (const environment in data.environments)
       if (!(data.environments[environment].account in data.accounts))
@@ -98,6 +102,7 @@ export const ConfigSchema = z
         });
   })
   // validate organization.master_account
+  // TODO: can't be a destroyed account
   .superRefine((data, ctx) => {
     if (!(data.organization.master_account in data.accounts))
       ctx.addIssue({
@@ -110,6 +115,7 @@ export const ConfigSchema = z
   })
   // validate organizational_unit.parent
   // TODO: validate circular dependencies
+  // TODO: validate name uniqueness within parent
   .superRefine((data, ctx) => {
     for (const organizational_unit in data.organizational_units) {
       const parent = data.organizational_units[organizational_unit].parent;
@@ -132,6 +138,7 @@ export const ConfigSchema = z
     }
   })
   // validate terraform.state_account
+  // TODO: can't be a destroyed account
   .superRefine((data, ctx) => {
     if (!(data.terraform.state_account in data.accounts))
       ctx.addIssue({

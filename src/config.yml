@@ -6,30 +6,34 @@
 accounts:
   dev:
     name: Core Development Account
-    email: jscroft+karma.dev.000@gmail.com
+    email: jscroft+karma.dev.001@gmail.com
+    organizational_unit: dev
+  dev2:
+    name: Second Development Account
+    email: jscroft+karma.dev2.001@gmail.com
     organizational_unit: dev
   identity:
     name: Identity Account
-    email: jscroft+karma.identity.000@gmail.com
+    email: jscroft+karma.identity.001@gmail.com
     organizational_unit: infrastructure
   log_archive:
     name: Log Archive Account
-    email: jscroft+karma.log_archive.000@gmail.com
+    email: jscroft+karma.log_archive.001@gmail.com
     organizational_unit: security
   master:
     name: Master Account
     email: infra-abc@karmanivero.us
   prod:
     name: Core Production Account
-    email: jscroft+karma.prod.000@gmail.com
+    email: jscroft+karma.prod.001@gmail.com
     organizational_unit: prod
   shared_services:
     name: Core Shared Services Account
-    email: jscroft+karma.log_archive.000@gmail.com
+    email: jscroft+karma.log_archive.0010@gmail.com
     organizational_unit: infrastructure
   test:
     name: Core Test Account
-    email: jscroft+karma.log_archive.000@gmail.com
+    email: jscroft+karma.log_archive.001@gmail.com
     organizational_unit: test
 environments:
   bali:
@@ -65,7 +69,7 @@ organizational_units:
   infrastructure:
     name: Infrastructure OU
   prod:
-    name: Dev Workloads OU
+    name: Prod Workloads OU
     parent: workloads
   security:
     name: Security OU
