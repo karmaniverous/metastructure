@@ -28,7 +28,17 @@ removed {
   }
 }
 {{/if}}
-
+{{#if (logic "or" (lodash "eq" this.action "destroy") (lodash "eq" this.action "remove"))}}
+###############################################################################
+# Remove Terraform deployment role from account "{{this.name}}".
+###############################################################################
+removed {
+  from      = module.{{@key}}_terraform_deployment_role
+  lifecycle {
+    destroy = false
+  }
+}
+{{else}}
 ###############################################################################
 # Create a Terraform deployment role at account "{{this.name}}"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -43,6 +53,4 @@ module "{{@key}}_terraform_deployment_role" {
   delegator_principals   = ["${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}"]
   delegated_role_name    = module.global.config.terraform.deployment_role
 }
-{{/each}}
-
-
+{{/if}}{{/each}}

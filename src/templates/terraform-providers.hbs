@@ -21,7 +21,7 @@ provider "aws" {
 
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
-# Tarraform state account.
+# Terraform state account.
 ###############################################################################
 provider "aws" {
   alias   = "terraform_state_account"
@@ -35,15 +35,15 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
-{{#each accounts}}
+{{#each accounts}}{{#if (logic "not" (lodash "eq" this.action "destroy"))}}
 ###############################################################################
-# Create a provider to assume the OrganizationAccountAccessRole role on the 
-# {{this.name}}.
+# Create a provider to assume the OrganizationAccountAccessRole role on account 
+# "{{this.name}}".
 ###############################################################################
 provider "aws" {
   alias   = "{{@key}}" {{#if (lodash "eq" @key ../organization.master_account)}} {{else}}
   assume_role {
-    role_arn = "arn:aws:iam::${aws_organizations_account.accounts["{{@key}}"].id}:role/OrganizationAccountAccessRole"
+    role_arn = "arn:aws:iam::${try(aws_organizations_account.accounts["{{@key}}"].id, module.global.config.accounts["{{@key}}"].id)}:role/OrganizationAccountAccessRole"
   } {{/if}}
   default_tags {
     tags = {
@@ -52,4 +52,4 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
-{{/each}}
+{{/if}}{{/each}}

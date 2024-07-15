@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "terraform_admin" {
     ]
 
     resources = [
-      "arn:aws:dynamodb:*:${aws_organizations_account.accounts[module.global.config.terraform.state_account].id}:table/${module.global.config.terraform.state_table}",
+      "arn:aws:dynamodb:*:${aws_organizations_account.accounts[module.global.config.terraform.state_account].id}:table/${module.global.config.terraform.state_lock_table}",
     ]
   }
 

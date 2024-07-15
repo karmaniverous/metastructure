@@ -14,7 +14,6 @@ file at every commit. See the README for more info!
 ###############################################################################
 ###############################################################################
 
-
 ###############################################################################
 # Create a Terraform deployment role at account "Core Development Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -29,7 +28,6 @@ module "dev_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Second Development Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -44,22 +42,15 @@ module "dev2_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
-# Create a Terraform deployment role at account "Third Development Account"
-# and allow it to be assumed from the Terraform deployment delegator role at
-# the Terraform state account.
+# Remove Terraform deployment role from account "Third Development Account".
 ###############################################################################
-module "dev3_terraform_deployment_role" {
-  source = "../../modules/delegated-role"
-  providers = {
-    aws = aws.dev3
+removed {
+  from = module.dev3_terraform_deployment_role
+  lifecycle {
+    destroy = false
   }
-  delegated_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
-  delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Identity Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -74,7 +65,6 @@ module "identity_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Log Archive Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -89,7 +79,6 @@ module "log_archive_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Master Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -104,7 +93,6 @@ module "master_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Core Production Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -119,7 +107,6 @@ module "prod_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Core Shared Services Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -134,7 +121,6 @@ module "shared_services_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 ###############################################################################
 # Create a Terraform deployment role at account "Core Test Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
@@ -149,5 +135,4 @@ module "test_terraform_deployment_role" {
   delegator_principals  = ["${aws_organizations_account.accounts["shared_services"].id}"]
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
-
 

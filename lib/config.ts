@@ -88,7 +88,7 @@ export const configSchema = z
         state_account: z.string(),
         state_bucket: z.string(),
         state_key: z.string(),
-        state_table: z.string(),
+        state_lock_table: z.string(),
         terraform_version: z.string(),
       })
       .strict(),

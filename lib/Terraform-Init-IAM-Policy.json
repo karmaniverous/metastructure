@@ -38,13 +38,10 @@
         "iam:UpdateAssumeRolePolicy",
         "iam:TagRole"
       ],
-      "Resource": [
-        "arn:aws:iam::*:role/Billing",
-        "arn:aws:iam::*:role/*Terraform*"
-      ]
+      "Resource": ["arn:aws:iam::*:role/*"]
     },
     {
-      "Sid": "AllowIamCreateTerraformPolicy",
+      "Sid": "AllowIamCreatePolicy",
       "Effect": "Allow",
       "Action": [
         "iam:CreatePolicy",
@@ -55,10 +52,10 @@
         "iam:GetPolicy",
         "iam:GetPolicyVersion"
       ],
-      "Resource": ["arn:aws:iam::*:policy/*Terraform*"]
+      "Resource": ["arn:aws:iam::*:policy/*"]
     },
     {
-      "Sid": "AllowIamAttachTerraformPolicy",
+      "Sid": "AllowIamAttachPolicy",
       "Effect": "Allow",
       "Action": [
         "iam:GetUser",
@@ -67,7 +64,7 @@
         "iam:ListAttachedUserPolicies",
         "iam:ListInstanceProfilesForRole"
       ],
-      "Resource": ["arn:aws:iam::*:user/terraform-init"]
+      "Resource": ["arn:aws:iam::*:user/*"]
     },
     {
       "Sid": "AllowGuardDutyManagement",
@@ -104,10 +101,10 @@
       "Resource": ["arn:aws:guardduty:*:*:detector/*"]
     },
     {
-      "Sid": "AllowRoleAssumptionToOrgAccounts",
+      "Sid": "AllowRoleAssumption",
       "Effect": "Allow",
       "Action": ["sts:AssumeRole"],
-      "Resource": ["arn:aws:iam::*:role/OrganizationAccountAccessRole"]
+      "Resource": ["arn:aws:iam::*:role/*"]
     }
   ]
 }

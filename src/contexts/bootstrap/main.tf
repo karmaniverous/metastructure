@@ -108,8 +108,11 @@ module "terraform_admin_role" {
     aws = aws.terraform_state_account
   }
   delegated_policy_arns = [aws_iam_policy.terraform_admin.arn]
-  delegator_principals  = [aws_organizations_account.accounts[module.global.config.terraform.state_account].id]
-  delegated_role_name   = module.global.config.terraform.admin_role
+  delegator_principals = [
+    aws_organizations_account.accounts[module.global.config.terraform.state_account].id,
+    data.aws_caller_identity.current.arn
+  ]
+  delegated_role_name = module.global.config.terraform.admin_role
 }
 
 ###############################################################################
@@ -125,3 +128,24 @@ module "terraform_reader_role" {
   delegated_role_name   = module.global.config.terraform.reader_role
 }
 
+###############################################################################
+# Create S3 state bucket on the Terraform state account.
+###############################################################################
+resource "aws_s3_bucket" "terraform_state" {
+  provider = aws.terraform_state_account
+  bucket   = module.global.config.terraform.state_bucket
+}
+
+###############################################################################
+# Create DynamoDB state lock table on the Terraform state account.
+###############################################################################
+resource "aws_dynamodb_table" "terraform_state_lock" {
+  provider     = aws.terraform_state_account
+  name         = module.global.config.terraform.state_lock_table
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}

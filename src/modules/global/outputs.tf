@@ -31,6 +31,7 @@ output "config" {
         organizational_unit = "dev"
       }
       dev3 = {
+        action              = "destroy"
         id                  = "058264090080"
         email               = "jscroft+karma.dev3.001@gmail.com"
         name                = "Third Development Account"
@@ -104,7 +105,7 @@ output "config" {
       github_org     = "karmaniverous"
       id             = "o-3f4ig2op2b"
       master_account = "master"
-      namespace      = "karma"
+      namespace      = "karma2"
     }
     organizational_units = {
       dev = {
@@ -151,9 +152,9 @@ output "config" {
       }
       reader_role       = "TerraformReader"
       state_account     = "shared_services"
-      state_bucket      = "karma-terraform-state"
+      state_bucket      = "karma2-terraform-state"
       state_key         = "terraform.tfstate"
-      state_table       = "terraform-state-lock"
+      state_lock_table  = "terraform-state-lock"
       terraform_version = ">= 1.9.0"
     }
   }

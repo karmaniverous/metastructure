@@ -16,11 +16,12 @@ file at every commit. See the README for more info!
 
 terraform {
   backend "s3" {
-    bucket               = "karma-terraform-state"
-    encrypt              = true
+    bucket               = "karma2-terraform-state"
     dynamodb_table       = "terraform-state-lock"
+    encrypt              = true
     key                  = "terraform.tfstate"
     region               = "us-east-1"
+    role_arn             = "arn:aws:iam::533267247492:role/TerraformAdmin"
     workspace_key_prefix = "env"
   }
 }
