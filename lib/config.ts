@@ -1,14 +1,36 @@
 import _ from 'lodash';
 import { z } from 'zod';
 
-export const ConfigSchema = z
+const actionEnum = z.enum(['destroy', 'import', 'remove']).optional();
+type Action = z.infer<typeof actionEnum>;
+
+const actionableSchema = z.object({
+  action: actionEnum,
+  id: z.string().optional(),
+});
+
+export type Actionable = z.infer<typeof actionableSchema>;
+
+const filterValid = <T extends Actionable = Actionable>(
+  collection: Record<string, T>,
+) =>
+  _.entries(collection)
+    .filter(([, v]) => !v.action || !['destroy', 'remove'].includes(v.action))
+    .map(([k]) => k);
+
+const actionErrorModifier = (action: Action) =>
+  action === 'destroy'
+    ? 'destroyed'
+    : action === 'remove'
+      ? 'removed'
+      : 'invalid';
+
+export const configSchema = z
   .object({
     accounts: z.record(
-      z
-        .object({
-          destroy: z.boolean().optional(),
+      actionableSchema
+        .extend({
           email: z.string(),
-          id: z.string().optional(),
           name: z.string(),
           organizational_unit: z.string().optional(),
         })
@@ -27,15 +49,14 @@ export const ConfigSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
-        id: z.string().optional(),
+        id: z.string(),
         master_account: z.string(),
         namespace: z.string().optional(),
       })
       .strict(),
     organizational_units: z.record(
-      z
-        .object({
-          id: z.string().optional(),
+      actionableSchema
+        .extend({
           name: z.string(),
           parent: z.string().optional(),
         })
@@ -69,94 +90,118 @@ export const ConfigSchema = z
       .strict(),
   })
   .strict()
-  // TODO: validate account email uniqueness
-  // validate account.organizational_unit
   .superRefine((data, ctx) => {
-    for (const account in data.accounts)
-      if (
-        data.accounts[account].organizational_unit &&
-        !(
-          data.accounts[account].organizational_unit in
-          data.organizational_units
-        )
-      )
+    const validAccounts = filterValid(data.accounts);
+    const validOus = filterValid(data.organizational_units);
+
+    // validate accounts
+    for (const account in data.accounts) {
+      // TODO: validate email uniqueness within account
+
+      // validate account
+      const { action, id } = data.accounts[account];
+      if (action && !id)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `id required when action populated`,
+          path: ['accounts', account, 'id'],
+        });
+
+      // validate organizational_unit
+      const ou = data.accounts[account].organizational_unit;
+
+      if (ou && !validOus.includes(ou)) {
+        const action = data.organizational_units[ou]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
-          message: `invalid organizational_unit`,
-          options: _.keys(data.organizational_units),
+          message: `${actionErrorModifier(action)} organizational_unit`,
+          options: validOus,
           path: ['accounts', account, 'organizational_unit'],
-          received: data.accounts[account].organizational_unit,
+          received: ou,
         });
-  })
-  // validate environment.account
-  // TODO: can't be a destroyed account
-  .superRefine((data, ctx) => {
-    for (const environment in data.environments)
-      if (!(data.environments[environment].account in data.accounts))
+      }
+    }
+
+    // validate environments
+    for (const environment in data.environments) {
+      // validate account
+      const account = data.environments[environment].account;
+      if (!validAccounts.includes(account)) {
+        const action = data.accounts[account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
-          message: `invalid account`,
-          options: _.keys(data.accounts),
+          message: `${actionErrorModifier(action)} account`,
+          options: validAccounts,
           path: ['environments', environment, 'account'],
-          received: data.environments[environment].account,
+          received: account,
         });
-  })
-  // validate organization.master_account
-  // TODO: can't be a destroyed account
-  .superRefine((data, ctx) => {
-    if (!(data.organization.master_account in data.accounts))
+      }
+    }
+
+    // validate organization.master_account
+    if (!validAccounts.includes(data.organization.master_account)) {
+      const action = data.accounts[data.organization.master_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_enum_value,
-        message: `invalid account`,
-        options: _.keys(data.accounts),
+        message: `${actionErrorModifier(action)} account`,
+        options: validAccounts,
         path: ['organization', 'master_account'],
         received: data.organization.master_account,
       });
-  })
-  // validate organizational_unit.parent
-  // TODO: validate circular dependencies
-  // TODO: validate name uniqueness within parent
-  .superRefine((data, ctx) => {
-    for (const organizational_unit in data.organizational_units) {
-      const parent = data.organizational_units[organizational_unit].parent;
+    }
 
-      if (
-        parent &&
-        (parent === organizational_unit ||
-          !(parent in data.organizational_units))
-      )
+    // validate organizational_units
+    for (const ou in data.organizational_units) {
+      // TODO: validate circular dependencies
+      // TODO: validate name uniqueness within parent
+
+      // validate organizational_unit
+      const { action, id } = data.organizational_units[ou];
+      if (action && !id)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `id required when action populated`,
+          path: ['organizational_units', ou, 'id'],
+        });
+
+      // validate parent
+      const parent = data.organizational_units[ou].parent;
+      if (parent && !validOus.includes(parent)) {
+        const action = data.organizational_units[parent]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
-          message: `invalid organizational_unit parent`,
-          options: _.without(
-            _.keys(data.organizational_units),
-            organizational_unit,
-          ),
-          path: ['organizational_units', organizational_unit, 'parent'],
+          message: `${actionErrorModifier(action)} parent`,
+          options: validOus,
+          path: ['organizational_units', ou, 'parent'],
           received: parent,
         });
+      }
     }
-  })
-  // validate terraform.state_account
-  // TODO: can't be a destroyed account
-  .superRefine((data, ctx) => {
-    if (!(data.terraform.state_account in data.accounts))
-      ctx.addIssue({
-        code: z.ZodIssueCode.invalid_enum_value,
-        message: `invalid account`,
-        options: _.keys(data.accounts),
-        path: ['terraform', 'state_account'],
-        received: data.terraform.state_account,
-      });
-  })
-  // validate templates_path
-  .superRefine((data, ctx) => {
+
+    // validate templates_path
     if (data.targets && !data.templates_path)
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `targets defined but missing templates_path`,
         path: ['templates_path'],
       });
+
+    // validate terraform.state_account
+    if (!validAccounts.includes(data.terraform.state_account)) {
+      const action = data.accounts[data.terraform.state_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_enum_value,
+        message: `${actionErrorModifier(action)} account`,
+        options: validAccounts,
+        path: ['terraform', 'state_account'],
+        received: data.terraform.state_account,
+      });
+    }
   });
 
-export type Config = z.infer<typeof ConfigSchema>;
+export type Config = z.infer<typeof configSchema>;

@@ -7,26 +7,30 @@
 ###############################################################################
 ###############################################################################
 
+{{#each organizational_units}}{{#if (lodash "eq" this.action "remove")}}
 ###############################################################################
-# Import master account.
+# Remove organizational unit "{{this.name}}".
 ###############################################################################
-import {
-  to = aws_organizations_account.accounts["{{organization.master_account}}"]
-  id = data.aws_caller_identity.current.account_id
+removed {
+  from       = aws_organizations_organizational_unit.organizational_units["{{@key}}"]
+  lifecycle {
+    destroy = false
+  }
 }
-
-{{#each organizational_units}}{{#if this.id}}
+{{/if}}{{/each}}{{#each accounts}}{{#if (lodash "eq" this.action "remove")}}
 ###############################################################################
-# Import organizational unit {{this.name}}.
+# Remove account "{{this.name}}".
 ###############################################################################
-import {
-  to = aws_organizations_organizational_unit.organizational_units["{{@key}}"]
-  id = "{{this.id}}"
+removed {
+  from       = aws_organizations_account.accounts["{{@key}}"]
+  lifecycle {
+    destroy = false
+  }
 }
+{{/if}}
 
-{{/if}}{{/each}}{{#each accounts}}{{#if (logic "not" this.destroy)}}
 ###############################################################################
-# Create a Terraform deployment role on the {{this.name}}
+# Create a Terraform deployment role at account "{{this.name}}"
 # and allow it to be assumed from the Terraform deployment delegator role at
 # the Terraform state account.
 ###############################################################################
@@ -39,5 +43,6 @@ module "{{@key}}_terraform_deployment_role" {
   delegator_principals   = ["${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}"]
   delegated_role_name    = module.global.config.terraform.deployment_role
 }
+{{/each}}
 
-{{/if}}{{/each}}
+

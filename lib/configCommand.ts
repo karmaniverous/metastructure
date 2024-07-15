@@ -12,22 +12,27 @@ export const configCommand = new Command()
   .enablePositionalOptions()
   .passThroughOptions()
   .option('-l, --local-state', 'Use local state.')
-  .action(async ({ localState }) => {
+  .option('--throw-errors', 'Throw errors to the calling process.')
+  .action(async ({ localState, throwErrors }) => {
     process.stdout.write(
       chalk.black.bold('*** CONFIGURING INFRASTRUCTURE PROJECT ***\n\n'),
     );
 
-    // Load & parse project config.
-    const config = await parseConfig({ stdOut: true });
+    try {
+      // Load & parse project config.
+      const config = await parseConfig({ stdOut: true });
 
-    // Process templates.
-    await processTargets({ localState, config, stdOut: true });
+      // Process templates.
+      await processTargets({ localState, config, stdOut: true });
 
-    // Apply license headers.
-    await applyLicenseHeaders({ stdOut: true });
+      // Apply license headers.
+      await applyLicenseHeaders({ stdOut: true });
 
-    // Format files.
-    await formatFiles({ stdOut: true });
+      // Format files.
+      await formatFiles({ stdOut: true });
+    } catch (error) {
+      if (throwErrors) throw error;
+    }
 
     process.stdout.write('\n');
   });

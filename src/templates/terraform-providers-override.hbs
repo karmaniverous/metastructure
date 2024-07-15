@@ -22,8 +22,7 @@ provider "aws" {
     alias   = "terraform_state_account"
     profile = "{{terraform.aws_profile}}" 
 }
-
-{{#each accounts}}{{#if (logic "not" this.destroy)}}
+{{#each accounts}}
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # {{this.name}}.
@@ -32,5 +31,4 @@ provider "aws" {
     alias   = "{{@key}}"
     profile = "{{../terraform.aws_profile}}" 
 }
-
-{{/if}}{{/each}}
+{{/each}}

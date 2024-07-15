@@ -35,8 +35,7 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
-
-{{#each accounts}}{{#if (logic "not" this.destroy)}}
+{{#each accounts}}
 ###############################################################################
 # Create a provider to assume the OrganizationAccountAccessRole role on the 
 # {{this.name}}.
@@ -53,5 +52,4 @@ provider "aws" {
   }
   region = module.global.config.organization.aws_region
 }
-
-{{/if}}{{/each}}
+{{/each}}

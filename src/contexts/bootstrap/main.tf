@@ -44,7 +44,7 @@ import {
 # Create organizational units. 
 ###############################################################################
 resource "aws_organizations_organizational_unit" "organizational_units" {
-  for_each = module.global.config.organizational_units
+  for_each = local.organizational_units
   name     = each.value.name
 
   # Keeping the hierarchy flat for now. We'll connect them with their parents 
@@ -53,16 +53,34 @@ resource "aws_organizations_organizational_unit" "organizational_units" {
 }
 
 ###############################################################################
+# Import organizational units.
+###############################################################################
+import {
+  for_each = local.organizational_units_to_import
+  to       = aws_organizations_organizational_unit.organizational_units[each.key]
+  id       = module.global.config.organizational_units[each.key].id
+}
+
+###############################################################################
 # Create accounts.
 ###############################################################################
 resource "aws_organizations_account" "accounts" {
-  for_each = local.current_accounts
+  for_each = local.accounts
   email    = each.value.email
   lifecycle {
     ignore_changes = [email, name]
   }
   name      = each.value.name
   parent_id = contains(keys(each.value), "organizational_unit") ? aws_organizations_organizational_unit.organizational_units[each.value.organizational_unit].id : null
+}
+
+###############################################################################
+# Import accounts.
+###############################################################################
+import {
+  for_each = local.accounts_to_import
+  to       = aws_organizations_account.accounts[each.key]
+  id       = each.key == module.global.config.organization.master_account ? data.aws_caller_identity.current.account_id : module.global.config.accounts[each.key].id
 }
 
 ###############################################################################
@@ -74,7 +92,7 @@ module "terraform_deployment_delegator_role" {
   providers = {
     aws = aws.terraform_state_account
   }
-  delegated_roles = [for account in keys(local.current_accounts) : {
+  delegated_roles = [for account in keys(local.accounts) : {
     delegate_account_id = aws_organizations_account.accounts[account].id
     delegated_role_name = module.global.config.terraform.deployment_role
   } if account != module.global.config.terraform.state_account]

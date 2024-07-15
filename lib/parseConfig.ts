@@ -4,8 +4,9 @@ import fs from 'fs-extra';
 import { resolve } from 'path';
 import yaml from 'yaml';
 
-import { Config, ConfigSchema } from './Config';
+import { Config, configSchema } from './Config';
 import { type ConsoleParams } from './ConsoleParams';
+import { getErrorMessage } from './getErrorMessage';
 import pkgDir from './pkgDir';
 
 export const parseConfig = async ({ stdOut }: ConsoleParams = {}) => {
@@ -15,7 +16,7 @@ export const parseConfig = async ({ stdOut }: ConsoleParams = {}) => {
     if (stdOut) process.stdout.write(chalk.black.bold('Parsing config.yml...'));
 
     // Load & parse config file.
-    config = ConfigSchema.parse(
+    config = configSchema.parse(
       yaml.parse(
         await fs.readFile(resolve(pkgDir, './src/config.yml'), 'utf8'),
       ),
@@ -39,9 +40,10 @@ export const parseConfig = async ({ stdOut }: ConsoleParams = {}) => {
   } catch (error) {
     if (stdOut) {
       process.stdout.write(chalk.red.bold(' Parsing error!\n\n'));
-      console.log(chalk.red(error), '\n');
+      console.log(chalk.red(getErrorMessage(error)), '\n');
     }
-    process.exit();
+
+    process.exit(1);
   }
 
   return config;

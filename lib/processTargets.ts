@@ -6,6 +6,7 @@ import { resolve } from 'path';
 
 import { type Config } from './Config';
 import { type ConsoleParams } from './ConsoleParams';
+import { getErrorMessage } from './getErrorMessage';
 import pkgDir from './pkgDir';
 
 interface processTargetsParams extends ConsoleParams {
@@ -47,9 +48,12 @@ export const processTargets = async ({
 
         if (stdOut) process.stdout.write(chalk.green.dim(' Done!\n'));
       } catch (error) {
-        if (stdOut) process.stdout.write(chalk.red(' Processing error!\n\n'));
-        console.log(chalk.red(error), '\n');
-        process.exit();
+        if (stdOut) {
+          process.stdout.write(chalk.red(' Processing error!\n\n'));
+          console.log(chalk.red(getErrorMessage(error)), '\n');
+        }
+
+        process.exit(1);
       }
     }
   else if (stdOut) process.stdout.write(chalk.black.dim('No templates.\n'));
