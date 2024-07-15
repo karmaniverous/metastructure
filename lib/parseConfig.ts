@@ -1,26 +1,22 @@
 import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
-import fs from 'fs-extra';
-import { resolve } from 'path';
-import yaml from 'yaml';
 
-import { Config, configSchema } from './Config';
+import { type Config } from './Config';
+import { readConfigFile } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
-import pkgDir from './pkgDir';
 
-export const parseConfig = async ({ stdOut }: ConsoleParams = {}) => {
+export const parseConfig = async ({
+  configPath,
+  stdOut,
+}: ConsoleParams = {}) => {
   let config: Config;
 
   try {
     if (stdOut) process.stdout.write(chalk.black.bold('Parsing config.yml...'));
 
     // Load & parse config file.
-    config = configSchema.parse(
-      yaml.parse(
-        await fs.readFile(resolve(pkgDir, './src/config.yml'), 'utf8'),
-      ),
-    );
+    config = await readConfigFile(configPath);
 
     // Recursively apply config to itself as a handlebars template.
     let thisPass = JSON.stringify(config);

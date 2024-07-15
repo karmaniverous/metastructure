@@ -5,7 +5,8 @@ import _ from 'lodash';
 import { resolve } from 'path';
 import yaml from 'yaml';
 
-import { type Actionable, type Config, configSchema } from './Config';
+import { type Actionable, type Config } from './Config';
+import { readConfigFile } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 import pkgDir from './pkgDir';
@@ -18,24 +19,22 @@ type Update = {
     : never;
 };
 
-const $ = execa({
-  cwd: resolve(pkgDir, 'src/contexts/bootstrap'),
-  shell: true,
-});
-
-export const updateConfig = async ({ stdOut }: ConsoleParams = {}) => {
-  let config: Config;
-
+export const updateConfig = async ({
+  configPath,
+  stdOut,
+}: ConsoleParams = {}) => {
   try {
     if (stdOut)
       process.stdout.write(chalk.black.bold('\nUpdating config.yml...'));
 
     // Load & parse config file.
-    config = configSchema.parse(
-      yaml.parse(
-        await fs.readFile(resolve(pkgDir, './src/config.yml'), 'utf8'),
-      ),
-    );
+    const config = await readConfigFile(configPath);
+
+    // Configure shell client.
+    const $ = execa({
+      cwd: resolve(pkgDir, config.terraform.paths.bootstrap),
+      shell: true,
+    });
 
     // Retrieve outputs from Terraform.
     const update = JSON.parse(
@@ -70,6 +69,4 @@ export const updateConfig = async ({ stdOut }: ConsoleParams = {}) => {
 
     process.exit(1);
   }
-
-  return config;
 };

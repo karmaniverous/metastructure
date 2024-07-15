@@ -11,16 +11,16 @@ export const configCommand = new Command()
   .description('Process config.yml with config templates.')
   .enablePositionalOptions()
   .passThroughOptions()
+  .option('-c, --config-path <string>', 'Config file path relative to CWD.')
   .option('-l, --local-state', 'Use local state.')
-  .option('--throw-errors', 'Throw errors to the calling process.')
-  .action(async ({ localState, throwErrors }) => {
+  .action(async ({ configPath, localState }) => {
     process.stdout.write(
       chalk.black.bold('*** CONFIGURING INFRASTRUCTURE PROJECT ***\n\n'),
     );
 
     try {
       // Load & parse project config.
-      const config = await parseConfig({ stdOut: true });
+      const config = await parseConfig({ configPath, stdOut: true });
 
       // Process templates.
       await processTargets({ localState, config, stdOut: true });
@@ -30,8 +30,8 @@ export const configCommand = new Command()
 
       // Format files.
       await formatFiles({ stdOut: true });
-    } catch (error) {
-      if (throwErrors) throw error;
+    } catch {
+      /* empty */
     }
 
     process.stdout.write('\n');

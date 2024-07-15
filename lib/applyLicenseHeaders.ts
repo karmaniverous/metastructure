@@ -14,7 +14,7 @@ export const applyLicenseHeaders = async ({ stdOut }: ConsoleParams = {}) => {
   } catch (error) {
     const msg = getErrorMessage(error);
 
-    // This is common spurious error.
+    // This is a common spurious error.
     if (!msg.includes('0x1fffffe8')) {
       if (stdOut) {
         process.stdout.write(chalk.red.bold(' License error!\n\n'));

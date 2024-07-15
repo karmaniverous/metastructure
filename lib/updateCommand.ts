@@ -8,16 +8,15 @@ export const updateCommand = new Command()
   .description('Updates config.yml from Terraform output.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('--throw-errors', 'Throw errors to the calling process.')
-  .action(async ({ throwErrors }) => {
+  .action(async () => {
     process.stdout.write(
       chalk.black.bold(`*** UPDATING config.yml FROM TERRAFORM OUTPUT ***\n\n`),
     );
 
     try {
       await updateConfig({ stdOut: true });
-    } catch (error) {
-      if (throwErrors) throw error;
+    } catch {
+      /* empty */
     }
 
     process.stdout.write('\n');

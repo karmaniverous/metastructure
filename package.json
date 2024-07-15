@@ -63,5 +63,8 @@
     "release": "release-it"
   },
   "type": "module",
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
 }

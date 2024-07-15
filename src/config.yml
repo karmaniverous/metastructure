@@ -145,6 +145,9 @@ terraform:
   aws_version: ">= 5.56.1"
   deployment_role: TerraformDeployment
   deployment_delegator_role: TerraformDeploymentDelegator
+  paths:
+    bootstrap: src/contexts/bootstrap
+    source: src
   reader_role: TerraformReader
   state_account: shared_services
   state_bucket: "{{#if organization.namespace}}{{organization.namespace}}-{{/if}}terraform-state"

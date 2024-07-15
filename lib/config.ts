@@ -80,6 +80,10 @@ export const configSchema = z
         aws_version: z.string(),
         deployment_role: z.string(),
         deployment_delegator_role: z.string(),
+        paths: z.object({
+          bootstrap: z.string(),
+          source: z.string().or(z.string().array()),
+        }),
         reader_role: z.string(),
         state_account: z.string(),
         state_bucket: z.string(),
