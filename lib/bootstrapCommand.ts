@@ -46,13 +46,13 @@ export const bootstrapCommand = new Command()
       await $`terraform apply`;
 
       // Update config with Terraform outputs.
-      await updateConfig({ stdOut: true });
+      await updateConfig({ configPath, stdOut: true });
 
       // Apply license headers.
       await applyLicenseHeaders({ stdOut: true });
 
       // Format files.
-      await formatFiles({ stdOut: true });
+      await formatFiles({ config, stdOut: true });
     } catch {
       /* empty */
     }

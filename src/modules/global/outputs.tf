@@ -145,12 +145,16 @@ output "config" {
       aws_version               = ">= 5.56.1"
       deployment_role           = "TerraformDeployment"
       deployment_delegator_role = "TerraformDeploymentDelegator"
-      reader_role               = "TerraformReader"
-      state_account             = "shared_services"
-      state_bucket              = "karma-terraform-state"
-      state_key                 = "terraform.tfstate"
-      state_table               = "terraform-state-lock"
-      terraform_version         = ">= 1.9.0"
+      paths = {
+        bootstrap = "src/contexts/bootstrap"
+        source    = "src"
+      }
+      reader_role       = "TerraformReader"
+      state_account     = "shared_services"
+      state_bucket      = "karma-terraform-state"
+      state_key         = "terraform.tfstate"
+      state_table       = "terraform-state-lock"
+      terraform_version = ">= 1.9.0"
     }
   }
 }
