@@ -12,13 +12,14 @@
     "@types/node": "^20.14.10",
     "auto-changelog": "^2.4.0",
     "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tsdoc": "^0.3.0",
     "execa": "^9.3.0",
     "fs-extra": "^11.2.0",
-    "json-to-tf": "^0.3.1",
+    "knip": "^5.26.0",
     "lefthook": "^1.6.18",
     "license-check-and-add": "^4.0.5",
     "lodash": "^4.17.21",
@@ -57,14 +58,12 @@
   },
   "scripts": {
     "cli": "tsx lib",
+    "knip": "knip",
     "lint": "eslint lib/** && prettier -c lib",
     "lint:fix": "eslint --fix lib/** && prettier --write lib",
     "license": "license-check-and-add",
     "release": "release-it"
   },
   "type": "module",
-  "version": "0.0.0",
-  "dependencies": {
-    "dotenv": "^16.4.5"
-  }
+  "version": "0.0.0"
 }

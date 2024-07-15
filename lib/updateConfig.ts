@@ -1,12 +1,10 @@
 import chalk from 'chalk';
 import { $ as execa } from 'execa';
-import fs from 'fs-extra';
 import _ from 'lodash';
 import { resolve } from 'path';
-import yaml from 'yaml';
 
 import { type Actionable, type Config } from './Config';
-import { readConfigFile } from './configFile';
+import { readConfigFile, writeConfigFile } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 import pkgDir from './pkgDir';
@@ -55,10 +53,7 @@ export const updateConfig = async ({
     );
 
     // Write updated config to file.
-    await fs.writeFile(
-      resolve(pkgDir, './src/config.yml'),
-      yaml.stringify(config, { doubleQuotedAsJSON: true }),
-    );
+    await writeConfigFile(config, configPath);
 
     if (stdOut) process.stdout.write(chalk.black.bold(' Done!\n'));
   } catch (error) {
