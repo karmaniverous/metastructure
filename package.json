@@ -123,8 +123,8 @@
     "cli:dist": "node dist/metastructure.cli.mjs",
     "knip": "knip",
     "license": "license-check-and-add",
-    "lint": "eslint lib/** && prettier -c lib",
-    "lint:fix": "eslint --fix lib/** && prettier --write lib",
+    "lint": "eslint src/** && prettier -c src",
+    "lint:fix": "eslint --fix src/** && prettier --write src",
     "release": "release-it",
     "release:pre": "release-it --no-git.requireBranch --github.prerelease --preRelease",
     "test": "cross-env LOG_LEVEL=debug nyc mocha"
