@@ -9,7 +9,7 @@ file at every commit. See the README for more info!
 # Import global config.
 ###############################################################################
 module "global" {
-  source = "../../modules/global"
+  source = "../modules/global"
 }
 
 ###############################################################################
@@ -88,7 +88,7 @@ import {
 # assumption of the Terraform deployment role at all accounts.
 ###############################################################################
 module "terraform_deployment_policy" {
-  source = "../../modules/delegator-policy"
+  source = "../modules/delegator-policy"
   delegated_roles = [for account in keys(local.accounts) : {
     delegate_account_id = aws_organizations_account.accounts[account].id
     delegated_role_name = module.global.config.terraform.roles.deployment
@@ -101,7 +101,7 @@ module "terraform_deployment_policy" {
 # be assumed from the master account and the init admin user.
 ###############################################################################
 module "terraform_admin_role" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.terraform_state_account
   }
@@ -118,7 +118,7 @@ module "terraform_admin_role" {
 # assumption of the Terraform admin role at the Terraform state account.
 ###############################################################################
 module "terraform_admin_policy" {
-  source = "../../modules/delegator-policy"
+  source = "../modules/delegator-policy"
   delegated_roles = [{
     delegate_account_id = aws_organizations_account.accounts[module.global.config.terraform.state_account].id
     delegated_role_name = module.global.config.terraform.roles.admin
@@ -131,7 +131,7 @@ module "terraform_admin_policy" {
 # to be assumed from the master account and the init admin user.
 ###############################################################################
 module "terraform_reader_role" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.terraform_state_account
   }
@@ -145,7 +145,7 @@ module "terraform_reader_role" {
 # assumption of the Terraform reader role at the Terraform state account.
 ###############################################################################
 module "terraform_reader_policy" {
-  source = "../../modules/delegator-policy"
+  source = "../modules/delegator-policy"
   delegated_roles = [{
     delegate_account_id = aws_organizations_account.accounts[module.global.config.terraform.state_account].id
     delegated_role_name = module.global.config.terraform.roles.reader

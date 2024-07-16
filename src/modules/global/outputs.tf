@@ -137,7 +137,7 @@ output "config" {
       aws_profile = "KARMA-INIT"
       aws_version = ">= 5.56.1"
       paths = {
-        bootstrap = "src/contexts/bootstrap"
+        bootstrap = "src/bootstrap"
         source    = "src"
       }
       roles = {

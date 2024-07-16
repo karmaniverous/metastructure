@@ -19,7 +19,7 @@ file at every commit. See the README for more info!
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_dev" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.dev
   }
@@ -32,7 +32,7 @@ module "terraform_deployment_role_dev" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_dev2" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.dev2
   }
@@ -45,7 +45,7 @@ module "terraform_deployment_role_dev2" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_identity" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.identity
   }
@@ -58,7 +58,7 @@ module "terraform_deployment_role_identity" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_log_archive" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.log_archive
   }
@@ -71,7 +71,7 @@ module "terraform_deployment_role_log_archive" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_master" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.master
   }
@@ -84,7 +84,7 @@ module "terraform_deployment_role_master" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_prod" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.prod
   }
@@ -97,7 +97,7 @@ module "terraform_deployment_role_prod" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_shared_services" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.shared_services
   }
@@ -110,7 +110,7 @@ module "terraform_deployment_role_shared_services" {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_test" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.test
   }

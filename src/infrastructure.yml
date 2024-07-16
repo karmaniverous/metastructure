@@ -97,52 +97,28 @@ organizational_units:
 targets:
   src/modules/global/outputs.tf:
     template: terraform-global-outputs.hbs
-  src/contexts/acct/backend.tf:
-    config:
-      context: acct
-    template: terraform-backend.hbs
-  src/contexts/acct/backend_override.tf:
-    config:
-      context: acct
-    template: terraform-backend-override.hbs
-  src/contexts/acct/providers_override.tf:
-    template: terraform-providers-override.hbs
-  src/contexts/acct/terraform.tf:
-    template: terraform.hbs
-  src/contexts/bootstrap/backend.tf:
+  src/bootstrap/backend.tf:
     config:
       context: bootstrap
     template: terraform-backend.hbs
-  src/contexts/bootstrap/backend_override.tf:
+  src/bootstrap/backend_override.tf:
     config:
       context: bootstrap
     template: terraform-backend-override.hbs
-  src/contexts/bootstrap/providers.tf:
+  src/bootstrap/providers.tf:
     template: terraform-providers.hbs
-  src/contexts/bootstrap/providers_override.tf:
+  src/bootstrap/providers_override.tf:
     template: terraform-providers-override.hbs
-  src/contexts/bootstrap/generated.tf:
+  src/bootstrap/generated.tf:
     template: terraform-bootstrap-generated.hbs
-  src/contexts/bootstrap/terraform.tf:
-    template: terraform.hbs
-  src/contexts/env/backend.tf:
-    config:
-      context: env
-    template: terraform-backend.hbs
-  src/contexts/env/backend_override.tf:
-    config:
-      context: env
-    template: terraform-backend-override.hbs
-  src/contexts/env/providers_override.tf:
-    template: terraform-providers-override.hbs
-  src/contexts/env/terraform.tf:
+  src/bootstrap/terraform.tf:
     template: terraform.hbs
 templates_path: src/templates
 terraform:
   aws_profile: KARMA-INIT
   aws_version: ">= 5.56.1"
   paths:
-    bootstrap: src/contexts/bootstrap
+    bootstrap: src/bootstrap
     source: src
   roles:
     admin: TerraformAdmin

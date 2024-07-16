@@ -44,7 +44,7 @@ removed {
 # and allow it to be assumed from the master account.
 ###############################################################################
 module "terraform_deployment_role_{{@key}}" {
-  source = "../../modules/delegated-role"
+  source = "../modules/delegated-role"
   providers = {
     aws = aws.{{@key}}
   }
