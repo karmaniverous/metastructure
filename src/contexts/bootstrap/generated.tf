@@ -43,15 +43,6 @@ module "dev2_terraform_deployment_role" {
   delegated_role_name   = module.global.config.terraform.deployment_role
 }
 ###############################################################################
-# Remove Terraform deployment role from account "Third Development Account".
-###############################################################################
-removed {
-  from = module.dev3_terraform_deployment_role
-  lifecycle {
-    destroy = false
-  }
-}
-###############################################################################
 # Create a Terraform deployment role at account "Identity Account"
 # and allow it to be assumed from the Terraform deployment delegator role at
 # the Terraform state account.

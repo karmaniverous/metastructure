@@ -30,13 +30,6 @@ output "config" {
         name                = "Second Development Account"
         organizational_unit = "dev"
       }
-      dev3 = {
-        action              = "destroy"
-        id                  = "058264090080"
-        email               = "jscroft+karma.dev3.001@gmail.com"
-        name                = "Third Development Account"
-        organizational_unit = "dev"
-      }
       identity = {
         id                  = "654654161374"
         email               = "jscroft+karma.identity.001@gmail.com"
