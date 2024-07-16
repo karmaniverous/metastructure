@@ -18,7 +18,7 @@
     "yaml": "^2.4.5",
     "zod": "^3.23.8"
   },
-  "description": "Config-driven, enterprise-grade, open-source application infrastructure.",
+  "description": "A command-line tool that can generate & manage a complex IaC infrastructure with a single YAML config file and a handful of Handlebars templates.",
   "devDependencies": {
     "@commander-js/extra-typings": "^12.1.0",
     "@eslint/js": "^9.6.0",
