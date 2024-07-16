@@ -1,4 +1,5 @@
 import aliasPlugin, { type Alias } from '@rollup/plugin-alias';
+import commonjsPlugin from '@rollup/plugin-commonjs';
 import jsonPlugin from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescriptPlugin from '@rollup/plugin-typescript';
@@ -9,6 +10,7 @@ import dtsPlugin from 'rollup-plugin-dts';
 const outputPath = `dist`;
 
 const commonPlugins = [
+  commonjsPlugin(),
   jsonPlugin(),
   nodeResolve({ exportConditions: ['node'] }), // https://github.com/SBoudrias/Inquirer.js/issues/1153#issuecomment-1212827810
   typescriptPlugin(),

@@ -23,6 +23,7 @@
     "@commander-js/extra-typings": "^12.1.0",
     "@eslint/js": "^9.6.0",
     "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
