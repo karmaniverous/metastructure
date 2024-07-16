@@ -1,14 +1,14 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
 
-import { applyLicenseHeaders } from './applyLicenseHeaders';
-import { formatFiles } from './formatFiles';
-import { parseConfig } from './parseConfig';
-import { processTargets } from './processTargets';
+import { applyLicenseHeaders } from '../../applyLicenseHeaders';
+import { formatFiles } from '../../formatFiles';
+import { parseConfig } from '../../parseConfig';
+import { processTargets } from '../../processTargets';
 
 export const configCommand = new Command()
   .name('config')
-  .description('Process config.yml with config templates.')
+  .description('Process config file with templates.')
   .enablePositionalOptions()
   .passThroughOptions()
   .option('-c, --config-path <string>', 'Config file path relative to CWD.')

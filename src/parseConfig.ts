@@ -13,7 +13,8 @@ export const parseConfig = async ({
   let config: Config;
 
   try {
-    if (stdOut) process.stdout.write(chalk.black.bold('Parsing config.yml...'));
+    if (stdOut)
+      process.stdout.write(chalk.black.bold('Parsing config file...'));
 
     // Load & parse config file.
     config = await readConfigFile(configPath);

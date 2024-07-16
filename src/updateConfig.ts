@@ -7,7 +7,7 @@ import { type Actionable, type Config } from './Config';
 import { readConfigFile, writeConfigFile } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
-import pkgDir from './pkgDir';
+import { pkgDir } from './pkgDir';
 
 type Update = {
   [K in keyof Config]-?: Config[K] extends Record<string, object>
@@ -23,7 +23,7 @@ export const updateConfig = async ({
 }: ConsoleParams = {}) => {
   try {
     if (stdOut)
-      process.stdout.write(chalk.black.bold('\nUpdating config.yml...'));
+      process.stdout.write(chalk.black.bold('\nUpdating config file...'));
 
     // Load & parse config file.
     const config = await readConfigFile(configPath);

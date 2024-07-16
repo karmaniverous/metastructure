@@ -1,10 +1,13 @@
-import { parse } from 'dotenv';
 import fs from 'fs-extra';
 import { resolve } from 'path';
 import yaml from 'yaml';
+import { z } from 'zod';
 
 import { Config, configSchema } from './Config';
-import pkgDir from './pkgDir';
+import { pkgDir } from './pkgDir';
+
+const rcSchema = z.object({ configPath: z.string() }).strict();
+export type RC = z.infer<typeof rcSchema>;
 
 const resolveConfigPath = async (path?: string) => {
   let resolvedPath: string | undefined;
@@ -12,12 +15,15 @@ const resolveConfigPath = async (path?: string) => {
   if (path) {
     resolvedPath = resolve(path);
   } else {
-    const rcPath = resolve(pkgDir, '.infrarc');
+    const rcPath = resolve(pkgDir, '.metastructure.yml');
 
     if (await fs.exists(rcPath)) {
       try {
-        const { CONFIG_PATH } = parse(await fs.readFile(rcPath, 'utf8'));
-        if (CONFIG_PATH) resolvedPath = resolve(pkgDir, CONFIG_PATH);
+        const { configPath } = yaml.parse(
+          await fs.readFile(rcPath, 'utf8'),
+        ) as RC;
+
+        if (configPath) resolvedPath = resolve(pkgDir, configPath);
       } catch {
         /* empty */
       }

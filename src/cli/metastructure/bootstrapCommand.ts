@@ -3,12 +3,12 @@ import chalk from 'chalk';
 import { $ as execa } from 'execa';
 import { resolve } from 'path';
 
-import { applyLicenseHeaders } from './applyLicenseHeaders';
-import { formatFiles } from './formatFiles';
-import { parseConfig } from './parseConfig';
-import pkgDir from './pkgDir';
-import { processTargets } from './processTargets';
-import { updateConfig } from './updateConfig';
+import { applyLicenseHeaders } from '../../applyLicenseHeaders';
+import { formatFiles } from '../../formatFiles';
+import { parseConfig } from '../../parseConfig';
+import { pkgDir } from '../../pkgDir';
+import { processTargets } from '../../processTargets';
+import { updateConfig } from '../../updateConfig';
 
 export const bootstrapCommand = new Command()
   .name('bootstrap')

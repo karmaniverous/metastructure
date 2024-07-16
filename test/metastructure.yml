@@ -95,31 +95,31 @@ organizational_units:
     id: ou-ene9-11hhbwhx
     name: Workloads OU
 targets:
-  src/modules/global/outputs.tf:
+  test/modules/global/outputs.tf:
     template: terraform-global-outputs.hbs
-  src/bootstrap/backend.tf:
+  test/bootstrap/backend.tf:
     config:
       context: bootstrap
     template: terraform-backend.hbs
-  src/bootstrap/backend_override.tf:
+  test/bootstrap/backend_override.tf:
     config:
       context: bootstrap
     template: terraform-backend-override.hbs
-  src/bootstrap/providers.tf:
+  test/bootstrap/providers.tf:
     template: terraform-providers.hbs
-  src/bootstrap/providers_override.tf:
+  test/bootstrap/providers_override.tf:
     template: terraform-providers-override.hbs
-  src/bootstrap/generated.tf:
+  test/bootstrap/generated.tf:
     template: terraform-bootstrap-generated.hbs
-  src/bootstrap/terraform.tf:
+  test/bootstrap/terraform.tf:
     template: terraform.hbs
-templates_path: src/templates
+templates_path: test/templates
 terraform:
   aws_profile: KARMA-INIT
   aws_version: ">= 5.56.1"
   paths:
-    bootstrap: src/bootstrap
-    source: src
+    bootstrap: test/bootstrap
+    source: test
   roles:
     admin: TerraformAdmin
     deployment: TerraformDeployment

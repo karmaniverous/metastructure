@@ -7,7 +7,7 @@ import { resolve } from 'path';
 import { type Config } from './Config';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
-import pkgDir from './pkgDir';
+import { pkgDir } from './pkgDir';
 
 interface processTargetsParams extends ConsoleParams {
   config?: Config;

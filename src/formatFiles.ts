@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { type Config } from './Config';
 import { ConsoleParams } from './ConsoleParams';
 import { parseConfig } from './parseConfig';
-import pkgDir from './pkgDir';
+import { pkgDir } from './pkgDir';
 
 interface FormatFilesParams extends ConsoleParams {
   config?: Config;

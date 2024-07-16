@@ -1,3 +1,13 @@
+.nyc_output/
+.rollup.cache/
+.tsbuildinfo
+*.local
+local/
+coverage/
+dist/
+esm/
+node_modules/
+
 # Local .terraform directories
 **/.terraform/*
 
@@ -35,11 +45,3 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
-# package directories
-node_modules
-jspm_packages
-
-# Local secrets
-local
-*.local
