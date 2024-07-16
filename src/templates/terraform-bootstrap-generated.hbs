@@ -33,7 +33,7 @@ removed {
 # Remove Terraform deployment role from account "{{this.name}}".
 ###############################################################################
 removed {
-  from      = module.{{@key}}_terraform_deployment_role
+  from      = module.terraform_deployment_role_{{@key}}
   lifecycle {
     destroy = false
   }
@@ -41,16 +41,15 @@ removed {
 {{else}}
 ###############################################################################
 # Create a Terraform deployment role at account "{{this.name}}"
-# and allow it to be assumed from the Terraform deployment delegator role at
-# the Terraform state account.
+# and allow it to be assumed from the master account.
 ###############################################################################
-module "{{@key}}_terraform_deployment_role" {
+module "terraform_deployment_role_{{@key}}" {
   source = "../../modules/delegated-role"
   providers = {
     aws = aws.{{@key}}
   }
   delegated_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  delegator_principals   = ["${aws_organizations_account.accounts["{{../terraform.state_account}}"].id}"]
-  delegated_role_name    = module.global.config.terraform.deployment_role
+  delegator_principals   = ["${aws_organizations_account.accounts["{{../organization.master_account}}"].id}"]
+  delegated_role_name    = module.global.config.terraform.roles.deployment
 }
 {{/if}}{{/each}}

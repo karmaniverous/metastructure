@@ -1,31 +1,28 @@
 {
-  "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowOrgManagement",
-      "Effect": "Allow",
       "Action": ["organizations:*"],
-      "Resource": ["*"]
+      "Effect": "Allow",
+      "Resource": ["*"],
+      "Sid": "AllowOrgManagement"
     },
     {
-      "Sid": "AllowAliasAdmin",
-      "Effect": "Allow",
       "Action": [
         "iam:ListAccountAliases",
         "iam:CreateAccountAlias",
         "iam:DeleteAccountAlias"
       ],
-      "Resource": ["*"]
+      "Effect": "Allow",
+      "Resource": ["*"],
+      "Sid": "AllowAliasAdmin"
     },
     {
-      "Sid": "AllowServiceLinkedRoleCreation",
-      "Effect": "Allow",
       "Action": ["iam:CreateServiceLinkedRole"],
-      "Resource": ["arn:aws:iam::*:role/aws-service-role/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:iam::*:role/aws-service-role/*"],
+      "Sid": "AllowServiceLinkedRoleCreation"
     },
     {
-      "Sid": "AllowRoleManagement",
-      "Effect": "Allow",
       "Action": [
         "iam:GetRole",
         "iam:CreateRole",
@@ -38,11 +35,11 @@
         "iam:UpdateAssumeRolePolicy",
         "iam:TagRole"
       ],
-      "Resource": ["arn:aws:iam::*:role/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:iam::*:role/*"],
+      "Sid": "AllowRoleManagement"
     },
     {
-      "Sid": "AllowIamCreatePolicy",
-      "Effect": "Allow",
       "Action": [
         "iam:CreatePolicy",
         "iam:CreatePolicyVersion",
@@ -50,13 +47,14 @@
         "iam:DeletePolicyVersion",
         "iam:ListPolicyVersions",
         "iam:GetPolicy",
-        "iam:GetPolicyVersion"
+        "iam:GetPolicyVersion",
+        "iam:TagPolicy"
       ],
-      "Resource": ["arn:aws:iam::*:policy/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:iam::*:policy/*"],
+      "Sid": "AllowIamCreatePolicy"
     },
     {
-      "Sid": "AllowIamAttachPolicy",
-      "Effect": "Allow",
       "Action": [
         "iam:GetUser",
         "iam:AttachUserPolicy",
@@ -64,11 +62,11 @@
         "iam:ListAttachedUserPolicies",
         "iam:ListInstanceProfilesForRole"
       ],
-      "Resource": ["arn:aws:iam::*:user/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:iam::*:user/*"],
+      "Sid": "AllowIamAttachPolicy"
     },
     {
-      "Sid": "AllowGuardDutyManagement",
-      "Effect": "Allow",
       "Action": [
         "guardduty:EnableOrganizationAdminAccount",
         "guardduty:CreateDetector",
@@ -76,11 +74,11 @@
         "guardduty:DisableOrganizationAdminAccount",
         "guardduty:ListOrganizationAdminAccounts"
       ],
-      "Resource": ["*"]
+      "Effect": "Allow",
+      "Resource": ["*"],
+      "Sid": "AllowGuardDutyManagement"
     },
     {
-      "Sid": "AllowGuardDutyDetectorManagement",
-      "Effect": "Allow",
       "Action": [
         "guardduty:DeleteMembers",
         "guardduty:GetMasterAccount",
@@ -98,13 +96,16 @@
         "guardduty:InviteMembers",
         "guardduty:ListMembers"
       ],
-      "Resource": ["arn:aws:guardduty:*:*:detector/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:guardduty:*:*:detector/*"],
+      "Sid": "AllowGuardDutyDetectorManagement"
     },
     {
-      "Sid": "AllowRoleAssumption",
-      "Effect": "Allow",
       "Action": ["sts:AssumeRole"],
-      "Resource": ["arn:aws:iam::*:role/*"]
+      "Effect": "Allow",
+      "Resource": ["arn:aws:iam::*:role/*"],
+      "Sid": "AllowRoleAssumption"
     }
-  ]
+  ],
+  "Version": "2012-10-17"
 }

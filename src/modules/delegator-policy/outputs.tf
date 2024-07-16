@@ -5,7 +5,12 @@ file at every commit. See the README for more info!
 *************************************************************
 */
 
-output "role_name" {
-  description = "Delegator role name."
-  value       = aws_iam_role.delegator.name
+output "policy_arn" {
+  description = "Delegator policy ARN."
+  value       = aws_iam_policy.delegator.arn
+}
+
+output "policy_name" {
+  description = "Delegator policy name."
+  value       = aws_iam_policy.delegator.name
 }

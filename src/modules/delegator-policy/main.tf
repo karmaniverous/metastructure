@@ -16,10 +16,7 @@ data "aws_iam_policy_document" "delegator" {
       "sts:AssumeRole"
     ]
 
-    principals {
-      type        = "AWS"
-      identifiers = [for r in var.delegated_roles : "arn:aws:iam::${r.delegate_account_id}:role/${r.delegated_role_name}"]
-    }
+    resources = [for r in var.delegated_roles : "arn:aws:iam::${r.delegate_account_id}:role/${r.delegated_role_name}"]
   }
 }
 

@@ -75,16 +75,17 @@ export const configSchema = z
     templates_path: z.string().optional(),
     terraform: z
       .object({
-        admin_role: z.string(),
         aws_profile: z.string().optional(),
         aws_version: z.string(),
-        deployment_role: z.string(),
-        deployment_delegator_role: z.string(),
         paths: z.object({
           bootstrap: z.string(),
           source: z.string().or(z.string().array()),
         }),
-        reader_role: z.string(),
+        roles: z.object({
+          admin: z.string(),
+          deployment: z.string(),
+          reader: z.string(),
+        }),
         state_account: z.string(),
         state_bucket: z.string(),
         state_key: z.string(),

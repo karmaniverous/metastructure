@@ -21,7 +21,7 @@ terraform {
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "us-east-1"
-    role_arn             = "arn:aws:iam::533267247492:role/TerraformAdmin"
+    role_arn             = "arn:aws:iam::533267247492:role/"
     workspace_key_prefix = "acct"
   }
 }

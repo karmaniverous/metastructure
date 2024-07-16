@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "terraform_admin" {
 }
 
 resource "aws_iam_policy" "terraform_admin" {
-  name        = module.global.config.terraform.admin_role
+  name        = module.global.config.terraform.roles.admin
   policy      = data.aws_iam_policy_document.terraform_admin.json
   description = "Permits management & locking of Terraform state."
   provider    = aws.terraform_state_account
@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "terraform_reader" {
 }
 
 resource "aws_iam_policy" "terraform_reader" {
-  name        = module.global.config.terraform.reader_role
+  name        = module.global.config.terraform.roles.reader
   policy      = data.aws_iam_policy_document.terraform_reader.json
   description = "Permits management & locking of Terraform state."
   provider    = aws.terraform_state_account
