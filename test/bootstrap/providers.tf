@@ -8,7 +8,7 @@ file at every commit. See the README for more info!
 ###############################################################################
 ###############################################################################
 ####                                                                       ####
-####              THIS FILE WAS GENERATED WITH nr cli config               ####
+####              THIS FILE WAS GENERATED WITH METASTRUCTURE               ####
 ####                       DO NOT EDIT IT MANUALLY!                        ####
 ####                                                                       ####
 ###############################################################################
