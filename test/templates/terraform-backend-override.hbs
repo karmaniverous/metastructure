@@ -17,6 +17,6 @@ terraform { {{#if params.localState}}
         profile = "{{terraform.aws_profile}}" 
         region = "{{organization.aws_region}}" 
         role_arn = "arn:aws:iam::{{lookup (lookup accounts terraform.state_account) "id"}}:role/{{terraform.admin_role}}"
-        workspace_key_prefix = "{{config.context}}" 
+        workspace_key_prefix = "{{params.batch}}" 
     } {{/if}}
 }

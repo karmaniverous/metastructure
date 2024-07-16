@@ -25,10 +25,9 @@ output "config" {
         organizational_unit = "dev"
       }
       master = {
-        action = "import"
-        id     = "891377150698"
-        email  = "jscroft+karma.003.master@gmail.com"
-        name   = "Master Account"
+        id    = "891377150698"
+        email = "jscroft+karma.003.master@gmail.com"
+        name  = "Master Account"
       }
       prod = {
         id                  = "381491905215"
@@ -115,10 +114,7 @@ output "config" {
     terraform = {
       aws_profile = "KARMA-INIT"
       aws_version = ">= 5.56.1"
-      paths = {
-        bootstrap = "test/bootstrap"
-        source    = "test"
-      }
+      paths       = "test"
       roles = {
         admin      = "TerraformAdmin"
         deployment = "TerraformDeployment"

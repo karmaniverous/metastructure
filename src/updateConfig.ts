@@ -17,20 +17,33 @@ type Update = {
     : never;
 };
 
+interface UpdateConfigParams extends ConsoleParams {
+  batch: string;
+}
+
 export const updateConfig = async ({
+  batch,
   configPath,
   stdOut,
-}: ConsoleParams = {}) => {
+}: UpdateConfigParams) => {
   try {
     if (stdOut)
-      process.stdout.write(chalk.black.bold('\nUpdating config file...'));
+      process.stdout.write(
+        chalk.black.bold(`\nUpdating config file from batch '${batch}...`),
+      );
 
     // Load & parse config file.
     const config = await readConfigFile(configPath);
 
+    // Validate batch.
+    if (!config.batches?.[batch]) {
+      if (stdOut) process.stdout.write(chalk.red.bold(' Unknown batch!\n\n'));
+      process.exit(1);
+    }
+
     // Configure shell client.
     const $ = execa({
-      cwd: resolve(pkgDir, config.terraform.paths.bootstrap),
+      cwd: resolve(pkgDir, config.batches[batch].path),
       shell: true,
     });
 

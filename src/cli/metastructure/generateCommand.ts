@@ -3,19 +3,24 @@ import chalk from 'chalk';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
+import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
-import { processTargets } from '../../processTargets';
 
-export const configCommand = new Command()
-  .name('config')
-  .description('Process config file with templates.')
+export const generateCommand = new Command()
+  .name('generate')
+  .description('Generate infrastructure batch.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-c, --config-path <string>', 'Config file path relative to CWD.')
   .option('-l, --local-state', 'Use local state.')
-  .action(async ({ configPath, localState }) => {
+  .argument('<batch>', 'Batch name.')
+  .action(async (batch, options, cmd) => {
+    const { configPath, localState }: typeof options & { configPath?: string } =
+      cmd.optsWithGlobals();
+
     process.stdout.write(
-      chalk.black.bold('*** CONFIGURING INFRASTRUCTURE PROJECT ***\n\n'),
+      chalk.black.bold(
+        `*** GENERATING INFRASTRUCTURE BATCH "${batch}" ***\n\n`,
+      ),
     );
 
     try {
@@ -23,7 +28,7 @@ export const configCommand = new Command()
       const config = await parseConfig({ configPath, stdOut: true });
 
       // Process templates.
-      await processTargets({ localState, config, stdOut: true });
+      await generateBatch({ batch, localState, config, stdOut: true });
 
       // Apply license headers.
       await applyLicenseHeaders({ stdOut: true });

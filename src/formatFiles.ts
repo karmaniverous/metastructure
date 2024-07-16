@@ -23,7 +23,7 @@ export const formatFiles = async ({
   if (stdOut) process.stdout.write(chalk.black.bold('Formatting files...\n'));
 
   // Format Terraform files.
-  for (const dir of _.castArray(config.terraform.paths.source)) {
+  for (const dir of _.castArray(config.terraform.paths)) {
     const { stdout: formatOutput } =
       await $`terraform fmt -recursive ${resolve(pkgDir, dir)}`;
 

@@ -2,28 +2,27 @@ import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
-import { formatFiles } from '../../formatFiles';
 import { updateConfig } from '../../updateConfig';
 
 export const updateCommand = new Command()
   .name('update')
-  .description('Updates config from Terraform output.')
+  .description('Update config from batch output.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-c, --config-path <string>', 'Config file path relative to CWD.')
-  .action(async ({ configPath }) => {
+  .argument('<batch>', 'Batch name.')
+  .action(async (batch, options, cmd) => {
+    const { configPath }: typeof options & { configPath?: string } =
+      cmd.optsWithGlobals();
+
     process.stdout.write(
-      chalk.black.bold(`*** UPDATING CONFIG FROM TERRAFORM OUTPUT ***\n\n`),
+      chalk.black.bold(`*** UPDATING CONFIG FROM BATCH ${batch} ***\n\n`),
     );
 
     try {
-      await updateConfig({ configPath, stdOut: true });
+      await updateConfig({ batch, configPath, stdOut: true });
 
       // Apply license headers.
       await applyLicenseHeaders({ stdOut: true });
-
-      // Format files.
-      await formatFiles({ configPath, stdOut: true });
     } catch {
       /* empty */
     }

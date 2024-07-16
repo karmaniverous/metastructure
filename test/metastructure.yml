@@ -27,6 +27,17 @@ accounts:
     email: jscroft+karma.003.shared_services@gmail.com
     name: Shared Services Account
     organizational_unit: infrastructure
+batches:
+  bootstrap:
+    generators:
+      test/modules/global/outputs.tf: test/templates/terraform-global-outputs.hbs
+      test/bootstrap/backend.tf: test/templates/terraform-backend.hbs
+      test/bootstrap/backend_override.tf: test/templates/terraform-backend-override.hbs
+      test/bootstrap/providers.tf: test/templates/terraform-providers.hbs
+      test/bootstrap/providers_override.tf: test/templates/terraform-providers-override.hbs
+      test/bootstrap/generated.tf: test/templates/terraform-bootstrap-generated.hbs
+      test/bootstrap/terraform.tf: test/templates/terraform.hbs
+    path: test/bootstrap
 environments:
   bali:
     account: dev
@@ -76,32 +87,10 @@ organizational_units:
   workloads:
     id: ou-u0l7-zu0gl8ze
     name: Workloads OU
-targets:
-  test/modules/global/outputs.tf:
-    template: terraform-global-outputs.hbs
-  test/bootstrap/backend.tf:
-    config:
-      context: bootstrap
-    template: terraform-backend.hbs
-  test/bootstrap/backend_override.tf:
-    config:
-      context: bootstrap
-    template: terraform-backend-override.hbs
-  test/bootstrap/providers.tf:
-    template: terraform-providers.hbs
-  test/bootstrap/providers_override.tf:
-    template: terraform-providers-override.hbs
-  test/bootstrap/generated.tf:
-    template: terraform-bootstrap-generated.hbs
-  test/bootstrap/terraform.tf:
-    template: terraform.hbs
-templates_path: test/templates
 terraform:
   aws_profile: KARMA-INIT
   aws_version: ">= 5.56.1"
-  paths:
-    bootstrap: test/bootstrap
-    source: test
+  paths: test
   roles:
     admin: TerraformAdmin
     deployment: TerraformDeployment

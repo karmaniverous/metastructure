@@ -36,6 +36,17 @@ export const configSchema = z
         })
         .strict(),
     ),
+    batches: z
+      .record(
+        z
+          .object({
+            generators: z.record(z.string()).optional(),
+            path: z.string(),
+          })
+          .strict(),
+      )
+      .optional(),
+    configPath: z.string().optional(),
     environments: z.record(
       z
         .object({
@@ -62,25 +73,11 @@ export const configSchema = z
         })
         .strict(),
     ),
-    targets: z
-      .record(
-        z
-          .object({
-            config: z.record(z.unknown()).optional(),
-            template: z.string(),
-          })
-          .strict(),
-      )
-      .optional(),
-    templates_path: z.string().optional(),
     terraform: z
       .object({
         aws_profile: z.string().optional(),
         aws_version: z.string(),
-        paths: z.object({
-          bootstrap: z.string(),
-          source: z.string().or(z.string().array()),
-        }),
+        paths: z.string().or(z.string().array()),
         roles: z.object({
           admin: z.string(),
           deployment: z.string(),
@@ -186,14 +183,6 @@ export const configSchema = z
         });
       }
     }
-
-    // validate templates_path
-    if (data.targets && !data.templates_path)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `targets defined but missing templates_path`,
-        path: ['templates_path'],
-      });
 
     // validate terraform.state_account
     if (!validAccounts.includes(data.terraform.state_account)) {
