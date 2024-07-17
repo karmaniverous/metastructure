@@ -1,10 +1,10 @@
 import fs from 'fs-extra';
 import _ from 'lodash';
 import { resolve } from 'path';
+import { packageDirectory } from 'pkg-dir';
 import { Document, parse, parseDocument, stringify, YAMLMap } from 'yaml';
 
 import { type Config, configSchema } from './Config';
-import { pkgDir } from './pkgDir';
 
 const resolveConfigPath = async (path?: string) => {
   let resolvedPath: string | undefined;
@@ -12,6 +12,8 @@ const resolveConfigPath = async (path?: string) => {
   if (path) {
     resolvedPath = resolve(path);
   } else {
+    const pkgDir = (await packageDirectory()) ?? '.';
+
     resolvedPath = resolve(pkgDir, '.metastructure.yml');
 
     if (await fs.exists(resolvedPath)) {
@@ -35,21 +37,24 @@ const resolveConfigPath = async (path?: string) => {
   return resolvedPath;
 };
 
-const readConfigDoc = async (path?: string) =>
-  parseDocument(await fs.readFile(await resolveConfigPath(path), 'utf8'));
+const readConfigDoc = async (configPath: string) =>
+  parseDocument(await fs.readFile(configPath, 'utf8'));
 
-export const readConfig = async (path?: string) =>
-  configSchema.parse(
-    parse(await fs.readFile(await resolveConfigPath(path), 'utf8')),
-  );
+export const readConfig = async (path?: string) => {
+  const configPath = await resolveConfigPath(path);
 
-export const writeConfig = async (config: Config, path?: string) => {
-  const doc = await readConfigDoc(path);
+  return {
+    config: configSchema.parse(parse(await fs.readFile(configPath, 'utf8'))),
+    configPath,
+  };
+};
 
-  await fs.writeFile(
-    await resolveConfigPath(path),
-    stringify(updateYamlDoc(doc, config), { doubleQuotedAsJSON: true }),
-  );
+export const writeConfig = async (config: Config, configPath: string) => {
+  const doc = await readConfigDoc(configPath);
+
+  updateYamlDoc(doc, config);
+
+  await fs.writeFile(configPath, stringify(doc, { doubleQuotedAsJSON: true }));
 };
 
 function updateYamlDoc(doc: Document.Parsed, update: object | object[]) {
@@ -62,6 +67,4 @@ function updateYamlDoc(doc: Document.Parsed, update: object | object[]) {
       doc.set(key, value);
     }
   }
-
-  return doc;
 }

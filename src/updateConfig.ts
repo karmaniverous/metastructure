@@ -2,12 +2,11 @@ import chalk from 'chalk';
 import { $ as execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
+import { packageDirectory } from 'pkg-dir';
 
 import { type Actionable, type Config } from './Config';
 import { readConfig, writeConfig } from './configFile';
-import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
-import { pkgDir } from './pkgDir';
 
 type Update = {
   [K in keyof Config]-?: Config[K] extends Record<string, object>
@@ -17,13 +16,15 @@ type Update = {
     : never;
 };
 
-interface UpdateConfigParams extends ConsoleParams {
+interface UpdateConfigParams {
   batch: string;
+  path?: string;
+  stdOut?: boolean;
 }
 
 export const updateConfig = async ({
   batch,
-  configPath,
+  path,
   stdOut,
 }: UpdateConfigParams) => {
   try {
@@ -32,8 +33,8 @@ export const updateConfig = async ({
         chalk.black.bold(`\nUpdating config file from batch '${batch}...`),
       );
 
-    // Load & parse config file.
-    const config = await readConfig(configPath);
+    // Load config file.
+    const { config, configPath } = await readConfig(path);
 
     // Validate batch.
     if (!config.batches?.[batch]) {
@@ -43,7 +44,10 @@ export const updateConfig = async ({
 
     // Configure shell client.
     const $ = execa({
-      cwd: resolve(pkgDir, config.batches[batch].path),
+      cwd: resolve(
+        (await packageDirectory({ cwd: configPath })) ?? '.',
+        config.batches[batch].path,
+      ),
       shell: true,
     });
 
@@ -69,6 +73,8 @@ export const updateConfig = async ({
     await writeConfig(config, configPath);
 
     if (stdOut) process.stdout.write(chalk.black.bold(' Done!\n'));
+
+    return { configPath };
   } catch (error) {
     if (stdOut) {
       process.stdout.write(chalk.red.bold(' Error!\n\n'));

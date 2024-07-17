@@ -1,5 +1,6 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
+import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
@@ -14,8 +15,10 @@ export const generateCommand = new Command()
   .option('-l, --local-state', 'Use local state.')
   .argument('<batch>', 'Batch name.')
   .action(async (batch, options, cmd) => {
-    const { configPath, localState }: typeof options & { configPath?: string } =
-      cmd.optsWithGlobals();
+    const {
+      configPath: path,
+      localState,
+    }: typeof options & { configPath?: string } = cmd.optsWithGlobals();
 
     process.stdout.write(
       chalk.black.bold(
@@ -25,16 +28,18 @@ export const generateCommand = new Command()
 
     try {
       // Load & parse project config.
-      const config = await parseConfig({ configPath, stdOut: true });
+      const { config, configPath } = await parseConfig({ path, stdOut: true });
+
+      const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
       // Process templates.
-      await generateBatch({ batch, localState, config, stdOut: true });
+      await generateBatch({ batch, localState, config, pkgDir, stdOut: true });
 
       // Apply license headers.
-      await applyLicenseHeaders({ stdOut: true });
+      await applyLicenseHeaders({ pkgDir, stdOut: true });
 
       // Format files.
-      await formatFiles({ stdOut: true });
+      await formatFiles({ config, pkgDir, stdOut: true });
     } catch {
       /* empty */
     }

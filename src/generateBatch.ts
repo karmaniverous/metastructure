@@ -5,22 +5,23 @@ import _ from 'lodash';
 import { resolve } from 'path';
 
 import { type Config } from './Config';
-import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
-import { pkgDir } from './pkgDir';
 
-interface generateBatchParams extends ConsoleParams {
+interface GenerateBatchParams {
   batch: string;
   config: Config;
   localState?: boolean;
+  pkgDir: string;
+  stdOut?: boolean;
 }
 
 export const generateBatch = async ({
   batch,
   config,
   localState,
+  pkgDir,
   stdOut,
-}: generateBatchParams) => {
+}: GenerateBatchParams) => {
   if (stdOut)
     process.stdout.write(chalk.black.bold(`Generating batch '${batch}'...`));
 

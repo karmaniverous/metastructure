@@ -2,12 +2,12 @@ import { Command, Option } from '@commander-js/extra-typings';
 import chalk from 'chalk';
 import { $ as execa } from 'execa';
 import { resolve } from 'path';
+import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
 import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
-import { pkgDir } from '../../pkgDir';
 import { updateConfig } from '../../updateConfig';
 
 export const applyCommand = new Command()
@@ -25,7 +25,7 @@ export const applyCommand = new Command()
   .argument('<batch>', 'Batch name.')
   .action(async (batch, options, cmd) => {
     const {
-      configPath,
+      configPath: path,
       localState,
       migrateState,
       reconfigure,
@@ -39,10 +39,12 @@ export const applyCommand = new Command()
 
     try {
       // Load & parse project config.
-      const config = await parseConfig({ configPath, stdOut: true });
+      const { config, configPath } = await parseConfig({ path, stdOut: true });
+
+      const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
       // Process templates.
-      await generateBatch({ batch, localState, config, stdOut: true });
+      await generateBatch({ batch, localState, config, pkgDir, stdOut: true });
 
       if (!config.batches?.[batch]) throw new Error('Unknown batch!');
 
@@ -60,13 +62,13 @@ export const applyCommand = new Command()
       await $`terraform apply`;
 
       // Update config with Terraform outputs.
-      await updateConfig({ batch, configPath, stdOut: true });
+      await updateConfig({ batch, path: configPath, stdOut: true });
 
       // Apply license headers.
-      await applyLicenseHeaders({ stdOut: true });
+      await applyLicenseHeaders({ pkgDir, stdOut: true });
 
       // Format files.
-      await formatFiles({ config, stdOut: true });
+      await formatFiles({ config, pkgDir, stdOut: true });
     } catch {
       /* empty */
     }

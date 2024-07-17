@@ -4,22 +4,19 @@ import _ from 'lodash';
 import { resolve } from 'path';
 
 import { type Config } from './Config';
-import { ConsoleParams } from './ConsoleParams';
-import { parseConfig } from './parseConfig';
-import { pkgDir } from './pkgDir';
 
-interface FormatFilesParams extends ConsoleParams {
-  config?: Config;
+interface FormatFilesParams {
+  config: Config;
+  pkgDir: string;
+  stdOut?: boolean;
 }
 
 export const formatFiles = async ({
   config,
-  configPath,
+  pkgDir,
   stdOut,
-}: FormatFilesParams = {}) => {
-  // Load config if necessary.
-  if (!config) config = await parseConfig({ configPath, stdOut });
-
+}: FormatFilesParams) => {
+  // Load config.
   if (stdOut) process.stdout.write(chalk.black.bold('Formatting files...\n'));
 
   // Format Terraform files.

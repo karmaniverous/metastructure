@@ -1,5 +1,6 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
+import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { updateConfig } from '../../updateConfig';
@@ -11,7 +12,7 @@ export const updateCommand = new Command()
   .passThroughOptions()
   .argument('<batch>', 'Batch name.')
   .action(async (batch, options, cmd) => {
-    const { configPath }: typeof options & { configPath?: string } =
+    const { configPath: path }: typeof options & { configPath?: string } =
       cmd.optsWithGlobals();
 
     process.stdout.write(
@@ -19,10 +20,13 @@ export const updateCommand = new Command()
     );
 
     try {
-      await updateConfig({ batch, configPath, stdOut: true });
+      const { configPath } = await updateConfig({ batch, path, stdOut: true });
 
       // Apply license headers.
-      await applyLicenseHeaders({ stdOut: true });
+      await applyLicenseHeaders({
+        pkgDir: (await packageDirectory({ cwd: configPath })) ?? '.',
+        stdOut: true,
+      });
     } catch {
       /* empty */
     }

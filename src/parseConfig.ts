@@ -3,21 +3,23 @@ import chalk from 'chalk';
 
 import { type Config } from './Config';
 import { readConfig } from './configFile';
-import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 
-export const parseConfig = async ({
-  configPath,
-  stdOut,
-}: ConsoleParams = {}) => {
+interface ParseConfigParams {
+  path?: string;
+  stdOut?: boolean;
+}
+
+export const parseConfig = async ({ path, stdOut }: ParseConfigParams) => {
   let config: Config;
+  let configPath: string;
 
   try {
     if (stdOut)
       process.stdout.write(chalk.black.bold('Parsing config file...'));
 
     // Load & parse config file.
-    config = await readConfig(configPath);
+    ({ config, configPath } = await readConfig(path));
 
     // Recursively apply config to itself as a handlebars template.
     let thisPass = JSON.stringify(config);
@@ -43,5 +45,5 @@ export const parseConfig = async ({
     process.exit(1);
   }
 
-  return config;
+  return { config, configPath };
 };

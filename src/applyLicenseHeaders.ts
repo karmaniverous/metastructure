@@ -1,15 +1,28 @@
 import chalk from 'chalk';
-import { $ } from 'execa';
+import { $ as execa } from 'execa';
 
-import { ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 
-export const applyLicenseHeaders = async ({ stdOut }: ConsoleParams = {}) => {
+interface ApplyLicenseHeaders {
+  pkgDir: string;
+  stdOut?: boolean;
+}
+
+export const applyLicenseHeaders = async ({
+  pkgDir,
+  stdOut,
+}: ApplyLicenseHeaders) => {
   if (stdOut)
     process.stdout.write(chalk.black.bold('Applying license headers...'));
 
-  let licenseOutput = '';
+  let licenseOutput: string | undefined;
   try {
+    // Configure shell client.
+    const $ = execa({
+      cwd: pkgDir,
+      shell: true,
+    });
+
     ({ stdout: licenseOutput } = await $`license-check-and-add add`);
   } catch (error) {
     const msg = getErrorMessage(error);
