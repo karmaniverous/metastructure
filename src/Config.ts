@@ -109,15 +109,12 @@ export const configSchema = z
         aws_profile: z.string().optional(),
         aws_version: z.string(),
         paths: z.string().or(z.string().array()),
-        roles: z.object({
-          admin: z.string(),
-          deployment: z.string(),
-          reader: z.string(),
+        state: z.object({
+          account: z.string(),
+          bucket: z.string(),
+          key: z.string(),
+          lock_table: z.string(),
         }),
-        state_account: z.string(),
-        state_bucket: z.string(),
-        state_key: z.string(),
-        state_lock_table: z.string(),
         terraform_version: z.string(),
       })
       .strict(),
@@ -282,21 +279,51 @@ export const configSchema = z
         }
       }
 
-    // validate terraform.state_account
+    // validate terraform.state.account
     if (
       data.accounts &&
-      !validAccounts.includes(data.terraform.state_account)
+      !validAccounts.includes(data.terraform.state.account)
     ) {
-      const action = data.accounts[data.terraform.state_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      const action = data.accounts[data.terraform.state.account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_enum_value,
         message: `${actionErrorModifier(action)} account`,
         options: validAccounts,
-        path: ['terraform', 'state_account'],
-        received: data.terraform.state_account,
+        path: ['terraform', 'state.account'],
+        received: data.terraform.state.account,
       });
     }
+  })
+  .transform((data) => {
+    const validAccounts = filterValid(data.accounts);
+
+    // expand account_permission_sets
+    if (data.sso?.groups)
+      for (const group of _.values(data.sso.groups)) {
+        if (group.account_permission_sets) {
+          if (_.isPlainObject(group.account_permission_sets))
+            group.account_permission_sets = _.mapValues(
+              group.account_permission_sets as Record<
+                string,
+                string | string[]
+              >,
+              (permissionSets) => _.castArray(permissionSets),
+            );
+          else
+            group.account_permission_sets = _.fromPairs(
+              validAccounts.map((account) => [
+                account,
+                _.castArray(group.account_permission_sets as string | string[]),
+              ]),
+            );
+        }
+      }
+
+    // expand terraform.paths
+    data.terraform.paths = _.castArray(data.terraform.paths);
+
+    return data;
   });
 
 export type Config = z.infer<typeof configSchema>;
