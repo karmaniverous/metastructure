@@ -9,8 +9,8 @@ import { readConfig, writeConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 type Update = {
-  [K in keyof Config]-?: Config[K] extends Record<string, object>
-    ? Config[K][string] extends Actionable
+  [K in keyof Config]-?: NonNullable<Config[K]> extends Record<string, object>
+    ? NonNullable<Config[K]>[string] extends Actionable
       ? { value: Record<string, string> }
       : never
     : never;

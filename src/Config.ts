@@ -1,24 +1,24 @@
 import _ from 'lodash';
 import { z } from 'zod';
 
-const actionEnum = z.enum(['destroy', 'import', 'remove']).optional();
+const actionEnum = z.enum(['destroy', 'import', 'remove']);
 type Action = z.infer<typeof actionEnum>;
 
 const actionableSchema = z.object({
-  action: actionEnum,
+  action: actionEnum.optional(),
   id: z.string().optional(),
 });
 
 export type Actionable = z.infer<typeof actionableSchema>;
 
 const filterValid = <T extends Actionable = Actionable>(
-  collection: Record<string, T>,
+  collection: Record<string, T> = {},
 ) =>
   _.entries(collection)
     .filter(([, v]) => !v.action || !['destroy', 'remove'].includes(v.action))
     .map(([k]) => k);
 
-const actionErrorModifier = (action: Action) =>
+const actionErrorModifier = (action?: Action) =>
   action === 'destroy'
     ? 'destroyed'
     : action === 'remove'
@@ -27,15 +27,17 @@ const actionErrorModifier = (action: Action) =>
 
 export const configSchema = z
   .object({
-    accounts: z.record(
-      actionableSchema
-        .extend({
-          email: z.string(),
-          name: z.string(),
-          organizational_unit: z.string().optional(),
-        })
-        .strict(),
-    ),
+    accounts: z
+      .record(
+        actionableSchema
+          .extend({
+            email: z.string(),
+            name: z.string(),
+            organizational_unit: z.string().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
     batches: z
       .record(
         z
@@ -47,15 +49,17 @@ export const configSchema = z
       )
       .optional(),
     configPath: z.string().optional(),
-    environments: z.record(
-      z
-        .object({
-          account: z.string(),
-          cognito_user_pool_name: z.string(),
-          gha_on_push_branches: z.string().optional(),
-        })
-        .strict(),
-    ),
+    environments: z
+      .record(
+        z
+          .object({
+            account: z.string(),
+            cognito_user_pool_name: z.string(),
+            gha_on_push_branches: z.string().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
     organization: z
       .object({
         aws_region: z.string(),
@@ -65,14 +69,41 @@ export const configSchema = z
         namespace: z.string().optional(),
       })
       .strict(),
-    organizational_units: z.record(
-      actionableSchema
-        .extend({
-          name: z.string(),
-          parent: z.string().optional(),
-        })
-        .strict(),
-    ),
+    organizational_units: z
+      .record(
+        actionableSchema
+          .extend({
+            name: z.string(),
+            parent: z.string().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+    sso: z
+      .object({
+        groups: z
+          .record(
+            z.object({
+              description: z.string().optional(),
+              account_permission_sets: z
+                .string()
+                .or(z.string().array())
+                .or(z.record(z.string().or(z.string().array())))
+                .optional(),
+            }),
+          )
+          .optional(),
+        permission_sets: z
+          .record(
+            z.object({
+              description: z.string().optional(),
+              policies: z.string().or(z.string().array()).optional(),
+            }),
+          )
+          .optional(),
+        policy_documents: z.record(z.string()).optional(),
+      })
+      .optional(),
     terraform: z
       .object({
         aws_profile: z.string().optional(),
@@ -113,7 +144,7 @@ export const configSchema = z
       const ou = data.accounts[account].organizational_unit;
 
       if (ou && !validOus.includes(ou)) {
-        const action = data.organizational_units[ou]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+        const action = data.organizational_units?.[ou]?.action;
 
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
@@ -129,7 +160,7 @@ export const configSchema = z
     for (const environment in data.environments) {
       // validate account
       const account = data.environments[environment].account;
-      if (!validAccounts.includes(account)) {
+      if (data.accounts && !validAccounts.includes(account)) {
         const action = data.accounts[account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
         ctx.addIssue({
@@ -143,7 +174,10 @@ export const configSchema = z
     }
 
     // validate organization.master_account
-    if (!validAccounts.includes(data.organization.master_account)) {
+    if (
+      data.accounts &&
+      !validAccounts.includes(data.organization.master_account)
+    ) {
       const action = data.accounts[data.organization.master_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
       ctx.addIssue({
@@ -185,7 +219,10 @@ export const configSchema = z
     }
 
     // validate terraform.state_account
-    if (!validAccounts.includes(data.terraform.state_account)) {
+    if (
+      data.accounts &&
+      !validAccounts.includes(data.terraform.state_account)
+    ) {
       const action = data.accounts[data.terraform.state_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
       ctx.addIssue({
