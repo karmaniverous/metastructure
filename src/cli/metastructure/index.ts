@@ -11,9 +11,12 @@ const cli = new Command()
   .description('Generate & manage infrastructure artifacts.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-c, --config-path <string>', 'Config file path relative to CWD.')
+  .option('-c, --config-path <string>', 'config file path relative to CWD')
+  .option('-d, --debug <string>', 'enable debug logging.')
   .addCommand(generateCommand)
   .addCommand(applyCommand)
   .addCommand(updateCommand);
 
 cli.parse();
+
+export type GlobalCliOptions = ReturnType<typeof cli.opts>;

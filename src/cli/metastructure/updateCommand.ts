@@ -4,15 +4,16 @@ import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { updateConfig } from '../../updateConfig';
+import { type GlobalCliOptions } from '.';
 
 export const updateCommand = new Command()
   .name('update')
   .description('Update config from batch output.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .argument('<batch>', 'Batch name.')
+  .argument('<batch>', 'batch name')
   .action(async (batch, options, cmd) => {
-    const { configPath: path }: typeof options & { configPath?: string } =
+    const { configPath: path }: typeof options & GlobalCliOptions =
       cmd.optsWithGlobals();
 
     process.stdout.write(

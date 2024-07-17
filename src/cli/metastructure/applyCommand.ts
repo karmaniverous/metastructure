@@ -9,16 +9,17 @@ import { formatFiles } from '../../formatFiles';
 import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
 import { updateConfig } from '../../updateConfig';
+import { type GlobalCliOptions } from '.';
 
 export const applyCommand = new Command()
   .name('apply')
   .description('Generate & apply infrastructure batch.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-l, --local-state', 'Use local state.')
-  .option('-m, --migrate-state', 'Migrate state.')
+  .option('-l, --local-state', 'use local state')
+  .option('-m, --migrate-state', 'migrate state')
   .addOption(
-    new Option('-r, --reconfigure', 'Reconfigure state.').conflicts(
+    new Option('-r, --reconfigure', 'reconfigure state').conflicts(
       'migrateState',
     ),
   )
@@ -29,7 +30,7 @@ export const applyCommand = new Command()
       localState,
       migrateState,
       reconfigure,
-    }: typeof options & { configPath?: string } = cmd.optsWithGlobals();
+    }: typeof options & GlobalCliOptions = cmd.optsWithGlobals();
 
     process.stdout.write(
       chalk.black.bold(

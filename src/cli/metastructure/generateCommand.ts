@@ -6,19 +6,18 @@ import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
 import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
+import { type GlobalCliOptions } from '.';
 
 export const generateCommand = new Command()
   .name('generate')
   .description('Generate infrastructure batch.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-l, --local-state', 'Use local state.')
-  .argument('<batch>', 'Batch name.')
+  .option('-l, --local-state', 'use local state')
+  .argument('<batch>', 'batch name')
   .action(async (batch, options, cmd) => {
-    const {
-      configPath: path,
-      localState,
-    }: typeof options & { configPath?: string } = cmd.optsWithGlobals();
+    const { configPath: path, localState }: typeof options & GlobalCliOptions =
+      cmd.optsWithGlobals();
 
     process.stdout.write(
       chalk.black.bold(
