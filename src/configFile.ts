@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import _ from 'lodash';
 import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
-import { Document, parse, parseDocument, stringify, YAMLMap } from 'yaml';
+import { Document, parse, parseDocument, YAMLMap } from 'yaml';
 
 import { type Config, configSchema } from './Config';
 
