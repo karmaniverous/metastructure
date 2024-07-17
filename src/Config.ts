@@ -101,7 +101,7 @@ export const configSchema = z
             }),
           )
           .optional(),
-        policy_documents: z.record(z.string()).optional(),
+        policies: z.record(z.string()).optional(),
       })
       .optional(),
     terraform: z
@@ -319,6 +319,24 @@ export const configSchema = z
             );
         }
       }
+
+    // add account_policies
+    const accountPolicies = new Map<string, Set<string>>();
+
+    for (const { account_permission_sets } of _.values(data.sso?.groups))
+      if (account_permission_sets)
+        for (const [account, permissionSets] of _.entries(
+          account_permission_sets as Record<string, string[]>,
+        ))
+          for (const permissionSet of permissionSets)
+            for (const policy of _.values(
+              data.sso?.permission_sets?.[permissionSet].policies,
+            ))
+              if (_.keys(data.sso?.policies).includes(policy))
+                accountPolicies.set(
+                  account,
+                  new Set([...(accountPolicies.get(account) ?? []), policy]),
+                );
 
     // expand terraform.paths
     data.terraform.paths = _.castArray(data.terraform.paths);
