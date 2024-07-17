@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { resolve } from 'path';
 
 import { type Actionable, type Config } from './Config';
-import { readConfigFile, writeConfigFile } from './configFile';
+import { readConfig, writeConfig } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 import { pkgDir } from './pkgDir';
@@ -33,7 +33,7 @@ export const updateConfig = async ({
       );
 
     // Load & parse config file.
-    const config = await readConfigFile(configPath);
+    const config = await readConfig(configPath);
 
     // Validate batch.
     if (!config.batches?.[batch]) {
@@ -66,7 +66,7 @@ export const updateConfig = async ({
     );
 
     // Write updated config to file.
-    await writeConfigFile(config, configPath);
+    await writeConfig(config, configPath);
 
     if (stdOut) process.stdout.write(chalk.black.bold(' Done!\n'));
   } catch (error) {

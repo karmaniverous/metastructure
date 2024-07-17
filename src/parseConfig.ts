@@ -2,7 +2,7 @@ import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
 
 import { type Config } from './Config';
-import { readConfigFile } from './configFile';
+import { readConfig } from './configFile';
 import { type ConsoleParams } from './ConsoleParams';
 import { getErrorMessage } from './getErrorMessage';
 
@@ -17,7 +17,7 @@ export const parseConfig = async ({
       process.stdout.write(chalk.black.bold('Parsing config file...'));
 
     // Load & parse config file.
-    config = await readConfigFile(configPath);
+    config = await readConfig(configPath);
 
     // Recursively apply config to itself as a handlebars template.
     let thisPass = JSON.stringify(config);

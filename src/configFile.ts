@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
+import _ from 'lodash';
 import { resolve } from 'path';
-import yaml from 'yaml';
+import { Document, parse, parseDocument, stringify, YAMLMap } from 'yaml';
 
-import { Config, configSchema } from './Config';
+import { type Config, configSchema } from './Config';
 import { pkgDir } from './pkgDir';
 
 const resolveConfigPath = async (path?: string) => {
@@ -15,7 +16,7 @@ const resolveConfigPath = async (path?: string) => {
 
     if (await fs.exists(resolvedPath)) {
       try {
-        const { configPath } = yaml.parse(
+        const { configPath } = parse(
           await fs.readFile(resolvedPath, 'utf8'),
         ) as Partial<Config>;
 
@@ -34,14 +35,33 @@ const resolveConfigPath = async (path?: string) => {
   return resolvedPath;
 };
 
-export const readConfigFile = async (path?: string) =>
+const readConfigDoc = async (path?: string) =>
+  parseDocument(await fs.readFile(await resolveConfigPath(path), 'utf8'));
+
+export const readConfig = async (path?: string) =>
   configSchema.parse(
-    yaml.parse(await fs.readFile(await resolveConfigPath(path), 'utf8')),
+    parse(await fs.readFile(await resolveConfigPath(path), 'utf8')),
   );
 
-export const writeConfigFile = async (config: Config, path?: string) => {
+export const writeConfig = async (config: Config, path?: string) => {
+  const doc = await readConfigDoc(path);
+
   await fs.writeFile(
     await resolveConfigPath(path),
-    yaml.stringify(config, { doubleQuotedAsJSON: true }),
+    stringify(updateYamlDoc(doc, config), { doubleQuotedAsJSON: true }),
   );
 };
+
+function updateYamlDoc(doc: Document.Parsed, update: object | object[]) {
+  for (const key in update) {
+    const value = _.get(update, key) as object | object[];
+    if (_.isPlainObject(value)) {
+      if (!doc.has(key)) doc.set(key, new YAMLMap());
+      updateYamlDoc(doc.get(key) as Document.Parsed, value);
+    } else {
+      doc.set(key, value);
+    }
+  }
+
+  return doc;
+}
