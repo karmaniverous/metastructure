@@ -218,6 +218,70 @@ export const configSchema = z
       }
     }
 
+    // validate sso groups
+    if (data.sso?.groups)
+      for (const [groupKey, group] of _.entries(data.sso.groups)) {
+        if (_.isPlainObject(group.account_permission_sets)) {
+          // validate account permission sets
+          for (const [accountKey, permissionSets] of _.entries(
+            group.account_permission_sets,
+          )) {
+            // validate account key
+            if (!validAccounts.includes(accountKey)) {
+              const action = data.accounts?.[accountKey]?.action;
+
+              ctx.addIssue({
+                code: z.ZodIssueCode.invalid_enum_value,
+                message: `${actionErrorModifier(action)} account`,
+                options: validAccounts,
+                path: [
+                  'sso',
+                  'groups',
+                  groupKey,
+                  'account_permisison_sets',
+                  accountKey,
+                ],
+                received: accountKey,
+              });
+            } // validate permission sets
+            const diff = _.difference(
+              _.castArray(permissionSets),
+              _.keys(data.sso.permission_sets),
+            );
+
+            if (_.size(diff))
+              ctx.addIssue({
+                code: z.ZodIssueCode.invalid_enum_value,
+                message: `invalid permission set(s)`,
+                options: _.keys(data.sso.permission_sets),
+                path: [
+                  'sso',
+                  'groups',
+                  groupKey,
+                  'account_permisison_sets',
+                  accountKey,
+                ],
+                received: diff.join(', '),
+              });
+          }
+        } else {
+          // validate global permission sets
+          const diff = _.difference(
+            _.castArray(group.account_permission_sets as string | string[]),
+            _.keys(data.sso.permission_sets),
+          );
+
+          if (_.size(diff))
+            ctx.addIssue({
+              code: z.ZodIssueCode.invalid_enum_value,
+              message: `invalid permission set(s)`,
+              options: _.keys(data.sso.permission_sets),
+              path: ['sso', 'groups', groupKey, 'account_permisison_sets'],
+              received: diff.join(', '),
+            });
+        }
+      }
+
     // validate terraform.state_account
     if (
       data.accounts &&
