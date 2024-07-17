@@ -12,7 +12,7 @@ const cli = new Command()
   .enablePositionalOptions()
   .passThroughOptions()
   .option('-c, --config-path <string>', 'config file path relative to CWD')
-  .option('-d, --debug <string>', 'enable debug logging.')
+  .option('-d, --debug', 'enable debug logging.')
   .addCommand(generateCommand)
   .addCommand(applyCommand)
   .addCommand(updateCommand);

@@ -1,6 +1,7 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
 import { packageDirectory } from 'pkg-dir';
+import { inspect } from 'util';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
@@ -16,8 +17,11 @@ export const generateCommand = new Command()
   .option('-l, --local-state', 'use local state')
   .argument('<batch>', 'batch name')
   .action(async (batch, options, cmd) => {
-    const { configPath: path, localState }: typeof options & GlobalCliOptions =
-      cmd.optsWithGlobals();
+    const {
+      configPath: path,
+      debug,
+      localState,
+    }: typeof options & GlobalCliOptions = cmd.optsWithGlobals();
 
     process.stdout.write(
       chalk.black.bold(
@@ -28,6 +32,11 @@ export const generateCommand = new Command()
     try {
       // Load & parse project config.
       const { config, configPath } = await parseConfig({ path, stdOut: true });
+
+      if (debug) {
+        console.log(chalk.cyan('*** PARSED & EXPANDED CONFIG OBJECT ***'));
+        console.log(chalk.cyan(inspect(config, false, null)), '\n');
+      }
 
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
