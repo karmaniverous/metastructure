@@ -81,6 +81,7 @@ export const configSchema = z
       .optional(),
     sso: z
       .object({
+        account_policies: z.record(z.string().array()).optional(),
         groups: z
           .record(
             z.object({
@@ -336,7 +337,7 @@ export const configSchema = z
                     ...new Set([...(accountPolicies[account] ?? []), policy]),
                   ];
 
-      data.sso.groups.account_policies = accountPolicies;
+      data.sso.account_policies = accountPolicies;
     }
 
     // expand terraform.paths
