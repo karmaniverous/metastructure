@@ -299,9 +299,9 @@ export const configSchema = z
     const validAccounts = filterValid(data.accounts);
 
     // expand account_permission_sets
-    if (data.sso?.groups)
+    if (data.sso?.groups) {
       for (const group of _.values(data.sso.groups)) {
-        if (group.account_permission_sets) {
+        if (group.account_permission_sets)
           if (_.isPlainObject(group.account_permission_sets))
             group.account_permission_sets = _.mapValues(
               group.account_permission_sets as Record<
@@ -317,26 +317,27 @@ export const configSchema = z
                 _.castArray(group.account_permission_sets as string | string[]),
               ]),
             );
-        }
       }
 
-    // add account_policies
-    const accountPolicies = new Map<string, Set<string>>();
+      // add account_policies
+      const accountPolicies: Record<string, string[]> = {};
 
-    for (const { account_permission_sets } of _.values(data.sso?.groups))
-      if (account_permission_sets)
-        for (const [account, permissionSets] of _.entries(
-          account_permission_sets as Record<string, string[]>,
-        ))
-          for (const permissionSet of permissionSets)
-            for (const policy of _.values(
-              data.sso?.permission_sets?.[permissionSet].policies,
-            ))
-              if (_.keys(data.sso?.policies).includes(policy))
-                accountPolicies.set(
-                  account,
-                  new Set([...(accountPolicies.get(account) ?? []), policy]),
-                );
+      for (const { account_permission_sets } of _.values(data.sso.groups))
+        if (account_permission_sets)
+          for (const [account, permissionSets] of _.entries(
+            account_permission_sets as Record<string, string[]>,
+          ))
+            for (const permissionSet of permissionSets)
+              for (const policy of _.values(
+                data.sso.permission_sets?.[permissionSet].policies,
+              ))
+                if (_.keys(data.sso.policies).includes(policy))
+                  accountPolicies[account] = [
+                    ...new Set([...(accountPolicies[account] ?? []), policy]),
+                  ];
+
+      data.sso.groups.account_policies = accountPolicies;
+    }
 
     // expand terraform.paths
     data.terraform.paths = _.castArray(data.terraform.paths);
