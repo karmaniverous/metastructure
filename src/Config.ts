@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { z } from 'zod';
 
+import { validateObjectPropertyUnique } from './validationHelpers';
+
 const actionEnum = z.enum(['destroy', 'import', 'remove']);
 type Action = z.infer<typeof actionEnum>;
 
@@ -85,12 +87,13 @@ export const configSchema = z
         groups: z
           .record(
             z.object({
-              description: z.string().optional(),
               account_permission_sets: z
                 .string()
                 .or(z.string().array())
                 .or(z.record(z.string().or(z.string().array())))
                 .optional(),
+              description: z.string().optional(),
+              name: z.string(),
             }),
           )
           .optional(),
@@ -98,6 +101,7 @@ export const configSchema = z
           .record(
             z.object({
               description: z.string().optional(),
+              name: z.string(),
               policies: z.string().or(z.string().array()).optional(),
             }),
           )
@@ -125,10 +129,14 @@ export const configSchema = z
     const validAccounts = filterValid(data.accounts);
     const validOus = filterValid(data.organizational_units);
 
+    // validate email uniqueness across accounts
+    validateObjectPropertyUnique(data, ctx, 'accounts', 'account', 'email');
+
+    // validate name uniqueness across accounts
+    validateObjectPropertyUnique(data, ctx, 'accounts', 'account', 'name');
+
     // validate accounts
     for (const account in data.accounts) {
-      // TODO: validate email uniqueness within account
-
       // validate account
       const { action, id } = data.accounts[account];
       if (action && !id)
@@ -187,10 +195,18 @@ export const configSchema = z
       });
     }
 
+    // validate name uniqueness across organizational_units
+    validateObjectPropertyUnique(
+      data,
+      ctx,
+      'organizational_units',
+      'organizational_unit',
+      'name',
+    );
+
     // validate organizational_units
     for (const ou in data.organizational_units) {
-      // TODO: validate circular dependencies
-      // TODO: validate name uniqueness within parent
+      // TODO: validate circular parent dependencies
 
       // validate organizational_unit
       const { action, id } = data.organizational_units[ou];
@@ -215,6 +231,18 @@ export const configSchema = z
         });
       }
     }
+
+    // validate name uniqueness across sso groups
+    validateObjectPropertyUnique(data, ctx, 'sso.groups', 'group', 'name');
+
+    // validate name uniqueness across sso permission sets
+    validateObjectPropertyUnique(
+      data,
+      ctx,
+      'sso.permission_sets',
+      'permission_set',
+      'name',
+    );
 
     // validate sso groups
     if (data.sso?.groups)
@@ -241,7 +269,9 @@ export const configSchema = z
                 ],
                 received: accountKey,
               });
-            } // validate permission sets
+            }
+
+            // validate permission sets
             const diff = _.difference(
               _.castArray(permissionSets),
               _.keys(data.sso.permission_sets),
