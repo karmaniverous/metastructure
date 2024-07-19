@@ -83,7 +83,6 @@ export const configSchema = z
       .optional(),
     sso: z
       .object({
-        account_policies: z.record(z.string().array()).optional(),
         groups: z
           .record(
             z.object({
@@ -107,6 +106,15 @@ export const configSchema = z
           )
           .optional(),
         policies: z.record(z.string()).optional(),
+        reference: z
+          .object({
+            account_policies: z.record(z.string().array()),
+            group_account_permission_set_policies: z.record(
+              z.record(z.record(z.string().array())),
+            ),
+            policy_accounts: z.record(z.string().array()),
+          })
+          .optional(),
       })
       .optional(),
     terraform: z
@@ -350,10 +358,16 @@ export const configSchema = z
             );
       }
 
-      // add account_policies
+      // add account_policies & group_account_policies
       const accountPolicies: Record<string, string[]> = {};
+      const groupAccountPermissionSetPolicies: Record<
+        string,
+        Record<string, Record<string, string[]>>
+      > = {};
 
-      for (const { account_permission_sets } of _.values(data.sso.groups))
+      for (const [group, { account_permission_sets }] of _.entries(
+        data.sso.groups,
+      ))
         if (account_permission_sets)
           for (const [account, permissionSets] of _.entries(
             account_permission_sets as Record<string, string[]>,
@@ -362,12 +376,47 @@ export const configSchema = z
               for (const policy of _.values(
                 data.sso.permission_sets?.[permissionSet].policies,
               ))
-                if (_.keys(data.sso.policies).includes(policy))
-                  accountPolicies[account] = [
-                    ...new Set([...(accountPolicies[account] ?? []), policy]),
-                  ];
+                if (_.keys(data.sso.policies).includes(policy)) {
+                  _.set(accountPolicies, account, [
+                    ...new Set([
+                      ...((_.get(accountPolicies, account) as
+                        | string[]
+                        | undefined) ?? []),
+                      policy,
+                    ]),
+                  ]);
 
-      data.sso.account_policies = accountPolicies;
+                  _.set(
+                    groupAccountPermissionSetPolicies,
+                    [group, account, permissionSet],
+                    [
+                      ...new Set([
+                        ...((_.get(accountPolicies, [
+                          group,
+                          account,
+                          permissionSet,
+                        ]) as string[] | undefined) ?? []),
+                        policy,
+                      ]),
+                    ],
+                  );
+                }
+
+      // add policy_accounts
+      const policyAccounts: Record<string, string[]> = {};
+
+      for (const [account, policies] of _.entries(accountPolicies))
+        for (const policy of policies)
+          policyAccounts[policy] = [
+            ...new Set([...(policyAccounts[policy] ?? []), account]),
+          ];
+
+      data.sso.reference = {
+        account_policies: accountPolicies,
+        group_account_permission_set_policies:
+          groupAccountPermissionSetPolicies,
+        policy_accounts: policyAccounts,
+      };
     }
 
     // expand terraform.paths
