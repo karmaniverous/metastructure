@@ -46,8 +46,8 @@ export const generateCommand = new Command()
 
       // Format files.
       await formatFiles({ config, pkgDir, stdOut: true });
-    } catch {
-      /* empty */
+    } catch (error) {
+      if (debug) throw error;
     }
 
     process.stdout.write('\n');

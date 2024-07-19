@@ -30,11 +30,11 @@ export const updateConfig = async ({
   try {
     if (stdOut)
       process.stdout.write(
-        chalk.black.bold(`\nUpdating config file from batch '${batch}...`),
+        chalk.black.bold(`Updating config file from batch '${batch}...`),
       );
 
     // Load config file.
-    const { config, configPath } = await readConfig(path);
+    const { rawConfig: config, configPath } = await readConfig(path);
 
     // Validate batch.
     if (!config.batches?.[batch]) {
@@ -72,7 +72,7 @@ export const updateConfig = async ({
     // Write updated config to file.
     await writeConfig(config, configPath);
 
-    if (stdOut) process.stdout.write(chalk.black.bold(' Done!\n'));
+    if (stdOut) process.stdout.write(chalk.green.bold(' Done!\n\n'));
 
     return { configPath };
   } catch (error) {
@@ -81,6 +81,6 @@ export const updateConfig = async ({
       console.log(chalk.red(getErrorMessage(error)), '\n');
     }
 
-    process.exit(1);
+    throw error;
   }
 };

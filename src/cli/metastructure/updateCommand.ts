@@ -1,5 +1,6 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
+import _ from 'lodash';
 import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
@@ -13,11 +14,13 @@ export const updateCommand = new Command()
   .passThroughOptions()
   .argument('<batch>', 'batch name')
   .action(async (batch, options, cmd) => {
-    const { configPath: path }: typeof options & GlobalCliOptions =
+    const { debug, configPath: path }: typeof options & GlobalCliOptions =
       cmd.optsWithGlobals();
 
     process.stdout.write(
-      chalk.black.bold(`*** UPDATING CONFIG FROM BATCH ${batch} ***\n\n`),
+      chalk.black.bold(
+        `*** UPDATING CONFIG FROM ${_.startCase(batch).toUpperCase()} BATCH ***\n\n`,
+      ),
     );
 
     try {
@@ -28,8 +31,8 @@ export const updateCommand = new Command()
         pkgDir: (await packageDirectory({ cwd: configPath })) ?? '.',
         stdOut: true,
       });
-    } catch {
-      /* empty */
+    } catch (error) {
+      if (debug) throw error;
     }
 
     process.stdout.write('\n');

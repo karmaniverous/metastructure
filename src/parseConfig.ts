@@ -2,7 +2,7 @@ import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
 import { inspect } from 'util';
 
-import { type Config } from './Config';
+import { type Config, configSchema } from './Config';
 import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
@@ -19,13 +19,16 @@ export const parseConfig = async ({
 }: ParseConfigParams) => {
   let config: Config;
   let configPath: string;
+  let rawConfig: unknown;
 
   try {
     if (stdOut)
       process.stdout.write(chalk.black.bold('Parsing config file...'));
 
     // Load & parse config file.
-    ({ config, configPath } = await readConfig(path));
+    ({ rawConfig, configPath } = await readConfig(path));
+
+    config = configSchema.parse(rawConfig);
 
     // Recursively apply config to itself as a handlebars template.
     let thisPass = JSON.stringify(config);
@@ -48,7 +51,7 @@ export const parseConfig = async ({
       console.log(chalk.red(getErrorMessage(error)), '\n');
     }
 
-    process.exit(1);
+    throw error;
   }
 
   if (debug) {

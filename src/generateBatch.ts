@@ -61,7 +61,7 @@ export const generateBatch = async ({
           console.log(chalk.red(getErrorMessage(error)), '\n');
         }
 
-        process.exit(1);
+        throw error;
       }
     }
   else if (stdOut) process.stdout.write(chalk.black.dim(' No templates.\n\n'));

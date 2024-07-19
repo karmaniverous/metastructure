@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 import { Document, parse, parseDocument, YAMLMap } from 'yaml';
 
-import { type Config, configSchema } from './Config';
+import { type Config } from './Config';
 
 const resolveConfigPath = async (path?: string) => {
   let resolvedPath: string | undefined;
@@ -44,7 +44,7 @@ export const readConfig = async (path?: string) => {
   const configPath = await resolveConfigPath(path);
 
   return {
-    config: configSchema.parse(parse(await fs.readFile(configPath, 'utf8'))),
+    rawConfig: parse(await fs.readFile(configPath, 'utf8')) as Config,
     configPath,
   };
 };
