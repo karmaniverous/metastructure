@@ -66,7 +66,6 @@ export const configSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
-        id: z.string(),
         master_account: z.string(),
         namespace: z.string().optional(),
       })
