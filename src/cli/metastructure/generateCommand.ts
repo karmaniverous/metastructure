@@ -14,9 +14,11 @@ export const generateCommand = new Command()
   .enablePositionalOptions()
   .passThroughOptions()
   .option('-l, --local-state', 'use local state')
+  .option('-p, --aws-profile <string>', 'AWS profile')
   .argument('<batch>', 'batch name')
   .action(async (batch, options, cmd) => {
     const {
+      awsProfile,
       configPath: path,
       debug,
       localState,
@@ -39,7 +41,14 @@ export const generateCommand = new Command()
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
       // Process templates.
-      await generateBatch({ batch, localState, config, pkgDir, stdOut: true });
+      await generateBatch({
+        awsProfile,
+        batch,
+        localState,
+        config,
+        pkgDir,
+        stdOut: true,
+      });
 
       // Apply license headers.
       await applyLicenseHeaders({ pkgDir, stdOut: true });

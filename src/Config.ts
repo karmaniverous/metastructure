@@ -118,7 +118,6 @@ export const configSchema = z
       .optional(),
     terraform: z
       .object({
-        aws_profile: z.string().optional(),
         aws_version: z.string(),
         paths: z.string().or(z.string().array()),
         state: z.object({

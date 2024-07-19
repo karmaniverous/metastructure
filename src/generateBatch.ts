@@ -8,6 +8,7 @@ import { type Config } from './Config';
 import { getErrorMessage } from './getErrorMessage';
 
 interface GenerateBatchParams {
+  awsProfile?: string;
   batch: string;
   config: Config;
   localState?: boolean;
@@ -16,6 +17,7 @@ interface GenerateBatchParams {
 }
 
 export const generateBatch = async ({
+  awsProfile = process.env.AWS_PROFILE,
   batch,
   config,
   localState,
@@ -48,7 +50,7 @@ export const generateBatch = async ({
         // Render template.
         const rendered = template({
           ...config,
-          params: { batch, localState },
+          params: { awsProfile, batch, localState },
         });
 
         // Write to file.

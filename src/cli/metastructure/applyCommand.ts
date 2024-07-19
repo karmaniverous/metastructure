@@ -18,6 +18,7 @@ export const applyCommand = new Command()
   .passThroughOptions()
   .option('-l, --local-state', 'use local state')
   .option('-m, --migrate-state', 'migrate state')
+  .option('-p, --aws-profile <string>', 'AWS profile')
   .addOption(
     new Option('-r, --reconfigure', 'reconfigure state').conflicts(
       'migrateState',
@@ -26,6 +27,7 @@ export const applyCommand = new Command()
   .argument('<batch>', 'Batch name.')
   .action(async (batch, options, cmd) => {
     const {
+      awsProfile,
       configPath: path,
       debug,
       localState,
@@ -50,7 +52,14 @@ export const applyCommand = new Command()
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
       // Process templates.
-      await generateBatch({ batch, localState, config, pkgDir, stdOut: true });
+      await generateBatch({
+        awsProfile,
+        batch,
+        localState,
+        config,
+        pkgDir,
+        stdOut: true,
+      });
 
       if (!config.batches?.[batch]) throw new Error('Unknown batch!');
 
