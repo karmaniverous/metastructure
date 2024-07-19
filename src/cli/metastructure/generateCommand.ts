@@ -1,7 +1,6 @@
 import { Command } from '@commander-js/extra-typings';
 import chalk from 'chalk';
 import { packageDirectory } from 'pkg-dir';
-import { inspect } from 'util';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { formatFiles } from '../../formatFiles';
@@ -31,12 +30,11 @@ export const generateCommand = new Command()
 
     try {
       // Load & parse project config.
-      const { config, configPath } = await parseConfig({ path, stdOut: true });
-
-      if (debug) {
-        console.log(chalk.cyan('*** PARSED & EXPANDED CONFIG OBJECT ***'));
-        console.log(chalk.cyan(inspect(config, false, null)), '\n');
-      }
+      const { config, configPath } = await parseConfig({
+        debug,
+        path,
+        stdOut: true,
+      });
 
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 

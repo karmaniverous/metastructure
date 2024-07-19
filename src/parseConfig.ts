@@ -1,16 +1,22 @@
 import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
+import { inspect } from 'util';
 
 import { type Config } from './Config';
 import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 interface ParseConfigParams {
+  debug?: boolean;
   path?: string;
   stdOut?: boolean;
 }
 
-export const parseConfig = async ({ path, stdOut }: ParseConfigParams) => {
+export const parseConfig = async ({
+  debug,
+  path,
+  stdOut,
+}: ParseConfigParams) => {
   let config: Config;
   let configPath: string;
 
@@ -43,6 +49,11 @@ export const parseConfig = async ({ path, stdOut }: ParseConfigParams) => {
     }
 
     process.exit(1);
+  }
+
+  if (debug) {
+    console.log(chalk.cyan('*** PARSED & EXPANDED CONFIG OBJECT ***'));
+    console.log(chalk.cyan(inspect(config, false, null)), '\n');
   }
 
   return { config, configPath };
