@@ -27,6 +27,7 @@ export const applyCommand = new Command()
   .action(async (batch, options, cmd) => {
     const {
       configPath: path,
+      debug,
       localState,
       migrateState,
       reconfigure,
@@ -40,7 +41,11 @@ export const applyCommand = new Command()
 
     try {
       // Load & parse project config.
-      const { config, configPath } = await parseConfig({ path, stdOut: true });
+      const { config, configPath } = await parseConfig({
+        debug,
+        path,
+        stdOut: true,
+      });
 
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
