@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { validateObjectPropertyUnique } from './validationHelpers';
 
-const actionEnum = z.enum(['destroy', 'import', 'remove']);
+const actionEnum = z.enum(['destroy', 'remove']);
 type Action = z.infer<typeof actionEnum>;
 
 const actionableSchema = z.object({
@@ -66,15 +66,17 @@ export const configSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
+        id: z.string().optional(),
         master_account: z.string(),
         namespace: z.string().optional(),
       })
       .strict(),
     organizational_units: z
       .record(
-        actionableSchema
-          .extend({
+        z
+          .object({
             name: z.string(),
+            id: z.string().optional(),
             parent: z.string().optional(),
           })
           .strict(),
@@ -133,7 +135,7 @@ export const configSchema = z
   .strict()
   .superRefine((data, ctx) => {
     const validAccounts = filterValid(data.accounts);
-    const validOus = filterValid(data.organizational_units);
+    const validOus = _.keys(data.organizational_units);
 
     // validate email uniqueness across accounts
     validateObjectPropertyUnique(data, ctx, 'accounts', 'account', 'email');
@@ -142,27 +144,39 @@ export const configSchema = z
     validateObjectPropertyUnique(data, ctx, 'accounts', 'account', 'name');
 
     // validate accounts
-    for (const account in data.accounts) {
-      // validate account
-      const { action, id } = data.accounts[account];
+    for (const [
+      accountKey,
+      { action, id, organizational_unit: ou },
+    ] of _.entries(data.accounts)) {
+      // validate id
       if (action && !id)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `id required when action populated`,
-          path: ['accounts', account, 'id'],
+          path: ['accounts', accountKey, 'id'],
+        });
+
+      // validate action
+      if (
+        action &&
+        [
+          data.organization.master_account,
+          data.terraform.state.account,
+        ].includes(accountKey)
+      )
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `no action allowed on account`,
+          path: ['accounts', accountKey, 'action'],
         });
 
       // validate organizational_unit
-      const ou = data.accounts[account].organizational_unit;
-
       if (ou && !validOus.includes(ou)) {
-        const action = data.organizational_units?.[ou]?.action;
-
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
-          message: `${actionErrorModifier(action)} organizational_unit`,
+          message: `invalid organizational_unit`,
           options: validOus,
-          path: ['accounts', account, 'organizational_unit'],
+          path: ['accounts', accountKey, 'organizational_unit'],
           received: ou,
         });
       }
@@ -214,23 +228,12 @@ export const configSchema = z
     for (const ou in data.organizational_units) {
       // TODO: validate circular parent dependencies
 
-      // validate organizational_unit
-      const { action, id } = data.organizational_units[ou];
-      if (action && !id)
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `id required when action populated`,
-          path: ['organizational_units', ou, 'id'],
-        });
-
       // validate parent
       const parent = data.organizational_units[ou].parent;
       if (parent && !validOus.includes(parent)) {
-        const action = data.organizational_units[parent]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
-          message: `${actionErrorModifier(action)} parent`,
+          message: `invalid parent`,
           options: validOus,
           path: ['organizational_units', ou, 'parent'],
           received: parent,

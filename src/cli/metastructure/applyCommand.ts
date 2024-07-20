@@ -77,7 +77,7 @@ export const applyCommand = new Command()
       await $`terraform apply`;
 
       // Update config with Terraform outputs.
-      await updateConfig({ batch, path: configPath, stdOut: true });
+      await updateConfig({ batch, debug, path: configPath, stdOut: true });
 
       // Apply license headers.
       await applyLicenseHeaders({ pkgDir, stdOut: true });

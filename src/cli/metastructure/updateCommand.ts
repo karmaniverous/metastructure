@@ -24,7 +24,12 @@ export const updateCommand = new Command()
     );
 
     try {
-      const { configPath } = await updateConfig({ batch, path, stdOut: true });
+      const { configPath } = await updateConfig({
+        batch,
+        debug,
+        path,
+        stdOut: true,
+      });
 
       // Apply license headers.
       await applyLicenseHeaders({

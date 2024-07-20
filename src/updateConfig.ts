@@ -3,27 +3,21 @@ import { $ as execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
+import { inspect } from 'util';
 
-import { type Actionable, type Config } from './Config';
 import { readConfig, writeConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
-type Update = {
-  [K in keyof Config]-?: NonNullable<Config[K]> extends Record<string, object>
-    ? NonNullable<Config[K]>[string] extends Actionable
-      ? { value: Record<string, string> }
-      : never
-    : never;
-};
-
 interface UpdateConfigParams {
   batch: string;
+  debug?: boolean;
   path?: string;
   stdOut?: boolean;
 }
 
 export const updateConfig = async ({
   batch,
+  debug,
   path,
   stdOut,
 }: UpdateConfigParams) => {
@@ -51,25 +45,19 @@ export const updateConfig = async ({
       shell: true,
     });
 
-    // Retrieve outputs from Terraform.
-    const update = JSON.parse(
-      (await $`terraform output -json`).stdout,
-    ) as Update;
-
-    // Remove destroyed Terraform outputs from config.
-    for (const key of _.keys(update) as (keyof Update)[])
-      for (const item of _.keys(config[key]))
-        if (!(item in update[key].value)) _.unset(config, [key, item]);
-
-    // Update config with Terraform outputs & remove action keys.
-    _.forEach(update, ({ value: collection }, key) =>
-      _.forEach(collection, (id, item) => {
-        _.set(config, [key, item, 'id'], id);
-        _.unset(config, [key, item, 'action']);
-      }),
+    // Retrieve & conform outputs from Terraform.
+    const update = _.mapValues(
+      JSON.parse((await $`terraform output -json`).stdout),
+      'value',
     );
 
-    // Write updated config to file.
+    if (debug) {
+      console.log(chalk.cyan('*** UPDATE OBJECT ***'));
+      console.log(chalk.cyan(inspect(update, false, null)), '\n');
+    }
+
+    // Merge update & write updated config to file.
+    _.merge(config, update);
     await writeConfig(config, configPath);
 
     if (stdOut) process.stdout.write(chalk.green.bold(' Done!\n\n'));

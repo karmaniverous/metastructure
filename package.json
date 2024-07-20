@@ -18,7 +18,7 @@
     "yaml": "^2.4.5",
     "zod": "^3.23.8"
   },
-  "description": "A command-line tool that can generate & manage a complex IaC infrastructure with a single YAML config file and a handful of Handlebars templates.",
+  "description": "A command-line tool that can generate & manage a complex AWS infrastructure with a single YAML config file and a handful of Handlebars templates.",
   "devDependencies": {
     "@commander-js/extra-typings": "^12.1.0",
     "@eslint/js": "^9.6.0",
@@ -28,9 +28,9 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/chai": "^4.3.16",
-    "@types/eslint__js": "^8.42.3",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/eslint-plugin-mocha": "^10.4.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.6",
     "@types/mocha": "^10.0.7",
@@ -73,14 +73,14 @@
   ],
   "homepage": "https://github.com/karmaniverous/metastructure#readme",
   "keywords": [
-    "code-generation",
-    "template",
-    "infrastructure",
     "aws",
+    "code-generation",
     "devops",
-    "typescript",
+    "infrastructure",
+    "sdlc",
+    "template",
     "terraform",
-    "sdlc"
+    "typescript"
   ],
   "license": "BSD-3-Clause",
   "module": "dist/index.mjs",
