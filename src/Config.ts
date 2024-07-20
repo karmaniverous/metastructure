@@ -110,6 +110,7 @@ export const configSchema = z
         policies: z.record(z.string()).optional(),
         reference: z
           .object({
+            account_permission_sets: z.record(z.string().array()),
             account_policies: z.record(z.string().array()),
             group_account_permission_set_policies: z.record(
               z.record(z.record(z.string().array())),
@@ -362,6 +363,7 @@ export const configSchema = z
 
       // add account_policies & group_account_policies
       const accountPolicies: Record<string, string[]> = {};
+      const accountPermissionSets: Record<string, string[]> = {};
       const groupAccountPermissionSetPolicies: Record<
         string,
         Record<string, Record<string, string[]>>
@@ -385,6 +387,15 @@ export const configSchema = z
                         | string[]
                         | undefined) ?? []),
                       policy,
+                    ]),
+                  ]);
+
+                  _.set(accountPermissionSets, account, [
+                    ...new Set([
+                      ...((_.get(accountPermissionSets, account) as
+                        | string[]
+                        | undefined) ?? []),
+                      permissionSet,
                     ]),
                   ]);
 
@@ -414,6 +425,7 @@ export const configSchema = z
           ];
 
       data.sso.reference = {
+        account_permission_sets: accountPermissionSets,
         account_policies: accountPolicies,
         group_account_permission_set_policies:
           groupAccountPermissionSetPolicies,
