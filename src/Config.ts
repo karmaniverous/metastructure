@@ -36,6 +36,7 @@ export const configSchema = z
             email: z.string(),
             name: z.string(),
             organizational_unit: z.string().optional(),
+            permission_set_roles: z.record(z.string()).optional(),
           })
           .strict(),
       )
