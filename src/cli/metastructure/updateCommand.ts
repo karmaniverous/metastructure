@@ -25,5 +25,6 @@ export const updateCommand = new Command()
       });
     } catch (error) {
       if (debug) throw error;
+      else process.exit(1);
     }
   });

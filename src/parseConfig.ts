@@ -1,5 +1,6 @@
 import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
+import _ from 'lodash';
 import { inspect } from 'util';
 
 import { type Config, configSchema } from './Config';
@@ -7,19 +8,25 @@ import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 interface ParseConfigParams {
+  awsProfile?: string;
   debug?: boolean;
+  localState?: boolean;
   path?: string;
+  permissionSet?: string;
   stdOut?: boolean;
 }
 
 export const parseConfig = async ({
+  awsProfile,
   debug,
+  localState,
   path,
+  permissionSet,
   stdOut,
 }: ParseConfigParams) => {
   let config: Config;
   let configPath: string;
-  let rawConfig: unknown;
+  let rawConfig: Config;
 
   try {
     if (stdOut)
@@ -27,6 +34,15 @@ export const parseConfig = async ({
 
     // Load & parse config file.
     ({ rawConfig, configPath } = await readConfig(path));
+
+    // Override cli defaults.
+    if (rawConfig.batches)
+      for (const batch of _.values(rawConfig.batches))
+        _.merge(batch.cli_defaults, {
+          aws_profile: awsProfile,
+          sso_permission_set: permissionSet,
+          use_local_state: localState,
+        });
 
     config = configSchema.parse(rawConfig);
 

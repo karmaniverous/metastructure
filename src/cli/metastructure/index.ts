@@ -59,46 +59,36 @@ const cli = new Command()
     try {
       // Load & parse project config.
       const { config, configPath } = await parseConfig({
+        awsProfile,
         debug,
+        localState,
         path,
+        permissionSet,
         stdOut: true,
       });
 
-      // Override cli defaults.
-      if (config.batches) {
-        const generatorParams = _.merge(
-          config.batches[batch].cli_defaults ?? {},
-          {
-            aws_profile: awsProfile,
-            sso_permission_set: permissionSet,
-            use_local_state: localState,
-          },
-        );
+      const generatorParams = config.batches?.[batch].cli_defaults;
 
-        config.batches[batch].cli_defaults = generatorParams;
+      if (_.size(generatorParams)) {
+        console.log(chalk.black.bold('Generator Params'));
 
-        if (_.size(generatorParams)) {
-          console.log(chalk.black.bold('Generator Params'));
+        const maxKeyLength =
+          _.max(
+            _.entries(generatorParams).map(([key, value]) =>
+              value ? key.length : 0,
+            ),
+          ) ?? 0;
 
-          const maxKeyLength =
-            _.max(
-              _.entries(generatorParams).map(([key, value]) =>
-                value ? key.length : 0,
-              ),
-            ) ?? 0;
+        for (const [key, value] of _.entries(generatorParams))
+          if (value) {
+            process.stdout.write(
+              chalk.black(`${key}:`.padEnd(maxKeyLength + 2)),
+            );
+            process.stdout.write(chalk.blue(`${value.toString()}\n`));
+          }
 
-          for (const [key, value] of _.entries(generatorParams))
-            if (value) {
-              process.stdout.write(
-                chalk.black(`${key}:`.padEnd(maxKeyLength + 2)),
-              );
-              process.stdout.write(chalk.blue(`${value.toString()}\n`));
-            }
-
-          console.log('');
-        }
+        console.log('');
       }
-
       _.set(cmd, 'metaValues.terraformPaths', config.terraform.paths);
 
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
@@ -114,6 +104,7 @@ const cli = new Command()
         });
     } catch (error) {
       if (debug) throw error;
+      else process.exit(1);
     }
   })
   .hook('postAction', async (cmd) => {

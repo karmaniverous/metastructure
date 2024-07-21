@@ -49,11 +49,12 @@ export const readConfig = async (path?: string) => {
 
   for (const batch of _.values(rawConfig.batches))
     if (batch.cli_defaults_path)
-      batch.cli_defaults =
+      batch.cli_defaults = _.merge(
+        batch.cli_defaults ?? {},
         (parse(
           await fs.readFile(resolve(pkgDir, batch.cli_defaults_path), 'utf8'),
-        ) as NonNullable<Config['batches']>[string]['cli_defaults']) ??
-        undefined;
+        ) as NonNullable<Config['batches']>[string]['cli_defaults']) ?? {},
+      );
 
   return { rawConfig, configPath };
 };

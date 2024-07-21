@@ -47,9 +47,10 @@ export const configSchema = z
           .object({
             cli_defaults: z
               .object({
-                aws_profile: z.string().optional(),
-                sso_permission_set: z.string().optional(),
-                use_local_state: z.boolean().optional(),
+                assume_role: z.string().nullable().optional(),
+                aws_profile: z.string().nullable().optional(),
+                sso_permission_set: z.string().nullable().optional(),
+                use_local_state: z.boolean().nullable().optional(),
               })
               .optional(),
             cli_defaults_path: z.string().optional(),
@@ -190,6 +191,35 @@ export const configSchema = z
           received: ou,
         });
       }
+    }
+
+    // validate batches
+    for (const [key, batch] of _.entries(data.batches)) {
+      // validate cli_defaults
+      if (
+        batch.cli_defaults?.assume_role &&
+        batch.cli_defaults.sso_permission_set
+      )
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `assume_role & sso_permission_set are mutually exclusive`,
+          path: ['batches', key, 'cli_defaults'],
+        });
+
+      // validate sso_permission_set
+      if (
+        batch.cli_defaults?.sso_permission_set &&
+        !(
+          data.sso?.permission_sets &&
+          batch.cli_defaults.sso_permission_set in data.sso.permission_sets
+        )
+      )
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          message: `invalid permission set`,
+          options: _.keys(data.sso?.permission_sets),
+          received: batch.cli_defaults.sso_permission_set,
+        });
     }
 
     // validate environments

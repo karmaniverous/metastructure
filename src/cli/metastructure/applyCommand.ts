@@ -51,5 +51,6 @@ export const applyCommand = new Command()
       await updateConfig({ batch, debug, path: configPath, stdOut: true });
     } catch (error) {
       if (debug) throw error;
+      else process.exit(1);
     }
   });
