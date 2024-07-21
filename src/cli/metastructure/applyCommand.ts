@@ -29,7 +29,7 @@ export const applyCommand = new Command()
 
     const {
       metaValues: { config, pkgDir },
-    } = cmd as unknown as MetaCommand;
+    } = cmd.parent as MetaCommand;
 
     try {
       if (!config.batches?.[batch]) throw new Error('Unknown batch!');

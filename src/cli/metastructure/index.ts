@@ -67,6 +67,8 @@ const cli = new Command()
         stdOut: true,
       });
 
+      _.set(cmd, 'metaValues.config', config);
+
       const generatorParams = config.batches?.[batch].cli_defaults;
 
       if (_.size(generatorParams)) {
