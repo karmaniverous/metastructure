@@ -8,11 +8,11 @@ import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 interface ParseConfigParams {
-  awsProfile?: string;
+  awsProfile?: string | null;
   debug?: boolean;
   localState?: boolean;
   path?: string;
-  permissionSet?: string;
+  permissionSet?: string | null;
   stdOut?: boolean;
 }
 

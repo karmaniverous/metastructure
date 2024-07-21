@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import { Command } from '@commander-js/extra-typings';
+import { boolean } from 'boolean';
 import chalk from 'chalk';
 import _ from 'lodash';
 import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { type Config } from '../../Config';
+import { detectNull } from '../../detectNull';
 import { formatFiles } from '../../formatFiles';
 import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
@@ -32,7 +34,7 @@ const cli = new Command()
   .requiredOption('-b, --batch <string>', 'Batch name (required).')
   .option('-p, --aws-profile <string>', 'AWS profile.')
   .option('-s, --permission-set <string>', 'SSO permission set.')
-  .option('-l, --local-state', 'Use local state.')
+  .option('-l, --local-state [boolean]', 'Use local state.')
   .option('-c, --config-path <string>', 'Config file path relative to CWD.')
   .option('-d, --debug', 'Enable debug logging.')
   .helpOption('-h, --help', 'Display command help.')
@@ -59,11 +61,11 @@ const cli = new Command()
     try {
       // Load & parse project config.
       const { config, configPath } = await parseConfig({
-        awsProfile,
+        awsProfile: detectNull(awsProfile),
         debug,
-        localState,
+        localState: _.isUndefined(localState) ? undefined : boolean(localState),
         path,
-        permissionSet,
+        permissionSet: detectNull(permissionSet),
         stdOut: true,
       });
 
