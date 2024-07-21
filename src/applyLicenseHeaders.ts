@@ -34,7 +34,7 @@ export const applyLicenseHeaders = async ({
         console.log(chalk.red(msg), '\n');
       }
 
-      process.exit(1);
+      throw error;
     }
   }
 

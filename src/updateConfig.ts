@@ -23,9 +23,7 @@ export const updateConfig = async ({
 }: UpdateConfigParams) => {
   try {
     if (stdOut)
-      process.stdout.write(
-        chalk.black.bold(`Updating config file from batch '${batch}...`),
-      );
+      process.stdout.write(chalk.black.bold(`Updating config file...`));
 
     // Load config file.
     const { rawConfig: config, configPath } = await readConfig(path);
@@ -33,7 +31,7 @@ export const updateConfig = async ({
     // Validate batch.
     if (!config.batches?.[batch]) {
       if (stdOut) process.stdout.write(chalk.red.bold(' Unknown batch!\n\n'));
-      process.exit(1);
+      throw new Error(`Unknown batch: ${batch}`);
     }
 
     // Configure shell client.

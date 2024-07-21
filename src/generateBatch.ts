@@ -26,7 +26,7 @@ export const generateBatch = async ({
   // Validate batch.
   if (!config.batches?.[batch]) {
     if (stdOut) process.stdout.write(chalk.red.bold(' Unknown batch!\n\n'));
-    process.exit(1);
+    throw new Error(`Unknown batch: ${batch}`);
   }
 
   if (_.size(config.batches[batch].generators))
