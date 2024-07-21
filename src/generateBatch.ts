@@ -8,21 +8,15 @@ import { type Config } from './Config';
 import { getErrorMessage } from './getErrorMessage';
 
 interface GenerateBatchParams {
-  awsProfile?: string;
   batch: string;
   config: Config;
-  localState?: boolean;
-  permissionSet?: string;
   pkgDir: string;
   stdOut?: boolean;
 }
 
 export const generateBatch = async ({
-  awsProfile = process.env.AWS_PROFILE,
   batch,
   config,
-  localState,
-  permissionSet,
   pkgDir,
   stdOut,
 }: GenerateBatchParams) => {
@@ -52,7 +46,7 @@ export const generateBatch = async ({
         // Render template.
         const rendered = template({
           ...config,
-          params: { awsProfile, batch, localState, permissionSet },
+          params: { batch, ...(config.batches[batch].cli_defaults ?? {}) },
         });
 
         // Write to file.

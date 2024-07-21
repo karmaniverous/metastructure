@@ -15,15 +15,15 @@ export const formatFiles = async ({
   stdOut,
 }: FormatFilesParams) => {
   // Load config.
-  if (stdOut) process.stdout.write(chalk.black.bold('Formatting files...'));
+  if (stdOut) console.log(chalk.black.bold('Formatting files...'));
 
   // Format Terraform files.
   for (const dir of _.castArray(paths)) {
     const { stdout: formatOutput } =
       await $`terraform fmt -recursive ${resolve(pkgDir, dir)}`;
 
-    if (stdOut) console.log(chalk.black.dim(formatOutput));
+    if (stdOut) process.stdout.write(chalk.black.dim(formatOutput));
   }
 
-  process.stdout.write(chalk.green.bold('Done!\n\n'));
+  console.log(chalk.green.bold('\nDone!\n'));
 };

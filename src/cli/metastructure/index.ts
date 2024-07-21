@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from '@commander-js/extra-typings';
+import chalk from 'chalk';
 import _ from 'lodash';
 import { packageDirectory } from 'pkg-dir';
 
@@ -49,7 +50,11 @@ const cli = new Command()
       configPath: path,
       debug,
       localState,
+      permissionSet,
     } = cmd.opts();
+
+    process.stdout.write(chalk.black.bold('Batch: '));
+    process.stdout.write(chalk.blue.bold(`${batch}\n\n`));
 
     try {
       // Load & parse project config.
@@ -58,6 +63,42 @@ const cli = new Command()
         path,
         stdOut: true,
       });
+
+      // Override cli defaults.
+      if (config.batches) {
+        const generatorParams = _.merge(
+          config.batches[batch].cli_defaults ?? {},
+          {
+            aws_profile: awsProfile,
+            sso_permission_set: permissionSet,
+            use_local_state: localState,
+          },
+        );
+
+        config.batches[batch].cli_defaults = generatorParams;
+
+        if (_.size(generatorParams)) {
+          console.log(chalk.black.bold('Generator Params'));
+
+          const maxKeyLength =
+            _.max(
+              _.entries(generatorParams).map(([key, value]) =>
+                value ? key.length : 0,
+              ),
+            ) ?? 0;
+
+          for (const [key, value] of _.entries(generatorParams))
+            if (value) {
+              process.stdout.write(
+                chalk.black(`${key}:`.padEnd(maxKeyLength + 2)),
+              );
+              process.stdout.write(chalk.blue(`${value.toString()}\n`));
+            }
+
+          console.log('');
+        }
+      }
+
       _.set(cmd, 'metaValues.terraformPaths', config.terraform.paths);
 
       const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
@@ -66,9 +107,7 @@ const cli = new Command()
       // Process templates if not update command.
       if (action !== 'update')
         await generateBatch({
-          awsProfile,
           batch,
-          localState,
           config,
           pkgDir,
           stdOut: true,
@@ -87,8 +126,6 @@ const cli = new Command()
 
     // Format files.
     await formatFiles({ paths, pkgDir, stdOut: true });
-
-    process.stdout.write('\n');
   });
 
 cli.parse();

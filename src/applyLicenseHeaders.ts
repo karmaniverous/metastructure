@@ -38,7 +38,8 @@ export const applyLicenseHeaders = async ({
     }
   }
 
-  if (licenseOutput && stdOut) console.log(chalk.black.dim(licenseOutput));
+  if (licenseOutput && stdOut)
+    process.stdout.write(chalk.black.dim(licenseOutput));
 
-  if (stdOut) process.stdout.write(chalk.green.bold('\nDone!\n\n'));
+  if (stdOut) console.log(chalk.green.bold('\nDone!\n'));
 };
