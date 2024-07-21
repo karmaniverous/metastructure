@@ -45,6 +45,14 @@ export const configSchema = z
       .record(
         z
           .object({
+            cli_defaults: z
+              .object({
+                aws_profile: z.string().optional(),
+                sso_permission_set: z.string().optional(),
+                use_local_state: z.boolean().optional(),
+              })
+              .optional(),
+            cli_defaults_path: z.string().optional(),
             generators: z.record(z.string()).optional(),
             path: z.string(),
           })
