@@ -12,6 +12,7 @@ interface GenerateBatchParams {
   batch: string;
   config: Config;
   localState?: boolean;
+  permissionSet?: string;
   pkgDir: string;
   stdOut?: boolean;
 }
@@ -21,6 +22,7 @@ export const generateBatch = async ({
   batch,
   config,
   localState,
+  permissionSet,
   pkgDir,
   stdOut,
 }: GenerateBatchParams) => {
@@ -50,7 +52,7 @@ export const generateBatch = async ({
         // Render template.
         const rendered = template({
           ...config,
-          params: { awsProfile, batch, localState },
+          params: { awsProfile, batch, localState, permissionSet },
         });
 
         // Write to file.

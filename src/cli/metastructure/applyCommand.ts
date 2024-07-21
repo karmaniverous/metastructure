@@ -1,66 +1,35 @@
 import { Command, Option } from '@commander-js/extra-typings';
-import chalk from 'chalk';
 import { $ as execa } from 'execa';
 import { resolve } from 'path';
-import { packageDirectory } from 'pkg-dir';
 
-import { applyLicenseHeaders } from '../../applyLicenseHeaders';
-import { formatFiles } from '../../formatFiles';
-import { generateBatch } from '../../generateBatch';
-import { parseConfig } from '../../parseConfig';
 import { updateConfig } from '../../updateConfig';
-import { type GlobalCliOptions } from '.';
+import { type GlobalCliOptions, type MetaCommand } from '.';
 
 export const applyCommand = new Command()
   .name('apply')
-  .description('Generate & apply infrastructure batch.')
+  .description('Apply batch & update config.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-l, --local-state', 'use local state')
   .option('-m, --migrate-state', 'migrate state')
-  .option('-p, --aws-profile <string>', 'AWS profile')
   .addOption(
     new Option('-r, --reconfigure', 'reconfigure state').conflicts(
       'migrateState',
     ),
   )
-  .argument('<batch>', 'Batch name.')
-  .action(async (batch, options, cmd) => {
+  .action(async (options, cmd) => {
     const {
-      awsProfile,
-      configPath: path,
+      batch,
+      configPath,
       debug,
-      localState,
       migrateState,
       reconfigure,
     }: typeof options & GlobalCliOptions = cmd.optsWithGlobals();
 
-    process.stdout.write(
-      chalk.black.bold(
-        `*** APPLYING BATCH "${batch}"${localState ? ' WITH LOCAL STATE' : ''} ***\n\n`,
-      ),
-    );
+    const {
+      metaValues: { config, pkgDir },
+    } = cmd as unknown as MetaCommand;
 
     try {
-      // Load & parse project config.
-      const { config, configPath } = await parseConfig({
-        debug,
-        path,
-        stdOut: true,
-      });
-
-      const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
-
-      // Process templates.
-      await generateBatch({
-        awsProfile,
-        batch,
-        localState,
-        config,
-        pkgDir,
-        stdOut: true,
-      });
-
       if (!config.batches?.[batch]) throw new Error('Unknown batch!');
 
       // Configure shell client.
@@ -78,15 +47,7 @@ export const applyCommand = new Command()
 
       // Update config with Terraform outputs.
       await updateConfig({ batch, debug, path: configPath, stdOut: true });
-
-      // Apply license headers.
-      await applyLicenseHeaders({ pkgDir, stdOut: true });
-
-      // Format files.
-      await formatFiles({ config, pkgDir, stdOut: true });
     } catch (error) {
       if (debug) throw error;
     }
-
-    process.stdout.write('\n');
   });

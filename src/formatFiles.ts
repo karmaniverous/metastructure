@@ -3,24 +3,22 @@ import { $ } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
 
-import { type Config } from './Config';
-
 interface FormatFilesParams {
-  config: Config;
+  paths: string | string[];
   pkgDir: string;
   stdOut?: boolean;
 }
 
 export const formatFiles = async ({
-  config,
+  paths,
   pkgDir,
   stdOut,
 }: FormatFilesParams) => {
   // Load config.
-  if (stdOut) process.stdout.write(chalk.black.bold('Formatting files...\n'));
+  if (stdOut) process.stdout.write(chalk.black.bold('Formatting files...'));
 
   // Format Terraform files.
-  for (const dir of _.castArray(config.terraform.paths)) {
+  for (const dir of _.castArray(paths)) {
     const { stdout: formatOutput } =
       await $`terraform fmt -recursive ${resolve(pkgDir, dir)}`;
 
