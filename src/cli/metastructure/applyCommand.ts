@@ -10,12 +10,14 @@ export const applyCommand = new Command()
   .description('Apply batch & update config.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .option('-m, --migrate-state', 'migrate state')
+  .option('-m, --migrate-state', 'Migrate state (conflicts with -r).')
   .addOption(
-    new Option('-r, --reconfigure', 'reconfigure state').conflicts(
-      'migrateState',
-    ),
+    new Option(
+      '-r, --reconfigure',
+      'Reconfigure state (conflicts with -m).',
+    ).conflicts('migrateState'),
   )
+  .helpOption('-h, --help', 'Display command help.')
   .action(async (options, cmd) => {
     const {
       batch,

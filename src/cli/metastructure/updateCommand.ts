@@ -8,6 +8,7 @@ export const updateCommand = new Command()
   .description('Update config from batch output.')
   .enablePositionalOptions()
   .passThroughOptions()
+  .helpOption('-h, --help', 'Display command help.')
   .action(async (options, cmd) => {
     const {
       batch,
