@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import { isPlainObject } from 'is-what';
 import _ from 'lodash';
 import { dirname, resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
@@ -70,7 +71,7 @@ export const writeConfig = async (config: Config, configPath: string) => {
 function updateYamlDoc(doc: Document.Parsed, update: object | object[]) {
   for (const key in update) {
     const value = _.get(update, key) as object | object[];
-    if (_.isPlainObject(value)) {
+    if (isPlainObject(value)) {
       if (!doc.has(key)) doc.set(key, new YAMLMap());
       updateYamlDoc(doc.get(key) as Document.Parsed, value);
     } else {

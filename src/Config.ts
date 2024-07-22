@@ -1,3 +1,4 @@
+import { isPlainObject } from 'is-what';
 import _ from 'lodash';
 import { z } from 'zod';
 
@@ -52,13 +53,15 @@ export const configSchema = z
                 sso_permission_set: z.string().nullable().optional(),
                 use_local_state: z.boolean().nullable().optional(),
               })
+              .nullable()
               .optional(),
             cli_defaults_path: z.string().optional(),
-            generators: z.record(z.string()).optional(),
+            generators: z.record(z.string()).nullable().optional(),
             path: z.string(),
           })
           .strict(),
       )
+      .nullable()
       .optional(),
     configPath: z.string().optional(),
     environments: z
@@ -71,6 +74,7 @@ export const configSchema = z
           })
           .strict(),
       )
+      .nullable()
       .optional(),
     organization: z
       .object({
@@ -91,6 +95,7 @@ export const configSchema = z
           })
           .strict(),
       )
+      .nullable()
       .optional(),
     sso: z
       .object({
@@ -101,22 +106,25 @@ export const configSchema = z
                 .string()
                 .or(z.string().array())
                 .or(z.record(z.string().or(z.string().array())))
+                .nullable()
                 .optional(),
               description: z.string().optional(),
               name: z.string(),
             }),
           )
+          .nullable()
           .optional(),
         permission_sets: z
           .record(
             z.object({
               description: z.string().optional(),
               name: z.string(),
-              policies: z.string().or(z.string().array()).optional(),
+              policies: z.string().or(z.string().array()).nullable().optional(),
             }),
           )
+          .nullable()
           .optional(),
-        policies: z.record(z.string()).optional(),
+        policies: z.record(z.string()).nullable().optional(),
         reference: z
           .object({
             account_permission_sets: z.record(z.string().array()),
@@ -194,33 +202,34 @@ export const configSchema = z
     }
 
     // validate batches
-    for (const [key, batch] of _.entries(data.batches)) {
-      // validate cli_defaults
-      if (
-        batch.cli_defaults?.assume_role &&
-        batch.cli_defaults.sso_permission_set
-      )
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `assume_role & sso_permission_set are mutually exclusive`,
-          path: ['batches', key, 'cli_defaults'],
-        });
-
-      // validate sso_permission_set
-      if (
-        batch.cli_defaults?.sso_permission_set &&
-        !(
-          data.sso?.permission_sets &&
-          batch.cli_defaults.sso_permission_set in data.sso.permission_sets
+    if (data.batches)
+      for (const [key, batch] of _.entries(data.batches)) {
+        // validate cli_defaults
+        if (
+          batch.cli_defaults?.assume_role &&
+          batch.cli_defaults.sso_permission_set
         )
-      )
-        ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
-          message: `invalid permission set`,
-          options: _.keys(data.sso?.permission_sets),
-          received: batch.cli_defaults.sso_permission_set,
-        });
-    }
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `assume_role & sso_permission_set are mutually exclusive`,
+            path: ['batches', key, 'cli_defaults'],
+          });
+
+        // validate sso_permission_set
+        if (
+          batch.cli_defaults?.sso_permission_set &&
+          !(
+            data.sso?.permission_sets &&
+            batch.cli_defaults.sso_permission_set in data.sso.permission_sets
+          )
+        )
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_enum_value,
+            message: `invalid permission set`,
+            options: _.keys(data.sso?.permission_sets),
+            received: batch.cli_defaults.sso_permission_set,
+          });
+      }
 
     // validate environments
     for (const environment in data.environments) {
@@ -296,7 +305,7 @@ export const configSchema = z
     // validate sso groups
     if (data.sso?.groups)
       for (const [groupKey, group] of _.entries(data.sso.groups)) {
-        if (_.isPlainObject(group.account_permission_sets)) {
+        if (isPlainObject(group.account_permission_sets)) {
           // validate account permission sets
           for (const [accountKey, permissionSets] of _.entries(
             group.account_permission_sets,
@@ -344,7 +353,7 @@ export const configSchema = z
         } else {
           // validate global permission sets
           const diff = _.difference(
-            _.castArray(group.account_permission_sets as string | string[]),
+            _.castArray(group.account_permission_sets),
             _.keys(data.sso.permission_sets),
           );
 
@@ -382,12 +391,9 @@ export const configSchema = z
     if (data.sso?.groups) {
       for (const group of _.values(data.sso.groups)) {
         if (group.account_permission_sets)
-          if (_.isPlainObject(group.account_permission_sets))
+          if (isPlainObject(group.account_permission_sets))
             group.account_permission_sets = _.mapValues(
-              group.account_permission_sets as Record<
-                string,
-                string | string[]
-              >,
+              group.account_permission_sets,
               (permissionSets) => _.castArray(permissionSets),
             );
           else

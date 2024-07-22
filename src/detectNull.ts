@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { isString } from 'is-what';
 
 export const detectNull = (value?: string) =>
-  _.isString(value) && value.toLowerCase() === 'null' ? null : value;
+  isString(value) && value.toLowerCase() === 'null' ? null : value;

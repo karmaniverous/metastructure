@@ -3,6 +3,7 @@
 import { Command } from '@commander-js/extra-typings';
 import { boolean } from 'boolean';
 import chalk from 'chalk';
+import { isUndefined } from 'is-what';
 import _ from 'lodash';
 import { packageDirectory } from 'pkg-dir';
 
@@ -63,7 +64,7 @@ const cli = new Command()
       const { config, configPath } = await parseConfig({
         awsProfile: detectNull(awsProfile),
         debug,
-        localState: _.isUndefined(localState) ? undefined : boolean(localState),
+        localState: isUndefined(localState) ? undefined : boolean(localState),
         path,
         permissionSet: detectNull(permissionSet),
         stdOut: true,
@@ -73,7 +74,7 @@ const cli = new Command()
 
       const generatorParams = config.batches?.[batch].cli_defaults;
 
-      if (_.size(generatorParams)) {
+      if (generatorParams && _.size(generatorParams)) {
         console.log(chalk.black.bold('Generator Params'));
 
         const maxKeyLength =
