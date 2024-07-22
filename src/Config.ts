@@ -148,6 +148,7 @@ export const configSchema = z
             policy_accounts: z.record(z.string().array()),
           })
           .optional(),
+        start_url: z.string(),
       })
       .optional(),
     terraform: z
