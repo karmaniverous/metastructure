@@ -36,8 +36,8 @@ export const configSchema = z
           .extend({
             email: z.string(),
             name: z.string(),
-            organizational_unit: z.string().optional(),
-            permission_set_roles: z.record(z.string()).optional(),
+            organizational_unit: z.string().nullable().optional(),
+            permission_set_roles: z.record(z.string()).nullable().optional(),
           })
           .strict(),
       )
@@ -53,26 +53,31 @@ export const configSchema = z
                 permission_set: z.string().nullable().optional(),
                 use_local_state: z.boolean().nullable().optional(),
               })
+              .strict()
               .nullable()
               .optional(),
-            cli_defaults_path: z.string().optional(),
+            cli_defaults_path: z.string().nullable().optional(),
             generators: z.record(z.string()).nullable().optional(),
             path: z.string(),
           })
-          .strict(),
+          .strict()
+          .nullable()
+          .optional(),
       )
       .nullable()
       .optional(),
-    configPath: z.string().optional(),
+    configPath: z.string().nullable().optional(),
     environments: z
       .record(
         z
           .object({
             account: z.string(),
             cognito_user_pool_name: z.string(),
-            gha_on_push_branches: z.string().optional(),
+            gha_on_push_branches: z.string().nullable().optional(),
           })
-          .strict(),
+          .strict()
+          .nullable()
+          .optional(),
       )
       .nullable()
       .optional(),
@@ -80,9 +85,9 @@ export const configSchema = z
       .object({
         aws_region: z.string(),
         github_org: z.string(),
-        id: z.string().optional(),
+        id: z.string().nullable().optional(),
         master_account: z.string(),
-        namespace: z.string().optional(),
+        namespace: z.string().nullable().optional(),
       })
       .strict(),
     organizational_units: z
@@ -90,8 +95,8 @@ export const configSchema = z
         z
           .object({
             name: z.string(),
-            id: z.string().optional(),
-            parent: z.string().optional(),
+            id: z.string().nullable().optional(),
+            parent: z.string().nullable().optional(),
           })
           .strict(),
       )
@@ -101,26 +106,34 @@ export const configSchema = z
       .object({
         groups: z
           .record(
-            z.object({
-              account_permission_sets: z
-                .string()
-                .or(z.string().array())
-                .or(z.record(z.string().or(z.string().array())))
-                .nullable()
-                .optional(),
-              description: z.string().optional(),
-              name: z.string(),
-            }),
+            z
+              .object({
+                account_permission_sets: z
+                  .string()
+                  .or(z.string().array())
+                  .or(z.record(z.string().or(z.string().array())))
+                  .nullable()
+                  .optional(),
+                description: z.string().nullable().optional(),
+                name: z.string(),
+              })
+              .strict(),
           )
           .nullable()
           .optional(),
         permission_sets: z
           .record(
-            z.object({
-              description: z.string().optional(),
-              name: z.string(),
-              policies: z.string().or(z.string().array()).nullable().optional(),
-            }),
+            z
+              .object({
+                description: z.string().nullable().optional(),
+                name: z.string(),
+                policies: z
+                  .string()
+                  .or(z.string().array())
+                  .nullable()
+                  .optional(),
+              })
+              .strict(),
           )
           .nullable()
           .optional(),
@@ -141,12 +154,14 @@ export const configSchema = z
       .object({
         aws_version: z.string(),
         paths: z.string().or(z.string().array()),
-        state: z.object({
-          account: z.string(),
-          bucket: z.string(),
-          key: z.string(),
-          lock_table: z.string(),
-        }),
+        state: z
+          .object({
+            account: z.string(),
+            bucket: z.string(),
+            key: z.string(),
+            lock_table: z.string(),
+          })
+          .strict(),
         terraform_version: z.string(),
       })
       .strict(),
@@ -206,7 +221,7 @@ export const configSchema = z
       for (const [key, batch] of _.entries(data.batches)) {
         // validate cli_defaults
         if (
-          batch.cli_defaults?.assume_role &&
+          batch?.cli_defaults?.assume_role &&
           batch.cli_defaults.permission_set
         )
           ctx.addIssue({
@@ -217,7 +232,7 @@ export const configSchema = z
 
         // validate permission_set
         if (
-          batch.cli_defaults?.permission_set &&
+          batch?.cli_defaults?.permission_set &&
           !(
             data.sso?.permission_sets &&
             batch.cli_defaults.permission_set in data.sso.permission_sets
@@ -234,9 +249,9 @@ export const configSchema = z
     // validate environments
     for (const environment in data.environments) {
       // validate account
-      const account = data.environments[environment].account;
-      if (data.accounts && !validAccounts.includes(account)) {
-        const action = data.accounts[account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      const account = data.environments[environment]?.account;
+      if (account && data.accounts && !validAccounts.includes(account)) {
+        const action = data.accounts[account].action;
 
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
@@ -253,7 +268,7 @@ export const configSchema = z
       data.accounts &&
       !validAccounts.includes(data.organization.master_account)
     ) {
-      const action = data.accounts[data.organization.master_account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      const action = data.accounts[data.organization.master_account].action;
 
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_enum_value,
@@ -373,7 +388,7 @@ export const configSchema = z
       data.accounts &&
       !validAccounts.includes(data.terraform.state.account)
     ) {
-      const action = data.accounts[data.terraform.state.account]?.action; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      const action = data.accounts[data.terraform.state.account].action;
 
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_enum_value,
