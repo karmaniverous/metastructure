@@ -40,13 +40,16 @@ export const parseConfig = async ({
     ({ rawConfig, configPath } = await readConfig(path));
 
     // Override cli defaults.
-    if (rawConfig.batches)
-      _.merge(rawConfig.batches[batch].cli_defaults, {
-        assume_role: assumeRole,
-        aws_profile: awsProfile,
-        permission_set: permissionSet,
-        use_local_state: useLocalState,
-      });
+    if (rawConfig.batches?.[batch])
+      rawConfig.batches[batch].cli_defaults = _.merge(
+        rawConfig.batches[batch].cli_defaults ?? {},
+        {
+          assume_role: assumeRole,
+          aws_profile: awsProfile,
+          permission_set: permissionSet,
+          use_local_state: useLocalState,
+        },
+      );
 
     config = configSchema.parse(rawConfig);
 
