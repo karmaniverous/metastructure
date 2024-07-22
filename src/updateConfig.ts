@@ -42,6 +42,7 @@ export const updateConfig = async ({
         config.batches[batch].path,
       ),
       env: await awsCredentials({
+        debug,
         profile: config.batches[batch].cli_defaults?.aws_profile ?? undefined,
         stdOut,
       }),

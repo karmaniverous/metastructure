@@ -1,15 +1,18 @@
 import chalk from 'chalk';
 import { $ } from 'execa';
+import { inspect } from 'util';
 
 let awsEnv: Record<string, string> | undefined;
 let awsProfile: string | undefined;
 
 interface awsCredentialsParams {
+  debug?: boolean;
   profile?: string;
   stdOut?: boolean;
 }
 
 export const awsCredentials = async ({
+  debug,
   profile,
   stdOut,
 }: awsCredentialsParams) => {
@@ -36,6 +39,11 @@ export const awsCredentials = async ({
       awsProfile = profile;
 
       if (stdOut) process.stdout.write(chalk.green.bold(` Done!\n\n`));
+
+      if (debug) {
+        console.log(chalk.cyan('*** AWS CREDENTIALS ***'));
+        console.log(chalk.cyan(inspect(awsEnv, false, null)), '\n');
+      }
     } catch (error) {
       if (stdOut) process.stdout.write(chalk.red.bold(` Failed!\n\n`));
       throw error;
