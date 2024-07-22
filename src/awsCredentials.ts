@@ -1,54 +1,95 @@
 import chalk from 'chalk';
 import { $ } from 'execa';
+import _ from 'lodash';
+import { resolve } from 'path';
 import { inspect } from 'util';
+
+import { type Config } from './Config';
 
 let awsEnv: Record<string, string> | undefined;
 let awsProfile: string | undefined;
 
 interface awsCredentialsParams {
+  batch: string;
+  config: Config;
   debug?: boolean;
-  profile?: string;
+  pkgDir: string;
   stdOut?: boolean;
 }
 
 export const awsCredentials = async ({
+  batch,
+  config,
   debug,
-  profile,
+  pkgDir,
   stdOut,
 }: awsCredentialsParams) => {
-  if (profile && (profile !== awsProfile || !awsEnv)) {
-    if (stdOut)
-      process.stdout.write(chalk.black.bold(`Acquiring AWS credentials...`));
+  const permissionSet = config.batches?.[batch]?.cli_defaults?.permission_set;
 
-    try {
-      const { stdout } =
-        await $`aws configure export-credentials --profile ${profile}`;
+  if (permissionSet) {
+    const profile = _.entries(
+      config.sso?.reference?.account_permission_sets,
+    ).find(([, permissionSets]) => permissionSets.includes(permissionSet))?.[0];
 
-      const {
-        AccessKeyId: AWS_ACCESS_KEY_ID,
-        SecretAccessKey: AWS_SECRET_ACCESS_KEY,
-        SessionToken: AWS_SESSION_TOKEN,
-      } = JSON.parse(stdout.toString()) as Record<string, string>;
+    if (profile) {
+      if (stdOut)
+        process.stdout.write(
+          chalk.black.bold(`Opening a browser to acquire AWS credentials...`),
+        );
 
-      awsEnv = {
-        AWS_ACCESS_KEY_ID,
-        AWS_SECRET_ACCESS_KEY,
-        AWS_SESSION_TOKEN,
-      };
-
-      awsProfile = profile;
-
-      if (stdOut) process.stdout.write(chalk.green.bold(` Done!\n\n`));
-
-      if (debug) {
-        console.log(chalk.cyan('*** AWS CREDENTIALS ***'));
-        console.log(chalk.cyan(inspect(awsEnv, false, null)), '\n');
+      try {
+        await $({
+          cwd: pkgDir,
+          env: {
+            AWS_CONFIG_FILE: resolve(
+              pkgDir,
+              config.batches?.[batch]?.shared_config_path ?? '',
+            ),
+          },
+        })`aws sso login --profile ${profile}`;
+        if (stdOut) process.stdout.write(chalk.green.bold(` Done!\n\n`));
+      } catch (error) {
+        if (stdOut) process.stdout.write(chalk.red.bold(` Failed!\n\n`));
+        throw error;
       }
-    } catch (error) {
-      if (stdOut) process.stdout.write(chalk.red.bold(` Failed!\n\n`));
-      throw error;
     }
-  }
+  } else {
+    const profile = config.batches?.[batch]?.cli_defaults?.aws_profile;
 
-  return awsEnv;
+    if (profile && (profile !== awsProfile || !awsEnv)) {
+      if (stdOut)
+        process.stdout.write(chalk.black.bold(`Acquiring AWS credentials...`));
+
+      try {
+        const { stdout } =
+          await $`aws configure export-credentials --profile ${profile}`;
+
+        const {
+          AccessKeyId: AWS_ACCESS_KEY_ID,
+          SecretAccessKey: AWS_SECRET_ACCESS_KEY,
+          SessionToken: AWS_SESSION_TOKEN,
+        } = JSON.parse(stdout.toString()) as Record<string, string>;
+
+        awsEnv = {
+          AWS_ACCESS_KEY_ID,
+          AWS_SECRET_ACCESS_KEY,
+          AWS_SESSION_TOKEN,
+        };
+
+        awsProfile = profile;
+
+        if (stdOut) process.stdout.write(chalk.green.bold(` Done!\n\n`));
+
+        if (debug) {
+          console.log(chalk.cyan('*** AWS CREDENTIALS ***'));
+          console.log(chalk.cyan(inspect(awsEnv, false, null)), '\n');
+        }
+      } catch (error) {
+        if (stdOut) process.stdout.write(chalk.red.bold(` Failed!\n`));
+        throw error;
+      }
+    }
+
+    return awsEnv;
+  }
 };

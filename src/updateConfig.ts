@@ -36,14 +36,14 @@ export const updateConfig = async ({
     }
 
     // Configure shell client.
+    const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
     const $ = execa({
-      cwd: resolve(
-        (await packageDirectory({ cwd: configPath })) ?? '.',
-        config.batches[batch].path,
-      ),
+      cwd: resolve(pkgDir, config.batches[batch].path),
       env: await awsCredentials({
+        batch,
+        config,
         debug,
-        profile: config.batches[batch].cli_defaults?.aws_profile ?? undefined,
+        pkgDir,
         stdOut,
       }),
 

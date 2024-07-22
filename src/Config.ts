@@ -59,6 +59,7 @@ export const configSchema = z
             cli_defaults_path: z.string().nullable().optional(),
             generators: z.record(z.string()).nullable().optional(),
             path: z.string(),
+            shared_config_path: z.string(),
           })
           .strict()
           .nullable()
@@ -222,12 +223,15 @@ export const configSchema = z
       for (const [key, batch] of _.entries(data.batches)) {
         // validate cli_defaults
         if (
-          batch?.cli_defaults?.assume_role &&
-          batch.cli_defaults.permission_set
+          !(
+            (batch?.cli_defaults?.assume_role &&
+              batch.cli_defaults.aws_profile) ??
+            batch?.cli_defaults?.permission_set
+          )
         )
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `assume_role & permission_set are mutually exclusive`,
+            message: `Either both assume_role & aws_profile or permission_set alone must be specified.`,
             path: ['batches', key, 'cli_defaults'],
           });
 

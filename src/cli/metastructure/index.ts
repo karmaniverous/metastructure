@@ -139,8 +139,10 @@ const cli = new Command()
       const $ = execa({
         cwd: resolve(pkgDir, config.batches[batch].path),
         env: await awsCredentials({
+          batch,
+          config,
           debug,
-          profile: config.batches[batch].cli_defaults?.aws_profile ?? undefined,
+          pkgDir,
           stdOut: true,
         }),
         shell: true,
