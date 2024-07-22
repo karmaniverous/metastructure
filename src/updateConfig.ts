@@ -1,24 +1,24 @@
 import chalk from 'chalk';
-import { $ as execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 import { inspect } from 'util';
 
 import { readConfig, writeConfig } from './configFile';
+import { execa } from './execa';
 import { getErrorMessage } from './getErrorMessage';
 
 interface UpdateConfigParams {
   batch: string;
+  configPath?: string;
   debug?: boolean;
-  path?: string;
   stdOut?: boolean;
 }
 
 export const updateConfig = async ({
   batch,
+  configPath: path,
   debug,
-  path,
   stdOut,
 }: UpdateConfigParams) => {
   try {
@@ -35,17 +35,23 @@ export const updateConfig = async ({
     }
 
     // Configure shell client.
-    const $ = execa({
-      cwd: resolve(
-        (await packageDirectory({ cwd: configPath })) ?? '.',
-        config.batches[batch].path,
-      ),
-      shell: true,
-    });
+    const $ = await execa(
+      {
+        profile: config.batches[batch].cli_defaults?.aws_profile ?? undefined,
+        stdOut,
+      },
+      {
+        cwd: resolve(
+          (await packageDirectory({ cwd: configPath })) ?? '.',
+          config.batches[batch].path,
+        ),
+        shell: true,
+      },
+    );
 
     // Retrieve & conform outputs from Terraform.
     const update = _.mapValues(
-      JSON.parse((await $`terraform output -json`).stdout),
+      JSON.parse((await $`terraform output -json`).stdout?.toString() ?? '{}'),
       'value',
     );
 

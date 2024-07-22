@@ -65,7 +65,10 @@ export const writeConfig = async (config: Config, configPath: string) => {
 
   updateYamlDoc(doc, config);
 
-  await fs.writeFile(configPath, doc.toString({ doubleQuotedAsJSON: true }));
+  await fs.writeFile(
+    configPath,
+    doc.toString({ doubleQuotedAsJSON: true, lineWidth: 0 }),
+  );
 };
 
 function updateYamlDoc(doc: Document.Parsed, update: object | object[]) {

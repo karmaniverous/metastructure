@@ -29,7 +29,10 @@ export const generateBatch = async ({
     throw new Error(`Unknown batch: ${batch}`);
   }
 
-  if (_.size(config.batches[batch].generators))
+  if (
+    config.batches[batch].generators &&
+    _.size(config.batches[batch].generators)
+  )
     for (const [targetPath, templatePath] of _.entries(
       config.batches[batch].generators,
     )) {

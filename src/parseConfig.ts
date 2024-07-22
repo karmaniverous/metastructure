@@ -8,21 +8,25 @@ import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 interface ParseConfigParams {
+  assumeRole?: string | null;
   awsProfile?: string | null;
+  batch: string;
   debug?: boolean;
-  localState?: boolean;
   path?: string;
   permissionSet?: string | null;
   stdOut?: boolean;
+  useLocalState?: boolean;
 }
 
 export const parseConfig = async ({
+  assumeRole,
   awsProfile,
+  batch,
   debug,
-  localState,
   path,
   permissionSet,
   stdOut,
+  useLocalState,
 }: ParseConfigParams) => {
   let config: Config;
   let configPath: string;
@@ -37,12 +41,12 @@ export const parseConfig = async ({
 
     // Override cli defaults.
     if (rawConfig.batches)
-      for (const batch of _.values(rawConfig.batches))
-        _.merge(batch.cli_defaults, {
-          aws_profile: awsProfile,
-          sso_permission_set: permissionSet,
-          use_local_state: localState,
-        });
+      _.merge(rawConfig.batches[batch].cli_defaults, {
+        assume_role: assumeRole,
+        aws_profile: awsProfile,
+        permission_set: permissionSet,
+        use_local_state: useLocalState,
+      });
 
     config = configSchema.parse(rawConfig);
 
