@@ -2,14 +2,15 @@
 
 import { Command, Option } from '@commander-js/extra-typings';
 import chalk from 'chalk';
+import { execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
+import { awsCredentials } from '../../awsCredentials';
 import { type Config } from '../../Config';
 import { detectNull } from '../../detectNull';
-import { execa } from '../../execa';
 import { formatFiles } from '../../formatFiles';
 import { generateBatch } from '../../generateBatch';
 import { parseConfig } from '../../parseConfig';
@@ -135,17 +136,15 @@ const cli = new Command()
       if (!config.batches?.[batch]) return;
 
       // Get script client.
-      const $ = await execa(
-        {
+      const $ = execa({
+        cwd: resolve(pkgDir, config.batches[batch].path),
+        env: await awsCredentials({
           profile: config.batches[batch].cli_defaults?.aws_profile ?? undefined,
           stdOut: true,
-        },
-        {
-          cwd: resolve(pkgDir, config.batches[batch].path),
-          shell: true,
-          stdio: 'inherit',
-        },
-      );
+        }),
+        shell: true,
+        stdio: 'inherit',
+      });
 
       // Execute command.
       console.log(chalk.black.bold('Running command...\n'));

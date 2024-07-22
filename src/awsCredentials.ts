@@ -1,18 +1,18 @@
 import chalk from 'chalk';
-import { $, type Options } from 'execa';
+import { $ } from 'execa';
 
 let awsEnv: Record<string, string> | undefined;
 let awsProfile: string | undefined;
 
-interface ExecaParams {
+interface awsCredentialsParams {
   profile?: string;
   stdOut?: boolean;
 }
 
-export const execa = async (
-  { profile, stdOut }: ExecaParams,
-  { env, ...rest }: Options = {},
-) => {
+export const awsCredentials = async ({
+  profile,
+  stdOut,
+}: awsCredentialsParams) => {
   if (profile && (profile !== awsProfile || !awsEnv)) {
     if (stdOut)
       process.stdout.write(chalk.black.bold(`Acquiring AWS credentials...`));
@@ -42,5 +42,5 @@ export const execa = async (
     }
   }
 
-  return $({ env: { ...(env ?? {}), ...awsEnv }, ...rest });
+  return awsEnv;
 };
