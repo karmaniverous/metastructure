@@ -145,6 +145,7 @@ export const configSchema = z
             group_account_permission_set_policies: z.record(
               z.record(z.record(z.string().array())),
             ),
+            permission_set_accounts: z.record(z.string().array()),
             policy_accounts: z.record(z.string().array()),
           })
           .optional(),
@@ -431,6 +432,7 @@ export const configSchema = z
         string,
         Record<string, Record<string, string[]>>
       > = {};
+      const permissionSetAccounts: Record<string, string[]> = {};
 
       for (const [group, { account_permission_sets }] of _.entries(
         data.sso.groups,
@@ -476,6 +478,15 @@ export const configSchema = z
                       ]),
                     ],
                   );
+
+                  _.set(permissionSetAccounts, permissionSet, [
+                    ...new Set([
+                      ...((_.get(permissionSetAccounts, permissionSet) as
+                        | string[]
+                        | undefined) ?? []),
+                      account,
+                    ]),
+                  ]);
                 }
 
       // add policy_accounts
@@ -492,6 +503,7 @@ export const configSchema = z
         account_policies: accountPolicies,
         group_account_permission_set_policies:
           groupAccountPermissionSetPolicies,
+        permission_set_accounts: permissionSetAccounts,
         policy_accounts: policyAccounts,
       };
     }
