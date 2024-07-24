@@ -37,7 +37,6 @@ export const configSchema = z
             email: z.string(),
             name: z.string(),
             organizational_unit: z.string().nullable().optional(),
-            permission_set_roles: z.record(z.string()).nullable().optional(),
           })
           .strict(),
       )
@@ -425,7 +424,7 @@ export const configSchema = z
             );
       }
 
-      // add account_policies & group_account_policies
+      // add reference
       const accountPolicies: Record<string, string[]> = {};
       const accountPermissionSets: Record<string, string[]> = {};
       const groupAccountPermissionSetPolicies: Record<

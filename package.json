@@ -7,7 +7,7 @@
     "url": "https://github.com/karmaniverous/metastructure/issues"
   },
   "dependencies": {
-    "@karmaniverous/handlebars": "^0.2.2",
+    "@karmaniverous/handlebars": "^0.3.0",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "execa": "^9.3.0",
@@ -22,7 +22,7 @@
   "description": "A command-line tool that can generate & manage a complex AWS infrastructure with a single YAML config file and a handful of Handlebars templates.",
   "devDependencies": {
     "@commander-js/extra-typings": "^12.1.0",
-    "@eslint/js": "^9.6.0",
+    "@eslint/js": "^9.7.0",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
@@ -33,9 +33,9 @@
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/eslint-plugin-mocha": "^10.4.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/lodash": "^4.17.6",
+    "@types/lodash": "^4.17.7",
     "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.10",
+    "@types/node": "^20.14.12",
     "auto-changelog": "^2.4.0",
     "chai": "^5.1.1",
     "cross-env": "^7.0.3",
@@ -46,20 +46,20 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tsdoc": "^0.3.0",
     "jsdom-global": "^3.0.2",
-    "knip": "^5.26.0",
-    "lefthook": "^1.6.18",
-    "mocha": "^10.6.0",
+    "knip": "^5.27.0",
+    "lefthook": "^1.7.5",
+    "mocha": "^10.7.0",
     "nyc": "^17.0.0",
-    "prettier": "^3.3.2",
-    "release-it": "^17.4.1",
+    "prettier": "^3.3.3",
+    "release-it": "^17.6.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.18.1",
+    "rollup": "^4.19.0",
     "rollup-plugin-dts": "^6.1.1",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
     "tsx": "^4.16.2",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^7.15.0"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.17.0"
   },
   "exports": {
     ".": {
