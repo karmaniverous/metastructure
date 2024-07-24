@@ -88,6 +88,7 @@ export const configSchema = z
         id: z.string().nullable().optional(),
         master_account: z.string(),
         namespace: z.string().nullable().optional(),
+        s3_access_log_token: z.string(),
       })
       .strict(),
     organizational_units: z
