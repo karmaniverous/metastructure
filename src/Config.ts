@@ -32,13 +32,11 @@ export const configSchema = z
   .object({
     accounts: z
       .record(
-        actionableSchema
-          .extend({
-            email: z.string(),
-            name: z.string(),
-            organizational_unit: z.string().nullable().optional(),
-          })
-          .strict(),
+        actionableSchema.extend({
+          email: z.string(),
+          name: z.string(),
+          organizational_unit: z.string().nullable().optional(),
+        }),
       )
       .optional(),
     batches: z
@@ -52,7 +50,6 @@ export const configSchema = z
                 permission_set: z.string().nullable().optional(),
                 use_local_state: z.boolean().nullable().optional(),
               })
-              .strict()
               .nullable()
               .optional(),
             cli_defaults_path: z.string().nullable().optional(),
@@ -60,7 +57,6 @@ export const configSchema = z
             path: z.string(),
             shared_config_path: z.string(),
           })
-          .strict()
           .nullable()
           .optional(),
       )
@@ -75,31 +71,26 @@ export const configSchema = z
             cognito_user_pool_name: z.string(),
             gha_on_push_branches: z.string().nullable().optional(),
           })
-          .strict()
           .nullable()
           .optional(),
       )
       .nullable()
       .optional(),
-    organization: z
-      .object({
-        aws_region: z.string(),
-        github_org: z.string(),
-        id: z.string().nullable().optional(),
-        master_account: z.string(),
-        namespace: z.string().nullable().optional(),
-        s3_access_log_token: z.string(),
-      })
-      .strict(),
+    organization: z.object({
+      aws_region: z.string(),
+      github_org: z.string(),
+      id: z.string().nullable().optional(),
+      master_account: z.string(),
+      namespace: z.string().nullable().optional(),
+      s3_access_log_token: z.string(),
+    }),
     organizational_units: z
       .record(
-        z
-          .object({
-            name: z.string(),
-            id: z.string().nullable().optional(),
-            parent: z.string().nullable().optional(),
-          })
-          .strict(),
+        z.object({
+          name: z.string(),
+          id: z.string().nullable().optional(),
+          parent: z.string().nullable().optional(),
+        }),
       )
       .nullable()
       .optional(),
@@ -107,34 +98,26 @@ export const configSchema = z
       .object({
         groups: z
           .record(
-            z
-              .object({
-                account_permission_sets: z
-                  .string()
-                  .or(z.string().array())
-                  .or(z.record(z.string().or(z.string().array())))
-                  .nullable()
-                  .optional(),
-                description: z.string().nullable().optional(),
-                name: z.string(),
-              })
-              .strict(),
+            z.object({
+              account_permission_sets: z
+                .string()
+                .or(z.string().array())
+                .or(z.record(z.string().or(z.string().array())))
+                .nullable()
+                .optional(),
+              description: z.string().nullable().optional(),
+              name: z.string(),
+            }),
           )
           .nullable()
           .optional(),
         permission_sets: z
           .record(
-            z
-              .object({
-                description: z.string().nullable().optional(),
-                name: z.string(),
-                policies: z
-                  .string()
-                  .or(z.string().array())
-                  .nullable()
-                  .optional(),
-              })
-              .strict(),
+            z.object({
+              description: z.string().nullable().optional(),
+              name: z.string(),
+              policies: z.string().or(z.string().array()).nullable().optional(),
+            }),
           )
           .nullable()
           .optional(),
@@ -149,27 +132,26 @@ export const configSchema = z
             permission_set_accounts: z.record(z.string().array()),
             policy_accounts: z.record(z.string().array()),
           })
+          .strict()
           .optional(),
         start_url: z.string(),
       })
+      .nullable()
       .optional(),
-    terraform: z
-      .object({
-        aws_version: z.string(),
-        paths: z.string().or(z.string().array()),
-        state: z
-          .object({
-            account: z.string(),
-            bucket: z.string(),
-            key: z.string(),
-            lock_table: z.string(),
-          })
-          .strict(),
-        terraform_version: z.string(),
-      })
-      .strict(),
+    terraform: z.object({
+      aws_version: z.string(),
+      paths: z.string().or(z.string().array()),
+      state: z
+        .object({
+          account: z.string(),
+          bucket: z.string(),
+          key: z.string(),
+          lock_table: z.string(),
+        })
+        .strict(),
+      terraform_version: z.string(),
+    }),
   })
-  .strict()
   .superRefine((data, ctx) => {
     const validAccounts = filterValid(data.accounts);
     const validOus = _.keys(data.organizational_units);
