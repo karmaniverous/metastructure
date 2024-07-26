@@ -39,17 +39,15 @@ const actionErrorModifier = (action?: Action) =>
 
 export const configSchema = z
   .object({
-    accounts: z
-      .record(
-        actionableSchema
-          .extend({
-            email: z.string(),
-            name: z.string(),
-            organizational_unit: z.string().nullable().optional(),
-          })
-          .catchall(z.any()),
-      )
-      .optional(),
+    accounts: z.record(
+      actionableSchema
+        .extend({
+          email: z.string(),
+          name: z.string(),
+          organizational_unit: z.string().nullable().optional(),
+        })
+        .catchall(z.any()),
+    ),
     batches: z
       .record(
         z
@@ -85,9 +83,13 @@ export const configSchema = z
     organization: z
       .object({
         aws_region: z.string(),
-        github_org: z.string(),
         id: z.string().nullable().optional(),
-        master_account: z.string(),
+        key_accounts: z
+          .object({
+            master: z.string(),
+            terraform_state: z.string(),
+          })
+          .catchall(z.string()),
         namespace: z.string().nullable().optional(),
         s3_access_log_token: z.string(),
       })
@@ -162,7 +164,6 @@ export const configSchema = z
         paths: z.string().or(z.string().array()),
         state: z
           .object({
-            account: z.string(),
             bucket: z.string(),
             key: z.string(),
             lock_table: z.string(),
@@ -223,21 +224,7 @@ export const configSchema = z
 
     // validate batches
     if (data.batches)
-      for (const [key, batch] of _.entries(data.batches)) {
-        // validate cli_defaults
-        if (
-          !(
-            (batch?.cli_defaults?.assume_role &&
-              batch.cli_defaults.aws_profile) ??
-            batch?.cli_defaults?.permission_set
-          )
-        )
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Either both assume_role & aws_profile or permission_set alone must be specified.`,
-            path: ['batches', key, 'cli_defaults'],
-          });
-
+      for (const batch of _.values(data.batches)) {
         // validate permission_set
         if (
           batch?.cli_defaults?.permission_set &&
@@ -254,11 +241,24 @@ export const configSchema = z
           });
       }
 
+    // validate cli_params
+    if (
+      !(
+        (data.cli_params?.assume_role && data.cli_params.aws_profile) ??
+        data.cli_params?.permission_set
+      )
+    )
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Either both assume_role & aws_profile or permission_set alone must be specified.`,
+        path: ['cli_params'],
+      });
+
     // validate environments
     for (const environment in data.environments) {
       // validate account
       const account = data.environments[environment]?.account;
-      if (account && data.accounts && !validAccounts.includes(account)) {
+      if (account && !validAccounts.includes(account)) {
         const action = data.accounts[account].action;
 
         ctx.addIssue({
@@ -271,21 +271,19 @@ export const configSchema = z
       }
     }
 
-    // validate organization.master_account
-    if (
-      data.accounts &&
-      !validAccounts.includes(data.organization.master_account)
-    ) {
-      const action = data.accounts[data.organization.master_account].action;
+    // validate organization.key_accounts
+    for (const account of _.values(data.organization.key_accounts))
+      if (!validAccounts.includes(account)) {
+        const action = data.accounts[account].action;
 
-      ctx.addIssue({
-        code: z.ZodIssueCode.invalid_enum_value,
-        message: `${actionErrorModifier(action)} account`,
-        options: validAccounts,
-        path: ['organization', 'master_account'],
-        received: data.organization.master_account,
-      });
-    }
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          message: `${actionErrorModifier(action)} account`,
+          options: validAccounts,
+          path: ['organization', 'key_accounts', account],
+          received: account,
+        });
+      }
 
     // validate name uniqueness across organizational_units
     validateObjectPropertyUnique(
@@ -335,7 +333,7 @@ export const configSchema = z
           )) {
             // validate account key
             if (!validAccounts.includes(accountKey)) {
-              const action = data.accounts?.[accountKey]?.action;
+              const action = data.accounts[accountKey].action;
 
               ctx.addIssue({
                 code: z.ZodIssueCode.invalid_enum_value,
@@ -390,22 +388,6 @@ export const configSchema = z
             });
         }
       }
-
-    // validate terraform.state.account
-    if (
-      data.accounts &&
-      !validAccounts.includes(data.terraform.state.account)
-    ) {
-      const action = data.accounts[data.terraform.state.account].action;
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.invalid_enum_value,
-        message: `${actionErrorModifier(action)} account`,
-        options: validAccounts,
-        path: ['terraform', 'state.account'],
-        received: data.terraform.state.account,
-      });
-    }
   })
   .transform((data) => {
     const validAccounts = filterValid(data.accounts);
