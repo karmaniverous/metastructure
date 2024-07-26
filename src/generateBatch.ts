@@ -46,14 +46,8 @@ export const generateBatch = async ({
           { noEscape: true },
         );
 
-        // Render template.
-        const rendered = template({
-          ...config,
-          params: { batch, ...(config.batches[batch].cli_defaults ?? {}) },
-        });
-
         // Write to file.
-        await fs.outputFile(resolve(pkgDir, targetPath), rendered);
+        await fs.outputFile(resolve(pkgDir, targetPath), template(config));
 
         if (stdOut) process.stdout.write(chalk.green(' Done!'));
       } catch (error) {

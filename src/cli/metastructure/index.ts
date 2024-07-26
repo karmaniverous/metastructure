@@ -5,7 +5,6 @@ import chalk from 'chalk';
 import { execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
-import { packageDirectory } from 'pkg-dir';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { awsCredentials } from '../../awsCredentials';
@@ -54,7 +53,7 @@ const cli = new Command()
       assumeRole,
       awsProfile,
       batch,
-      configPath: path,
+      configPath,
       debug,
       generate,
       localStateOff,
@@ -67,37 +66,28 @@ const cli = new Command()
 
     try {
       // Load & parse project config.
-      const { config, configPath } = await parseConfig({
+      const { config, pkgDir } = await parseConfig({
         assumeRole: detectNull(assumeRole),
         awsProfile: detectNull(awsProfile),
         batch,
         debug,
         useLocalState: localStateOn ? true : localStateOff ? false : undefined,
-        path,
+        path: configPath,
         permissionSet: detectNull(permissionSet),
         stdOut: true,
       });
 
-      _.set(cmd, 'metaValues.config', config);
-
-      if (!config.batches?.[batch]) {
-        console.log(chalk.red.bold('Unknown batch!\n'));
-        throw new Error(`Unknown batch: ${batch}`);
-      }
-
-      const generatorParams = config.batches[batch].cli_defaults;
-
-      if (generatorParams && _.size(generatorParams)) {
+      if (config.cli_params && _.size(config.cli_params)) {
         console.log(chalk.black.bold('Generator Params'));
 
         const maxKeyLength =
           _.max(
-            _.entries(generatorParams).map(([key, value]) =>
+            _.entries(config.cli_params).map(([key, value]) =>
               value ? key.length : 0,
             ),
           ) ?? 0;
 
-        for (const [key, value] of _.entries(generatorParams))
+        for (const [key, value] of _.entries(config.cli_params))
           if (value) {
             process.stdout.write(
               chalk.black(`${key}:`.padEnd(maxKeyLength + 2)),
@@ -107,10 +97,11 @@ const cli = new Command()
 
         console.log('');
       }
-      _.set(cmd, 'metaValues.terraformPaths', config.terraform.paths);
 
-      const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
+      // Save values to command for use in lifecycle hooks & subcommands.
+      _.set(cmd, 'metaValues.config', config);
       _.set(cmd, 'metaValues.pkgDir', pkgDir);
+      _.set(cmd, 'metaValues.terraformPaths', config.terraform.paths);
 
       // Process templates if not update command.
       if (generate)

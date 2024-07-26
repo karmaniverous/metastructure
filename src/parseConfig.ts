@@ -1,11 +1,19 @@
 import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
+import fs from 'fs-extra';
 import _ from 'lodash';
+import { dirname, resolve } from 'path';
+import { packageDirectory } from 'pkg-dir';
 import { inspect } from 'util';
+import { parse } from 'yaml';
 
 import { type Config, configSchema } from './Config';
 import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
+
+type CliDefaultOverrides = NonNullable<
+  NonNullable<Config['batches']>[string]
+>['cli_defaults'];
 
 interface ParseConfigParams {
   assumeRole?: string | null;
@@ -30,6 +38,7 @@ export const parseConfig = async ({
 }: ParseConfigParams) => {
   let config: Config;
   let configPath: string;
+  let pkgDir: string;
   let rawConfig: Config;
 
   try {
@@ -39,18 +48,45 @@ export const parseConfig = async ({
     // Load & parse config file.
     ({ rawConfig, configPath } = await readConfig(path));
 
-    // Override cli defaults.
-    if (rawConfig.batches?.[batch])
-      rawConfig.batches[batch].cli_defaults = _.merge(
-        rawConfig.batches[batch].cli_defaults ?? {},
-        {
-          assume_role: assumeRole,
-          aws_profile: awsProfile,
-          permission_set: permissionSet,
-          use_local_state: useLocalState,
-        },
+    // Validate batch.
+    if (!rawConfig.batches?.[batch]) {
+      console.log(chalk.red.bold('Unknown batch!\n'));
+      throw new Error(`Unknown batch: ${batch}`);
+    }
+
+    // Get CLI default overrides.
+    pkgDir = (await packageDirectory({ cwd: dirname(configPath) })) ?? '.';
+
+    let cliDefaultOverrides: CliDefaultOverrides = {};
+
+    const rawBatch = rawConfig.batches[batch];
+
+    if (rawBatch.cli_defaults_path) {
+      const cliDefaultOverridesPath = resolve(
+        pkgDir,
+        rawBatch.cli_defaults_path,
       );
 
+      if (await fs.exists(cliDefaultOverridesPath))
+        cliDefaultOverrides = parse(
+          await fs.readFile(cliDefaultOverridesPath, 'utf8'),
+        ) as CliDefaultOverrides;
+    }
+
+    // Override CLI params & apply to raw config.
+    rawConfig.cli_params = _.defaults(
+      {
+        assume_role: assumeRole,
+        aws_profile: awsProfile,
+        batch,
+        permission_set: permissionSet,
+        use_local_state: useLocalState,
+      },
+      cliDefaultOverrides,
+      rawBatch.cli_defaults,
+    );
+
+    // Parse raw config against schema.
     config = configSchema.parse(rawConfig);
 
     // Recursively apply config to itself as a handlebars template.
@@ -82,5 +118,5 @@ export const parseConfig = async ({
     console.log(chalk.cyan(inspect(config, false, null)), '\n');
   }
 
-  return { config, configPath };
+  return { config, pkgDir };
 };

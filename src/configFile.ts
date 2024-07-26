@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { isPlainObject } from 'is-what';
 import _ from 'lodash';
-import { dirname, resolve } from 'path';
+import { resolve } from 'path';
 import { packageDirectory } from 'pkg-dir';
 import { Document, parse, parseDocument, YAMLMap } from 'yaml';
 
@@ -45,19 +45,6 @@ export const readConfig = async (path?: string) => {
   const configPath = await resolveConfigPath(path);
 
   const rawConfig = parse(await fs.readFile(configPath, 'utf8')) as Config;
-
-  const pkgDir = (await packageDirectory({ cwd: dirname(configPath) })) ?? '.';
-
-  for (const batch of _.values(rawConfig.batches))
-    if (batch?.cli_defaults_path)
-      batch.cli_defaults = _.merge(
-        batch.cli_defaults ?? {},
-        (parse(
-          await fs.readFile(resolve(pkgDir, batch.cli_defaults_path), 'utf8'),
-        ) as NonNullable<
-          NonNullable<Config['batches']>[string]
-        >['cli_defaults']) ?? {},
-      );
 
   return { rawConfig, configPath };
 };

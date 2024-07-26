@@ -12,6 +12,15 @@ const actionableSchema = z.object({
   id: z.string().optional(),
 });
 
+const cliParamsSchema = z
+  .object({
+    assume_role: z.string().nullable().optional(),
+    aws_profile: z.string().nullable().optional(),
+    permission_set: z.string().nullable().optional(),
+    use_local_state: z.boolean().nullable().optional(),
+  })
+  .catchall(z.any());
+
 export type Actionable = z.infer<typeof actionableSchema>;
 
 const filterValid = <T extends Actionable = Actionable>(
@@ -32,36 +41,32 @@ export const configSchema = z
   .object({
     accounts: z
       .record(
-        actionableSchema.extend({
-          email: z.string(),
-          name: z.string(),
-          organizational_unit: z.string().nullable().optional(),
-        }),
+        actionableSchema
+          .extend({
+            email: z.string(),
+            name: z.string(),
+            organizational_unit: z.string().nullable().optional(),
+          })
+          .catchall(z.any()),
       )
       .optional(),
     batches: z
       .record(
         z
           .object({
-            cli_defaults: z
-              .object({
-                assume_role: z.string().nullable().optional(),
-                aws_profile: z.string().nullable().optional(),
-                permission_set: z.string().nullable().optional(),
-                use_local_state: z.boolean().nullable().optional(),
-              })
-              .nullable()
-              .optional(),
+            cli_defaults: cliParamsSchema.nullable().optional(),
             cli_defaults_path: z.string().nullable().optional(),
             generators: z.record(z.string()).nullable().optional(),
             path: z.string(),
             shared_config_path: z.string(),
           })
+          .catchall(z.any())
           .nullable()
           .optional(),
       )
       .nullable()
       .optional(),
+    cli_params: cliParamsSchema.optional(),
     configPath: z.string().nullable().optional(),
     environments: z
       .record(
@@ -71,26 +76,31 @@ export const configSchema = z
             cognito_user_pool_name: z.string(),
             gha_on_push_branches: z.string().nullable().optional(),
           })
+          .catchall(z.any())
           .nullable()
           .optional(),
       )
       .nullable()
       .optional(),
-    organization: z.object({
-      aws_region: z.string(),
-      github_org: z.string(),
-      id: z.string().nullable().optional(),
-      master_account: z.string(),
-      namespace: z.string().nullable().optional(),
-      s3_access_log_token: z.string(),
-    }),
+    organization: z
+      .object({
+        aws_region: z.string(),
+        github_org: z.string(),
+        id: z.string().nullable().optional(),
+        master_account: z.string(),
+        namespace: z.string().nullable().optional(),
+        s3_access_log_token: z.string(),
+      })
+      .catchall(z.any()),
     organizational_units: z
       .record(
-        z.object({
-          name: z.string(),
-          id: z.string().nullable().optional(),
-          parent: z.string().nullable().optional(),
-        }),
+        z
+          .object({
+            name: z.string(),
+            id: z.string().nullable().optional(),
+            parent: z.string().nullable().optional(),
+          })
+          .catchall(z.any()),
       )
       .nullable()
       .optional(),
@@ -98,26 +108,34 @@ export const configSchema = z
       .object({
         groups: z
           .record(
-            z.object({
-              account_permission_sets: z
-                .string()
-                .or(z.string().array())
-                .or(z.record(z.string().or(z.string().array())))
-                .nullable()
-                .optional(),
-              description: z.string().nullable().optional(),
-              name: z.string(),
-            }),
+            z
+              .object({
+                account_permission_sets: z
+                  .string()
+                  .or(z.string().array())
+                  .or(z.record(z.string().or(z.string().array())))
+                  .nullable()
+                  .optional(),
+                description: z.string().nullable().optional(),
+                name: z.string(),
+              })
+              .catchall(z.any()),
           )
           .nullable()
           .optional(),
         permission_sets: z
           .record(
-            z.object({
-              description: z.string().nullable().optional(),
-              name: z.string(),
-              policies: z.string().or(z.string().array()).nullable().optional(),
-            }),
+            z
+              .object({
+                description: z.string().nullable().optional(),
+                name: z.string(),
+                policies: z
+                  .string()
+                  .or(z.string().array())
+                  .nullable()
+                  .optional(),
+              })
+              .catchall(z.any()),
           )
           .nullable()
           .optional(),
@@ -138,19 +156,21 @@ export const configSchema = z
       })
       .nullable()
       .optional(),
-    terraform: z.object({
-      aws_version: z.string(),
-      paths: z.string().or(z.string().array()),
-      state: z
-        .object({
-          account: z.string(),
-          bucket: z.string(),
-          key: z.string(),
-          lock_table: z.string(),
-        })
-        .strict(),
-      terraform_version: z.string(),
-    }),
+    terraform: z
+      .object({
+        aws_version: z.string(),
+        paths: z.string().or(z.string().array()),
+        state: z
+          .object({
+            account: z.string(),
+            bucket: z.string(),
+            key: z.string(),
+            lock_table: z.string(),
+          })
+          .catchall(z.any()),
+        terraform_version: z.string(),
+      })
+      .catchall(z.any()),
   })
   .superRefine((data, ctx) => {
     const validAccounts = filterValid(data.accounts);
