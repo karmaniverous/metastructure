@@ -33,9 +33,7 @@ export const awsCredentials = async ({
 
     if (profile) {
       if (stdOut)
-        process.stdout.write(
-          chalk.black.bold(`Opening a browser to acquire AWS credentials...`),
-        );
+        console.log(chalk.black.bold(`Authenticating AWS credentials...\n`));
 
       try {
         await $({
@@ -46,10 +44,12 @@ export const awsCredentials = async ({
               config.batches?.[batch]?.shared_config_path ?? '',
             ),
           },
+          stdio: 'inherit',
         })`aws sso login --profile ${profile}`;
-        if (stdOut) process.stdout.write(chalk.green.bold(` Done!\n\n`));
+
+        if (stdOut) console.log(chalk.green.bold(`\nDone!\n`));
       } catch (error) {
-        if (stdOut) process.stdout.write(chalk.red.bold(` Failed!\n\n`));
+        if (stdOut) console.log(chalk.red.bold(`\nFailed!\n`));
         throw error;
       }
     }
