@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import { execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
+import { inspect } from 'util';
 
 import { applyLicenseHeaders } from '../../applyLicenseHeaders';
 import { awsCredentials } from '../../awsCredentials';
@@ -92,7 +93,9 @@ const cli = new Command()
             process.stdout.write(
               chalk.black(`${key}:`.padEnd(maxKeyLength + 2)),
             );
-            process.stdout.write(chalk.blue(`${value.toString()}\n`));
+            process.stdout.write(
+              chalk.blue(`${inspect(value, false, null)}\n`),
+            );
           }
 
         console.log('');
