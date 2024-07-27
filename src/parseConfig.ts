@@ -12,13 +12,13 @@ import { readConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 type CliDefaultOverrides = NonNullable<
-  NonNullable<Config['batches']>[string]
+  NonNullable<Config['workspaces']>[string]
 >['cli_defaults'];
 
 interface ParseConfigParams {
   assumeRole?: string | null;
   awsProfile?: string | null;
-  batch: string;
+  workspace: string;
   debug?: boolean;
   path?: string;
   permissionSet?: string | null;
@@ -29,7 +29,7 @@ interface ParseConfigParams {
 export const parseConfig = async ({
   assumeRole,
   awsProfile,
-  batch,
+  workspace,
   debug,
   path,
   permissionSet,
@@ -48,10 +48,10 @@ export const parseConfig = async ({
     // Load & parse config file.
     ({ rawConfig, configPath } = await readConfig(path));
 
-    // Validate batch.
-    if (!rawConfig.batches?.[batch]) {
-      console.log(chalk.red.bold('Unknown batch!\n'));
-      throw new Error(`Unknown batch: ${batch}`);
+    // Validate workspace.
+    if (!rawConfig.workspaces?.[workspace]) {
+      console.log(chalk.red.bold('Unknown workspace!\n'));
+      throw new Error(`Unknown workspace: ${workspace}`);
     }
 
     // Get CLI default overrides.
@@ -59,12 +59,12 @@ export const parseConfig = async ({
 
     let cliDefaultOverrides: CliDefaultOverrides = {};
 
-    const rawBatch = rawConfig.batches[batch];
+    const rawWorkspace = rawConfig.workspaces[workspace];
 
-    if (rawBatch.cli_defaults_path) {
+    if (rawWorkspace.cli_defaults_path) {
       const cliDefaultOverridesPath = resolve(
         pkgDir,
-        rawBatch.cli_defaults_path,
+        rawWorkspace.cli_defaults_path,
       );
 
       if (await fs.exists(cliDefaultOverridesPath))
@@ -78,12 +78,12 @@ export const parseConfig = async ({
       {
         assume_role: assumeRole,
         aws_profile: awsProfile,
-        batch,
+        workspace,
         permission_set: permissionSet,
         use_local_state: useLocalState,
       },
       cliDefaultOverrides,
-      rawBatch.cli_defaults,
+      rawWorkspace.cli_defaults,
     );
 
     // Parse raw config against schema.

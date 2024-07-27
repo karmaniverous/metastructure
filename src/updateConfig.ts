@@ -10,14 +10,14 @@ import { readConfig, writeConfig } from './configFile';
 import { getErrorMessage } from './getErrorMessage';
 
 interface UpdateConfigParams {
-  batch: string;
+  workspace: string;
   configPath?: string;
   debug?: boolean;
   stdOut?: boolean;
 }
 
 export const updateConfig = async ({
-  batch,
+  workspace,
   configPath: path,
   debug,
   stdOut,
@@ -29,19 +29,20 @@ export const updateConfig = async ({
     // Load config file.
     const { rawConfig: config, configPath } = await readConfig(path);
 
-    // Validate batch.
-    if (!config.batches?.[batch]) {
-      if (stdOut) process.stdout.write(chalk.red.bold(' Unknown batch!\n\n'));
-      throw new Error(`Unknown batch: ${batch}`);
+    // Validate workspace.
+    if (!config.workspaces?.[workspace]) {
+      if (stdOut)
+        process.stdout.write(chalk.red.bold(' Unknown workspace!\n\n'));
+      throw new Error(`Unknown workspace: ${workspace}`);
     }
 
     // Configure shell client.
     const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
     const $ = execa({
-      cwd: resolve(pkgDir, config.batches[batch].path),
+      cwd: resolve(pkgDir, config.workspaces[workspace].path),
       env: {
         ...(await awsCredentials({
-          batch,
+          workspace,
           config,
           debug,
           pkgDir,
@@ -51,6 +52,15 @@ export const updateConfig = async ({
       },
       shell: true,
     });
+
+    // Check workspace & switch if necessary.
+    const { stdout } = await $`terraform workspace show`;
+    if (stdout !== workspace) {
+      if (stdOut) console.log(chalk.black.bold('Switching workspace...\n'));
+      await $({
+        stdio: 'inherit',
+      })`terraform workspace select -or-create=true ${workspace}`;
+    }
 
     // Retrieve & conform outputs from Terraform.
     const update = _.mapValues(

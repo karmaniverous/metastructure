@@ -48,22 +48,6 @@ export const configSchema = z
         })
         .catchall(z.any()),
     ),
-    batches: z
-      .record(
-        z
-          .object({
-            cli_defaults: cliParamsSchema.nullable().optional(),
-            cli_defaults_path: z.string().nullable().optional(),
-            generators: z.record(z.string()).nullable().optional(),
-            path: z.string(),
-            shared_config_path: z.string(),
-          })
-          .catchall(z.any())
-          .nullable()
-          .optional(),
-      )
-      .nullable()
-      .optional(),
     cli_params: cliParamsSchema.optional(),
     configPath: z.string().nullable().optional(),
     environments: z
@@ -166,6 +150,22 @@ export const configSchema = z
         terraform_version: z.string(),
       })
       .catchall(z.any()),
+    workspaces: z
+      .record(
+        z
+          .object({
+            cli_defaults: cliParamsSchema.nullable().optional(),
+            cli_defaults_path: z.string().nullable().optional(),
+            generators: z.record(z.string()).nullable().optional(),
+            path: z.string(),
+            shared_config_path: z.string(),
+          })
+          .catchall(z.any())
+          .nullable()
+          .optional(),
+      )
+      .nullable()
+      .optional(),
   })
   .superRefine((data, ctx) => {
     const validAccounts = filterValid(data.accounts);
@@ -216,22 +216,22 @@ export const configSchema = z
       }
     }
 
-    // validate batches
-    if (data.batches)
-      for (const batch of _.values(data.batches)) {
+    // validate workspaces
+    if (data.workspaces)
+      for (const workspace of _.values(data.workspaces)) {
         // validate permission_set
         if (
-          batch?.cli_defaults?.permission_set &&
+          workspace?.cli_defaults?.permission_set &&
           !(
             data.sso?.permission_sets &&
-            batch.cli_defaults.permission_set in data.sso.permission_sets
+            workspace.cli_defaults.permission_set in data.sso.permission_sets
           )
         )
           ctx.addIssue({
             code: z.ZodIssueCode.invalid_enum_value,
             message: `invalid permission set`,
             options: _.keys(data.sso?.permission_sets),
-            received: batch.cli_defaults.permission_set,
+            received: workspace.cli_defaults.permission_set,
           });
       }
 

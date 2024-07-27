@@ -7,34 +7,36 @@ import { resolve } from 'path';
 import { type Config } from './Config';
 import { getErrorMessage } from './getErrorMessage';
 
-interface GenerateBatchParams {
-  batch: string;
+interface GenerateWorkspaceParams {
+  workspace: string;
   config: Config;
   pkgDir: string;
   stdOut?: boolean;
 }
 
-export const generateBatch = async ({
-  batch,
+export const generateWorkspace = async ({
+  workspace,
   config,
   pkgDir,
   stdOut,
-}: GenerateBatchParams) => {
+}: GenerateWorkspaceParams) => {
   if (stdOut)
-    process.stdout.write(chalk.black.bold(`Generating batch '${batch}'...`));
+    process.stdout.write(
+      chalk.black.bold(`Generating workspace '${workspace}'...`),
+    );
 
-  // Validate batch.
-  if (!config.batches?.[batch]) {
-    if (stdOut) process.stdout.write(chalk.red.bold(' Unknown batch!\n\n'));
-    throw new Error(`Unknown batch: ${batch}`);
+  // Validate workspace.
+  if (!config.workspaces?.[workspace]) {
+    if (stdOut) process.stdout.write(chalk.red.bold(' Unknown workspace!\n\n'));
+    throw new Error(`Unknown workspace: ${workspace}`);
   }
 
   if (
-    config.batches[batch].generators &&
-    _.size(config.batches[batch].generators)
+    config.workspaces[workspace].generators &&
+    _.size(config.workspaces[workspace].generators)
   )
     for (const [targetPath, templatePath] of _.entries(
-      config.batches[batch].generators,
+      config.workspaces[workspace].generators,
     )) {
       if (stdOut)
         process.stdout.write(chalk.black.dim(`\nGenerating ${targetPath}...`));

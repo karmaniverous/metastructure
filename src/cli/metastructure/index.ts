@@ -12,7 +12,7 @@ import { awsCredentials } from '../../awsCredentials';
 import { type Config } from '../../Config';
 import { detectNull } from '../../detectNull';
 import { formatFiles } from '../../formatFiles';
-import { generateBatch } from '../../generateBatch';
+import { generateWorkspace } from '../../generateWorkspace';
 import { parseConfig } from '../../parseConfig';
 import { updateConfig } from '../../updateConfig';
 
@@ -32,9 +32,9 @@ const cli = new Command()
   .description('Generate & manage infrastructure code.')
   .enablePositionalOptions()
   .passThroughOptions()
-  .requiredOption('-b, --batch <string>', 'Batch name (required).')
-  .option('-g, --generate', 'Generate batch from config.')
-  .option('-u, --update', 'Update config from batch output.')
+  .requiredOption('-w, --workspace <string>', 'Workspace name (required).')
+  .option('-g, --generate', 'Generate workspace from config.')
+  .option('-u, --update', 'Update config from workspace output.')
   .option('-p, --aws-profile <string>', 'AWS profile.')
   .option('-r, --assume-role <string>', 'Role to assume on target accounts.')
   .option('-s, --permission-set <string>', 'SSO permission set.')
@@ -53,7 +53,7 @@ const cli = new Command()
     const {
       assumeRole,
       awsProfile,
-      batch,
+      workspace,
       configPath,
       debug,
       generate,
@@ -62,15 +62,15 @@ const cli = new Command()
       permissionSet,
     } = cmd.opts();
 
-    process.stdout.write(chalk.black.bold('Batch: '));
-    process.stdout.write(chalk.blue.bold(`${batch}\n\n`));
+    process.stdout.write(chalk.black.bold('Workspace: '));
+    process.stdout.write(chalk.blue.bold(`${workspace}\n\n`));
 
     try {
       // Load & parse project config.
       const { config, pkgDir } = await parseConfig({
         assumeRole: detectNull(assumeRole),
         awsProfile: detectNull(awsProfile),
-        batch,
+        workspace,
         debug,
         useLocalState: localStateOn ? true : localStateOff ? false : undefined,
         path: configPath,
@@ -108,8 +108,8 @@ const cli = new Command()
 
       // Process templates if not update command.
       if (generate)
-        await generateBatch({
-          batch,
+        await generateWorkspace({
+          workspace,
           config,
           pkgDir,
           stdOut: true,
@@ -119,7 +119,7 @@ const cli = new Command()
       else process.exit(1);
     }
   })
-  .action(async (command, { batch, debug }, cmd) => {
+  .action(async (command, { workspace, debug }, cmd) => {
     if (!command.length) return;
 
     const {
@@ -127,14 +127,14 @@ const cli = new Command()
     } = cmd as unknown as MetaCommand;
 
     try {
-      if (!config.batches?.[batch]) return;
+      if (!config.workspaces?.[workspace]) return;
 
       // Get script client.
       const $ = execa({
-        cwd: resolve(pkgDir, config.batches[batch].path),
+        cwd: resolve(pkgDir, config.workspaces[workspace].path),
         env: {
           ...(await awsCredentials({
-            batch,
+            workspace,
             config,
             debug,
             pkgDir,
@@ -143,12 +143,21 @@ const cli = new Command()
           ...(debug ? { TF_LOG: 'DEBUG' } : {}),
         },
         shell: true,
-        stdio: 'inherit',
       });
 
-      // Execute command.
+      // Check workspace & switch if necessary.
+      const { stdout } = await $`terraform workspace show`;
+      if (stdout !== workspace) {
+        console.log(chalk.black.bold('Switching workspace...\n'));
+        await $({
+          stdio: 'inherit',
+        })`terraform workspace select -or-create=true ${workspace}`;
+      }
+
       console.log(chalk.black.bold('Running command...\n'));
-      await $(command.join(' '));
+      await $({
+        stdio: 'inherit',
+      })(command.join(' '));
       console.log(chalk.green.bold('\nDone!\n'));
     } catch (error) {
       console.log(chalk.red.bold('\nCommand failed!\n'));
@@ -158,7 +167,7 @@ const cli = new Command()
     }
   })
   .hook('postAction', async (cmd) => {
-    const { batch, configPath, debug, generate, update } = cmd.opts();
+    const { workspace, configPath, debug, generate, update } = cmd.opts();
 
     const {
       metaValues: { pkgDir, terraformPaths: paths },
@@ -167,7 +176,7 @@ const cli = new Command()
     // Update config with Terraform outputs.
     if (update)
       await updateConfig({
-        batch,
+        workspace,
         debug,
         configPath,
         stdOut: true,

@@ -10,7 +10,7 @@ let awsEnv: Record<string, string> | undefined;
 let awsProfile: string | undefined;
 
 interface awsCredentialsParams {
-  batch: string;
+  workspace: string;
   config: Config;
   debug?: boolean;
   pkgDir: string;
@@ -18,7 +18,7 @@ interface awsCredentialsParams {
 }
 
 export const awsCredentials = async ({
-  batch,
+  workspace,
   config,
   debug,
   pkgDir,
@@ -41,7 +41,7 @@ export const awsCredentials = async ({
           env: {
             AWS_CONFIG_FILE: resolve(
               pkgDir,
-              config.batches?.[batch]?.shared_config_path ?? '',
+              config.workspaces?.[workspace]?.shared_config_path ?? '',
             ),
           },
           stdio: 'inherit',
