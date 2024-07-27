@@ -132,13 +132,16 @@ const cli = new Command()
       // Get script client.
       const $ = execa({
         cwd: resolve(pkgDir, config.batches[batch].path),
-        env: await awsCredentials({
-          batch,
-          config,
-          debug,
-          pkgDir,
-          stdOut: true,
-        }),
+        env: {
+          ...(await awsCredentials({
+            batch,
+            config,
+            debug,
+            pkgDir,
+            stdOut: true,
+          })),
+          ...(debug ? { TF_LOG: 'DEBUG' } : {}),
+        },
         shell: true,
         stdio: 'inherit',
       });

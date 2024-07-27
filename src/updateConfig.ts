@@ -39,14 +39,16 @@ export const updateConfig = async ({
     const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
     const $ = execa({
       cwd: resolve(pkgDir, config.batches[batch].path),
-      env: await awsCredentials({
-        batch,
-        config,
-        debug,
-        pkgDir,
-        stdOut,
-      }),
-
+      env: {
+        ...(await awsCredentials({
+          batch,
+          config,
+          debug,
+          pkgDir,
+          stdOut,
+        })),
+        ...(debug ? { TF_LOG: 'DEBUG' } : {}),
+      },
       shell: true,
     });
 
