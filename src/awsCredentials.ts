@@ -24,7 +24,7 @@ export const awsCredentials = async ({
   pkgDir,
   stdOut,
 }: awsCredentialsParams) => {
-  const permissionSet = config.batches?.[batch]?.cli_defaults?.permission_set;
+  const permissionSet = config.cli_params?.permission_set;
 
   if (permissionSet) {
     const profile = _.entries(
@@ -54,7 +54,7 @@ export const awsCredentials = async ({
       }
     }
   } else {
-    const profile = config.batches?.[batch]?.cli_defaults?.aws_profile;
+    const profile = config.cli_params?.aws_profile;
 
     if (profile && (profile !== awsProfile || !awsEnv)) {
       if (stdOut)
