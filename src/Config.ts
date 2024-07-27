@@ -71,8 +71,6 @@ export const configSchema = z
         z
           .object({
             account: z.string(),
-            cognito_user_pool_name: z.string(),
-            gha_on_push_branches: z.string().nullable().optional(),
           })
           .catchall(z.any())
           .nullable()
@@ -90,8 +88,6 @@ export const configSchema = z
             terraform_state: z.string(),
           })
           .catchall(z.string()),
-        namespace: z.string().nullable().optional(),
-        s3_access_log_token: z.string(),
       })
       .catchall(z.any()),
     organizational_units: z
@@ -118,7 +114,6 @@ export const configSchema = z
                   .or(z.record(z.string().or(z.string().array())))
                   .nullable()
                   .optional(),
-                description: z.string().nullable().optional(),
                 name: z.string(),
               })
               .catchall(z.any()),
@@ -129,7 +124,6 @@ export const configSchema = z
           .record(
             z
               .object({
-                description: z.string().nullable().optional(),
                 name: z.string(),
                 policies: z
                   .string()
