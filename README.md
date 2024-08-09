@@ -160,13 +160,13 @@ Options:
   -h, --help                     Display command help.
 ```
 
-You can run Metastructure to do the following things in any combination:
+You can run Metastructure to do the following things. These may be specified in any combination, but will always run in this order:
 
-- Generate artifacts (like Terraform code) in a selected Terraform workspace from your project config & Handlebars templates.
+- Generate artifacts (like Terraform code) in a selected Terraform workspace from your project config & Handlebars templates. [_Learn more..._](#artifact-generation)
 
-- Create a valid AWS session (SSO or otherwise) and run a command (like `terraform apply`) against it.
+- Create a valid AWS session (SSO or otherwise) and run a command (like `terraform apply`) against it. [_Learn more..._](#authenticated-execution)
 
-- Update your project config file from the output of your selected Terraform workspace.
+- Update your project config file from the output of your selected Terraform workspace. [_Learn more..._](#config-update)
 
 ### CLI Overrides
 
@@ -278,15 +278,23 @@ These include:
 
 ### Artifact Generation
 
-TODO
+Each `workspace` defined in your project cnfig file contains an optional `generators` object. If present, each key of this object should specify a file path relative to the project root, and the associated value should specify the location of a Handlebars template, also relative to the project root.
 
-### AWS Authentication
+When you run Metastructure with the `-g` or `--generate` flag, it will generate (or replace) the files specified in the `generators` keys by processing the associated Handlebars templates with the expanded project config data object for the workspace provided with the `-w` or `--workspace` flag.
+
+To visualize this data object, use the `-d` or `--debug` flag when running Metastructure.
+
+Neither templates nor destination files need be located in any specific directory, so it is perfectly reasonable to collect global templates in a common directory and reference them from multiple workspaces. This is the approach taken in the [Metastructure Template repo](https://github.com/karmaniverous/metastructure-template).
+
+See the [Handlebars Templates](#handlebars-templates) section below for more information on how to write templates.
+
+### Authenticated Execution
 
 TODO
 
 ### Config Update
 
-The Metastructure CLI includes an `--update` flag. When applied, Metastructure will merge the output of the current Terraform workspace with the contents of the config file.
+When you run Metastructure with the `-u` or `--update` flag, Metastructure will merge the output of the current Terraform workspace with the contents of the config file.
 
 The main purpose of this feature is to write identifiers of key resources (like accounts & OUs) back to the config file. Other templates can then use this information to decide whether to create new resources or import existing ones.
 
@@ -330,11 +338,13 @@ TODO
 
 TODO
 
-## More to Come!
+## Metastructure In Action
 
-Metastructure works great right now, but the documentation is thin and the real magic is in setting up the templates for a model infrastructure. I'm working on that now, so feel free to track my progress at [this repo](https://github.com/karmaniverous/aws-metastructure).
+Metastructure is a powerful IDEA, but the tool itself is fairly simple. The real magic is in the templates you create to generate your infrastructure code.
 
-Stay tuned for WAY more documentation!
+The [Metastructure Template repo](https://github.com/karmaniverous/metastructure-template) aims to provide an enterprise-grade reference infrastructure that can serve as a robust starting point for your own projects.
+
+Stay tuned!
 
 ---
 
