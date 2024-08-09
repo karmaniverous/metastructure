@@ -47,11 +47,14 @@ const cli = new Command()
     '-s, --permission-set <string>',
     'SSO permission set (conflicts with --assume-role & --aws-profile).',
   )
-  .option('-L, --local-state-on', 'Use local state (conflicts with -l).')
+  .option(
+    '-L, --local-state-on',
+    'Use local state (conflicts with --local-state-off).',
+  )
   .addOption(
     new Option(
       '-l, --local-state-off',
-      'Use default state (conflicts with -L).',
+      'Use default state (conflicts with --local-state-on).',
     ).conflicts('localStateOn'),
   )
   .option('-c, --config-path <string>', 'Config file path relative to CWD.')
