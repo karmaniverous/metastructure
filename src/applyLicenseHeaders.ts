@@ -1,5 +1,7 @@
 import chalk from 'chalk';
 import { $ as execa } from 'execa';
+import fs from 'fs-extra';
+import { resolve } from 'path';
 
 import { getErrorMessage } from './getErrorMessage';
 
@@ -12,6 +14,9 @@ export const applyLicenseHeaders = async ({
   pkgDir,
   stdOut,
 }: ApplyLicenseHeaders) => {
+  if (!(await fs.exists(resolve(pkgDir, 'license-checker-config.json'))))
+    return;
+
   if (stdOut)
     process.stdout.write(chalk.black.bold('Applying license headers...'));
 
