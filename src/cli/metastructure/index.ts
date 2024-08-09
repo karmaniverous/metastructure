@@ -57,7 +57,10 @@ const cli = new Command()
       'Use default state (conflicts with --local-state-on).',
     ).conflicts('localStateOn'),
   )
-  .option('-c, --config-path <string>', 'Config file path relative to CWD.')
+  .option(
+    '-c, --config-path <string>',
+    'Config file path relative to CWD. Defaults to location specified in .metastructure.yml.',
+  )
   .option('-d, --debug', 'Enable debug logging.')
   .argument('[command...]', 'Command to run within AWS authentication context.')
   .helpOption('-h, --help', 'Display command help.')

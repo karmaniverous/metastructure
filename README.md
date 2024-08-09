@@ -10,7 +10,7 @@ This encapsulation isn't perfect, but it is VERY good. When you use Terraform, y
 
 There are some issues, though:
 
-- Terraform isn't particularly [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself). Especially in a multi-account setup like [AWS Organizations](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html), many code files will be nearly identical, but NOT so identical that they can be modularized.
+- Terraform isn't particularly [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself). Especially in a multi-account setup like [AWS Organizations](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html), many code blocks will be nearly identical, but NOT so identical that they can be modularized.
 
 - [Terraform iterators](https://developer.hashicorp.com/terraform/cdktf/concepts/iterators) are limited, especially when there are dependencies between iterated sets. Also, once a resource is part of an iterated set, it is ALWAYS part of that set. If you make any significant changes to your architecture, migrating existing resources is a thorny problem.
 
@@ -18,7 +18,7 @@ There are some issues, though:
 
 None of this matters much in a lab environment where you can tear down and rebuild your infrastructure at will. But in a production environment, where changes are often not reversible, these limitations can be a real headache.
 
-And in an ENTERPRISE environment—with multiple interdependent accounts, centralized services, and a compliance requirement—these limitations can be such a nightmare that infrastructure development just grinds to a halt.
+And in an ENTERPRISE environment—with multiple interdependent accounts, centralized services, and complex compliance requirements—these limitations can be such a nightmare that infrastructure development just grinds to a halt.
 
 ### Terragrunt, Terraspace, etc.
 
@@ -36,7 +36,7 @@ Metastructure addresses Terraform's issues from a different direction.
 
 **Where other tools use an improved syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful set of templating features to GENERATE Terraform code.**
 
-Once you've generated your code, there it is: Terraform code, in all its WET glory! (You know: not DRY. 🤣) It leverages whtever features you built into your templates, and is hooked into the same linters & IDE extensions you already use.
+Once you've generated your code, there it is: Terraform code, in all its WET glory! (You know: not DRY. 🤣) It leverages whatever features you built into your templates, and is hooked into the same linters & IDE extensions you already use.
 
 BUT...
 
@@ -56,11 +56,11 @@ Instead, Metastructure provides:
 
 - A unifed config file format.
 
-- A superchanged Handlebars templating engine.
+- A supercharged Handlebars template engine.
 
 - A CLI that intelligently parses your project configuraton and generates WHATEVER MAKES SENSE from your templates.
 
-The true magic of Metastructure is in your templates, which really just the code you were going to write anyway... only DRY as a bone and driven by a common config because, at long last, you CAN.
+The true magic of Metastructure is in your templates, which are really just the code you were going to write anyway... only DRY as a bone and driven by a common config because, at long last, you CAN.
 
 See the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo for a working example of a Metastructure project!
 
@@ -73,7 +73,7 @@ Metastructure expects your Terraform project to be embedded in an NPM package. F
 If you like, you can install Metastructure as a dev dependency:
 
 ```bash
-npm i -D @karmaniverous/metastructure
+npm i -D metastructure
 ```
 
 ... in which case you would run it like `npx metastructure...`. That's what you will see in the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo.
@@ -81,14 +81,14 @@ npm i -D @karmaniverous/metastructure
 Otherwise, you'll want to install it as a global dependency:
 
 ```bash
-npm i -g @karmaniverous/metastructure
+npm i -g metastructure
 ```
 
 In this README, for the sake of simplicity, we'll assume a global installation.
 
 ## Assumptions
 
-Metastructure assumes you are building an AWS Organization secured by IAM Identity Center SSO. You can do other things—in fact you HAVE to, to bootstrap a project—but in the long term, you shouldn't.
+Metastructure assumes you are building an [AWS Organization](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html) secured by [IAM Identity Center](https://aws.amazon.com/iam/identity-center/) single sign-on (SSO). You CAN do other things—in fact you HAVE to, to bootstrap a project—but in the long term, you shouldn't.
 
 If you build your project according to the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html), then Metastructure will serve you well.
 
@@ -106,13 +106,13 @@ This file must be located in your project root. It contains a single YAML object
 configPath: src/metastructure.yml
 ```
 
-The purpose of this file is to tell Metastructure where to find your project configuration file, which you can name whatever you like. The path is relative to the project root, and doesn't HAVE to be in the same project!
+The purpose of this file is to tell Metastructure where to find your project configuration file, which you can name whatever you like and put wherever you want. The path is relative to the project root, and doesn't even have to be in the same project!
 
 For example, to support testing this repository has a [`.metastructure.yml`](./.metastructure.yml) file that points to a config file in the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo.
 
 When you run Metastructure, it looks for a `.metastructure.yml` file in the current directory's project root, which points to a config file as described above. All subsequent activity will take place in that config file's project directory.
 
-If Metastructure can't find `.metastructure.yml`, it will be unable to locate your project config file and will throw an error.
+If your project doesn't have a `.metastructure.yml` file, you can specify your config file location at the command line using the `-c` or `--config-path` flag. If you do neither, Metastructure will be unable to locate your project config file and will throw an error.
 
 ### Project Config File
 
@@ -124,7 +124,7 @@ The structure of this file is laid out in the [Metastructure Config](#metastruct
 
 PCI and other compliance standards require that all code files contain a licensing header.
 
-Metastructure is optionally integrated with the [`license-check-and-add`](https://www.npmjs.com/package/license-check-and-add) package, which will place a licensing header as a properly-formatted comment at the top of each generated file.
+Metastructure is optionally integrated with the [`license-check-and-add`](https://www.npmjs.com/package/license-check-and-add) package, which will place a licensing header as a properly-formatted comment at the top of each generated file (in fact all non-excluded files in your project directory).
 
 If you choose to use this feature, place a `license-checker-config.json` file in your project root and point it at a license file somewhere in your project.
 
@@ -140,7 +140,8 @@ Usage: metastructure [options] [command...]
 Generate & manage infrastructure code.
 
 Arguments:
-  command                        Command to run within AWS authentication context.
+  command                        Command to run within AWS authentication
+                                 context.
 
 Options:
   -w, --workspace <string>       Workspace name (required).
@@ -155,7 +156,8 @@ Options:
                                  --assume-role & --aws-profile).
   -L, --local-state-on           Use local state (conflicts with -l).
   -l, --local-state-off          Use default state (conflicts with -L).
-  -c, --config-path <string>     Config file path relative to CWD.
+  -c, --config-path <string>     Config file path relative to CWD. Defaults to
+                                 location specified in .metastructure.yml.
   -d, --debug                    Enable debug logging.
   -h, --help                     Display command help.
 ```
