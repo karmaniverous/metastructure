@@ -24,7 +24,7 @@ And in an ENTERPRISE environment—with multiple interdependent accounts, centra
 
 [Terragrunt](https://terragrunt.gruntwork.io/), [Terraspace](https://terraspace.cloud/), and the like are all great tools that operate differently to DRY up Terraform code and encapsulate away some of the issues listed above. But they also all present their own challenges:
 
-- They're _DRYer_, but they aren't **_DRY_**. When your code is DRY, you don't have to think about maintaining dupes, ever. When it isn't, you do. That's fundamental, and close just doesn't count.
+- They're _DRYer_, but they aren't **_DRY_**. When your code is DRY, you don't have to think about maintaining dupes, ever. When it isn't, you do. That's fundamental, and **close just doesn't count**.
 
 - They're often opinionated as to project structure and other conventions. This is great when you're starting a new project, but it can be a real headache when you're trying to integrate them into an existing project alongside other tools that are ALSO opinionated.
 
@@ -40,17 +40,17 @@ Once you've generated your code, there it is: Terraform code, in all its WET glo
 
 BUT...
 
-- You can make changes to your DRY templates regenerate your WET code at will.
+- You can make changes to your DRY templates & regenerate your WET code at will.
 
 - You can drive multiple workspaces from single, coherent YAML config file.
 
 - You can use the same config to drive the generation of related assets like GitHub Actions workflows, Dockerfiles, etc.
 
-Do you need to create unique resources that are intrinsically DRY? No problem: just write boring old Terraform code, which can live right alongside the Metastructure output and still leverage much of its configuration.
+**_Do you need to create unique resources that are intrinsically DRY?_** No problem, and no template required: just write boring old Terraform code, which can live right alongside the Metastructure output and still leverage much of its configuration.
 
-Do you need to deploy to multiple accounts and manage authentication profiles in an SSO environment? No problem: when you run `terraform apply` THROUGH Metastructure, it will generate appropriate providers, get you authenticated, and deploy resources to EVERY account with a SINGLE command.
+**_Do you need to deploy to multiple accounts and manage authentication profiles in an SSO environment?_** No problem: when you run `terraform apply` THROUGH Metastructure, it will generate appropriate providers, get you authenticated, and deploy resources to EVERY account with a SINGLE command.
 
-Despite its power, Metastructure is a very simple tool. It doesn't try to replace or encapsulate Terraform, and it doesn't impose any particular structure on your project beyond the minimum required to support things like SSO.
+Despite its power, Metastructure is a very simple tool. It doesn't try to replace or encapsulate Terraform, and it doesn't impose any particular structure on your project beyond the relationships already intrinsic to things like accounts, OUs, and SSO permission sets.
 
 Instead, Metastructure provides:
 
@@ -68,7 +68,7 @@ See the [Metastructure Template](https://github.com/karmaniverous/metastructure-
 
 Metastructure is a Node.js package, so you'll need to have Node.js installed on your system. You can download it [here](https://nodejs.org/) or MUCH better use [NVM](https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/).
 
-Metastructure expects your Terraform project to be embedded in an NPM package (see the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo for details).
+Metastructure expects your Terraform project to be embedded in an NPM package. For best results, just [clone the Metastructure Template](https://github.com/new?template_name=metastructure-template)!
 
 If you like, you can install Metastructure as a dev dependency:
 
@@ -76,7 +76,7 @@ If you like, you can install Metastructure as a dev dependency:
 npm i -D @karmaniverous/metastructure
 ```
 
-... in which case you would run it like `npx metastructure...`.
+... in which case you would run it like `npx metastructure...`. That's what you will see in the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo.
 
 Otherwise, you'll want to install it as a global dependency:
 
@@ -112,9 +112,11 @@ For example, to support testing this repository has a [`.metastructure.yml`](./.
 
 When you run Metastructure, it looks for a `.metastructure.yml` file in the current directory's project root, which points to a config file as described above. All subsequent activity will take place in that config file's project directory.
 
+If Metastructure can't find `.metastructure.yml`, it will be unable to locate your project config file and will throw an error.
+
 ### Project Config File
 
-As described above, `.metastructure.yml` points to a project config file, which can have any name you like and may not be in the same project.
+As described above, `.metastructure.yml` points to a project config file, which can have any name you like and may not even be in the same project.
 
 The structure of this file is laid out in the [Metastructure Config](#metastructure-config) section below. Any file paths contaned in this file should be relative to its own project root.
 
@@ -160,8 +162,6 @@ Options:
 
 You can run Metastructure to do the following things in any combination:
 
-- Override default CLI arguments articulated in your project config or your local repo. Resolved CLI arguments are passed to your Handlebars templates, where you can use them just like any other config data.
-
 - Generate artifacts (like Terraform code) in a selected Terraform workspace from your project config & Handlebars templates.
 
 - Create a valid AWS session (SSO or otherwise) and run a command (like `terraform apply`) against it.
@@ -199,13 +199,104 @@ Some notes:
 
 - CLI argument overrides are performed CLI arguments are validated. After overrides, either `permission_set` or BOTH `assume_role` and `aws_profile` must be non-null.
 
+- You can access resolved CLI arguments in your Handlebars templates at key `cli_params`.
+
+### Config Expansion
+
+On loading, your project config file is expanded in several ways as described in the sections below.
+
+When you run Metastructure, use the `-d` or `--debug` flag to see the expanded config object in your console!
+
+#### Handlebars Recursion
+
+Your project config file is processed recursively as a Handlebars template, using itself as a data object. If your config file has this:
+
+```yaml
+organization:
+  tokens:
+    audit_log: audit-logs
+    namespace: metastructure-001
+    owner: karmaniverous
+accounts:
+  dev:
+    email: {{organization.tokens.owner}}+{{#if organization.tokens.namespace}}{{organization.tokens.namespace}}-{{/if}}dev@gmail.com
+```
+
+... it will be processed into this:
+
+```yaml
+organization:
+  tokens:
+    audit_log: audit-logs
+    namespace: metastructure-001
+    owner: karmaniverous
+accounts:
+  dev:
+    email: karmniverous+metastructure-001-dev@gmail.com
+```
+
+#### Format Expansion
+
+For brevity, you can enter data into your project config file in a condensed form. For example, where the format wants an array of strings and you only have one string, you can just provide the string. Metastructure will convert it to an array before passing the config object to your Handlebars templates.
+
+So this:
+
+```yaml
+permission_sets:
+  terraform_admin:
+    policies: AdministratorAccess
+```
+
+... will become this:
+
+```yaml
+permission_sets:
+  terraform_admin:
+    policies:
+      - AdministratorAccess
+```
+
+There are also some special expansion cases that will be covered in the relevant config sections below.
+
+#### CLI Params
+
+As described in the [CLI Overrides](#cli-overrides) section above, CLI arguments are resolved and added to the config object at key `cli_params`.
+
+#### SSO Reference
+
+The groups, permission sets, and policies defined in the `sso` section of your project config file encode a complex set of relationships. Metastructure generates `sso.reference` keys to provide your templates with easy access to different facets of these relationships to facilitate the creation of the resources necessary to support SSO.
+
+These include:
+
+- `account_permission_sets`: A map of the permission sets assigned to each account across all groups. This is used by the session authentication engine to select an SSO profile based on the provided permission set.
+
+- `account_policies`: A map of SSO policies assigned to each account via related permission sets. In the Metstructure Template repo, this is used by the [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) to generate the `aws_iam_policy` resources necessary to support the SSO permission sets assigned to each account.
+
+- `group_account_permission_set_policies`: A breakdown of the policies assigned to each permission set, in each account, in each SSO group. In the Metstructure Template repo, this is also used by the [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) to generate the `aws_ssoadmin_account_assignment` resources that link these entities.
+
+- `policy_accounts`: The inverse of `account_policies`, this is used by the [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) to prevent a policy from being added to an SSO permission set until it has been created in its parent account.
+
 ### Artifact Generation
 
 TODO
 
 ### AWS Authentication
 
+TODO
+
 ### Config Update
+
+The Metastructure CLI includes an `--update` flag. When applied, Metastructure will merge the output of the current Terraform workspace with the contents of the config file.
+
+The main purpose of this feature is to write identifiers of key resources (like accounts & OUs) back to the config file. Other templates can then use this information to decide whether to create new resources or import existing ones.
+
+To use this feature:
+
+- Create a template that generates a Terraform output containing the desired identifiers, whose structure matches that of the config file. Here's [an example](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/outputs.hbs).
+
+- Add the template to the relevant workspace's `generators` section in your project config file.
+
+- Run Metastructure with the `--update` flag.
 
 ## Metastructure Config
 
@@ -227,25 +318,17 @@ Wherever possible, the config file format will accept data in a condensed form. 
 
 Metastructure validates defined elements to ensure relational consistency. For example, it will validate that the account key assigned to an application environment actually exists. Feel free to create new elements of any complexity as you see fit, anywhere in the config file. Just know that validating the internal consistency of these elememts is up to you! See [Throwing Exceptions](#throwing-exceptions) below for more information.
 
-### Config Updates
-
-The Metastructure CLI includes an `--update` flag. When applied, Metastructure will merge the output of the current Terraform workspace with the contents of the config file.
-
-The main purpose of this feature is to write identifiers of key resources (like accounts & OUs) back to the config file. Other templates can then use this information to decide whether to create new resources or import existing ones.
-
-To use this feature:
-
-- Create a template that generates a Terraform output containing the desired identifiers, whose structure matches that of the config file. Here's [an example](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/outputs.hbs).
-
-- Add the template to the relevant workspace's `generators` section in your project config file.
-
-- Run Metastructure with the `--update` flag.
-
 ### Config Format
+
+TODO
 
 ## Handlebars Templates
 
+TODO
+
 ### Throwing Exceptions
+
+TODO
 
 ## More to Come!
 
