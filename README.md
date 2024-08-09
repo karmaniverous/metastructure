@@ -302,9 +302,9 @@ If `permission_set` is populated, then there are a few more moving parts, which 
 
 - Metastructure leverages this file to launch a browser window initiate the SSO login process. You should log in as a user that has access to the indicted permission set.
 
-- The [backend](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/backend.hbs) and [providers](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/providers.hbs) templates leverage the same shared config file to provide access to your Terraform state and account resources. #6
+- The [backend](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/backend.hbs) and [providers](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/providers.hbs) templates leverage the same shared config file to provide access to your Terraform state and account resources. [`GH-6`](https://github.com/karmaniverous/metastructure/issues/6)
 
-Note that these steps assume code generation has taken place in the indicted workspace with a `permission_set` argumet, otherwise the shared config file will not be populated and the `backend` and `providers` files will be configured for key credential access rather than SSO.
+These steps assume code generation has taken place in the indicted workspace with a `permission_set` CLI argument in effect! Otherwise, the shared config file will not be populated, and the `backend` and `providers` files will be configured for key credential access rather than SSO.
 
 So: if you are shifting from key credential access to SSO (which will happen as you bootstrap a new project), you MUST run Metastructure at least once with the `-g` or `--generate` flag in order to generate the required SSO configurations.
 
