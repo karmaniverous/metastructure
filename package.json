@@ -85,7 +85,7 @@
   ],
   "license": "BSD-3-Clause",
   "module": "dist/index.mjs",
-  "name": "@karmaniverous/metastructure",
+  "name": "metastructure",
   "publishConfig": {
     "access": "public"
   },
