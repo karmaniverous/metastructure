@@ -35,9 +35,18 @@ const cli = new Command()
   .requiredOption('-w, --workspace <string>', 'Workspace name (required).')
   .option('-g, --generate', 'Generate workspace from config.')
   .option('-u, --update', 'Update config from workspace output.')
-  .option('-p, --aws-profile <string>', 'AWS profile.')
-  .option('-r, --assume-role <string>', 'Role to assume on target accounts.')
-  .option('-s, --permission-set <string>', 'SSO permission set.')
+  .option(
+    '-r, --assume-role <string>',
+    'Role to assume on target accounts (requires --aws-profile, conflicts with --permission-set).',
+  )
+  .option(
+    '-p, --aws-profile <string>',
+    'AWS profile (requires --assume-role, conflicts with --permission-set).',
+  )
+  .option(
+    '-s, --permission-set <string>',
+    'SSO permission set (conflicts with --assume-role & --aws-profile).',
+  )
   .option('-L, --local-state-on', 'Use local state (conflicts with -l).')
   .addOption(
     new Option(

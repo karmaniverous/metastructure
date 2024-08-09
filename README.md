@@ -118,6 +118,32 @@ See the [Metastructure Template](https://github.com/karmaniverous/metastructure-
 
 ## Running Metastructure
 
+```text
+Usage: metastructure [options] [command...]
+
+Generate & manage infrastructure code.
+
+Arguments:
+  command                        Command to run within AWS authentication context.
+
+Options:
+  -w, --workspace <string>       Workspace name (required).
+  -g, --generate                 Generate workspace from config.
+  -u, --update                   Update config from workspace output.
+  -r, --assume-role <string>     Role to assume on target accounts (requires
+                                 --aws-profile, conflicts with
+                                 --permission-set).
+  -p, --aws-profile <string>     AWS profile (requires --assume-role, conflicts
+                                 with --permission-set).
+  -s, --permission-set <string>  SSO permission set (conflicts with
+                                 --assume-role & --aws-profile).
+  -L, --local-state-on           Use local state (conflicts with -l).
+  -l, --local-state-off          Use default state (conflicts with -L).
+  -c, --config-path <string>     Config file path relative to CWD.
+  -d, --debug                    Enable debug logging.
+  -h, --help                     Display command help.
+```
+
 You can run Metastructure to do the following things in any combination:
 
 - Override default CLI arguments articulated in your project config or your local repo. Resolved CLI arguments are passed to your Handlebars templates, where you can use them just like any other config data.
@@ -128,30 +154,42 @@ You can run Metastructure to do the following things in any combination:
 
 - Update your project config file from the output of your selected Terraform workspace.
 
-Here's the command line help:
+### CLI Overrides
 
-```text
-Usage: metastructure [options] [command...]
+The following CLI arguments can be specified as defaults in your config file at `workspaces.<workspace>.cli_defaults`:
 
-Generate & manage infrastructure code.
+| CLI Argument                                      | Config Key        | Config Type       | Description                                                                                  |
+| ------------------------------------------------- | ----------------- | ----------------- | -------------------------------------------------------------------------------------------- |
+| `-r, --assume-role`                               | `assume_role`     | `string \| null`  | Role to assume on target accounts (requires `aws_profile`, conflicts with `permission_set`). |
+| `-p, --aws-profile`                               | `aws_profile`     | `string \| null`  | AWS profile (requires `assume-role`, conflicts with `permission_set`).                       |
+| `-s, --permission-set`                            | `permission_set`  | `string \| null`  | SSO permission set (conflicts with `assume_role` & `aws_profile`).                           |
+| `-L, --local-state-on`<br>`-l, --local-state-off` | `use_local_state` | `boolean \| null` | Use local state.                                                                             |
 
-Arguments:
-  command                        Command to run within AWS authentication
-                                 context.
+Since the project config file will normally be persisted to your shared repository, these defaults apply to all developers working on the project.
 
-Options:
-  -w, --workspace <string>       Workspace name (required).
-  -g, --generate                 Generate workspace from config.
-  -u, --update                   Update config from workspace output.
-  -p, --aws-profile <string>     AWS profile.
-  -r, --assume-role <string>     Role to assume on target accounts.
-  -s, --permission-set <string>  SSO permission set.
-  -L, --local-state-on           Use local state (conflicts with -l).
-  -l, --local-state-off          Use default state (conflicts with -L).
-  -c, --config-path <string>     Config file path relative to CWD.
-  -d, --debug                    Enable debug logging.
-  -h, --help                     Display command help.
+If you wish to override these defaults locally, create a .gitignored local yaml file (e.g. `workspace.local.yml`) and add your overrides to the file root. For example:
+
+```yaml
+assume_role: null
+aws_profile: META-BOOTSTRAP
+permission_set: terraform_admin
 ```
+
+Then add the path to this file to your project config at `workspaces.<workspace>.cli_defaults_path`. These values will override the defaults in the config file.
+
+Finally, you can override these values at the command line.
+
+Some notes:
+
+- To negate a CLI argument without overriding it, use `null`.
+
+- CLI argument overrides are performed CLI arguments are validated. After overrides, either `permission_set` or BOTH `assume_role` and `aws_profile` must be non-null.
+
+### Artifact Generation
+
+### AWS Authentication
+
+### Config Update
 
 ## Metastructure Config
 
@@ -203,3 +241,7 @@ Stay tuned for WAY more documentation!
 
 See more great templates and other tools on
 [my GitHub Profile](https://github.com/karmaniverous)!
+
+```
+
+```
