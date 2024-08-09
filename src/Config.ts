@@ -48,20 +48,27 @@ export const configSchema = z
         })
         .catchall(z.any()),
     ),
-    cli_params: cliParamsSchema.optional(),
-    configPath: z.string().nullable().optional(),
-    environments: z
+    applications: z
       .record(
-        z
-          .object({
-            account: z.string(),
-          })
-          .catchall(z.any())
-          .nullable()
-          .optional(),
+        z.object({
+          environments: z
+            .record(
+              z
+                .object({
+                  account: z.string(),
+                })
+                .catchall(z.any())
+                .nullable()
+                .optional(),
+            )
+            .nullable()
+            .optional(),
+        }),
       )
       .nullable()
       .optional(),
+    cli_params: cliParamsSchema.optional(),
+    configPath: z.string().nullable().optional(),
     organization: z
       .object({
         aws_region: z.string(),
@@ -248,20 +255,32 @@ export const configSchema = z
         path: ['cli_params'],
       });
 
-    // validate environments
-    for (const environment in data.environments) {
-      // validate account
-      const account = data.environments[environment]?.account;
-      if (account && !validAccounts.includes(account)) {
-        const action = data.accounts[account].action;
+    // validate application environments
+    for (const applicationKey in data.applications) {
+      const application = data.applications[applicationKey];
 
-        ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
-          message: `${actionErrorModifier(action)} account`,
-          options: validAccounts,
-          path: ['environments', environment, 'account'],
-          received: account,
-        });
+      for (const environmentKey in application.environments) {
+        const environment = application.environments[environmentKey];
+
+        // validate account
+        const account = environment?.account;
+        if (account && !validAccounts.includes(account)) {
+          const action = data.accounts[account].action;
+
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_enum_value,
+            message: `${actionErrorModifier(action)} account`,
+            options: validAccounts,
+            path: [
+              'applications',
+              applicationKey,
+              'environments',
+              environmentKey,
+              'account',
+            ],
+            received: account,
+          });
+        }
       }
     }
 
