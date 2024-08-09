@@ -4,35 +4,47 @@ Metastructure is a command-line tool that can generate & manage a complex AWS in
 
 ## The Trouble With Terraform
 
-Terraform encapsulates the AWS API. (Forget about other cloud platforms for now).
+[Terraform](https://www.terraform.io/) encapsulates the [AWS Cloud Control API](https://aws.amazon.com/cloudcontrolapi/). Also other cloud providers, but for now Metastructure focuses on AWS.
 
 This encapsulation isn't perfect, but it is VERY good. When you use Terraform, you rarely have to think about the underlying API calls. Linter & IDE support allow you to focus on the Terraform code as if it were the only thing that mattered. Think TypeScript: you rarely have to think about the underlying JavaScript!
 
 There are some issues, though:
 
-- Terraform isn't particularly DRY. Especially in a multi-account setup like AWS Organizations, many code files will be nearly identical, but NOT so identical that they can be modularized.
+- Terraform isn't particularly [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself). Especially in a multi-account setup like [AWS Organizations](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html), many code files will be nearly identical, but NOT so identical that they can be modularized.
 
-- Terraform iterators are limited, especially when there are dependencies between iterated sets. Also, once a resource is part of an iterated set, it is ALWAYS part of that set. If you make any significant changes to your architecture, migrating existing resources is a thorny problem.
+- [Terraform iterators](https://developer.hashicorp.com/terraform/cdktf/concepts/iterators) are limited, especially when there are dependencies between iterated sets. Also, once a resource is part of an iterated set, it is ALWAYS part of that set. If you make any significant changes to your architecture, migrating existing resources is a thorny problem.
 
-- A Terraform module encapsulates code but is very much a black box. When they work, they're great. But when they don't, it's very hard to understand what is going on under the hood. Once a set of resources is encapsulated in a module, it is almost impossible to move those resourecs to a different module.
+- A [third-party Terraform module](https://registry.terraform.io/browse/modules) encapsulates code but is very much a black box. When they work, they're great. But when they don't, it's very hard to understand what is going on under the hood. Once a set of resources is encapsulated in a module, it is almost impossible to move those resourecs to a different module.
 
-None of this matters much in a lab environment where you can tear down and rebuild your infrastructure at will. But in a production environment, where changes are often not reversible, these limitations can be a real headache. And in an ENTERPRISE environment, with multiple interdependent accounts, centralized services, and a compliance requirement, these limitations can be such a nightmare that infrastructure development just grinds to a halt.
+None of this matters much in a lab environment where you can tear down and rebuild your infrastructure at will. But in a production environment, where changes are often not reversible, these limitations can be a real headache.
+
+And in an ENTERPRISE environment—with multiple interdependent accounts, centralized services, and a compliance requirement—these limitations can be such a nightmare that infrastructure development just grinds to a halt.
 
 ### Terragrunt, Terraspace, etc.
 
-All great tools that operate differently to DRY up Terraform code and encapsulate away some of the issues listed above. But they also all present their own challenges:
+[Terragrunt](https://terragrunt.gruntwork.io/), [Terraspace](https://terraspace.cloud/), and the like are all great tools that operate differently to DRY up Terraform code and encapsulate away some of the issues listed above. But they also all present their own challenges:
 
-- They're _DRYer_, but they aren't **_DRY_**. When your code is DRY, you don't have to think about maintaining dupes, ever. When it isn't, you do. That's funddamental.
+- They're _DRYer_, but they aren't **_DRY_**. When your code is DRY, you don't have to think about maintaining dupes, ever. When it isn't, you do. That's fundamental, and close just doesn't count.
 
-- The more Terraform is encapsulated, the less it is exposed to the very ecosystem of linters, IDE integrations, and other tools that made it SAFE to encapsulate the AWS API in the first place. If you write bad Terraform code, you can see what's going on. If you write bad Terragrunt code, you're flying blind.
+- They're often opinionated as to project structure and other conventions. This is great when you're starting a new project, but it can be a real headache when you're trying to integrate them into an existing project alongside other tools that are ALSO opinionated.
+
+- The more Terraform is encapsulated, the less it is exposed to the very ecosystem of linters, IDE integrations, and other tools that made it SAFE to encapsulate the AWS API in the first place. If you write bad Terraform code, you can see what's going on. If you write bad Terragrunt code, you're often flying blind!
 
 ### Metastructure to the Rescue
 
 Metastructure addresses Terraform's issues from a different direction.
 
-Where other tools use an improved syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful set of templating features to GENERATE Terraform code.
+**Where other tools use an improved syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful set of templating features to GENERATE Terraform code.**
 
-Once you've generated your code, there it is: Terraform, in all its wet glory, hooked into the same linters & IDE extensions you already use. But you can also regenerate it at will, with a single command, from a single YAML file and a highly condensed set of Handlebars templates.
+Once you've generated your code, there it is: Terraform code, in all its WET glory! (You know: not DRY. 🤣) It leverages whtever features you built into your templates, and is hooked into the same linters & IDE extensions you already use.
+
+BUT...
+
+- You can make changes to your DRY templates regenerate your WET code at will.
+
+- You can drive multiple workspaces from single, coherent YAML config file.
+
+- You can use the same config to drive the generation of related assets like GitHub Actions workflows, Dockerfiles, etc.
 
 Do you need to create unique resources that are intrinsically DRY? No problem: just write boring old Terraform code, which can live right alongside the Metastructure output and still leverage much of its configuration.
 
@@ -43,10 +55,12 @@ Despite its power, Metastructure is a very simple tool. It doesn't try to replac
 Instead, Metastructure provides:
 
 - A unifed config file format.
+
 - A superchanged Handlebars templating engine.
+
 - A CLI that intelligently parses your project configuraton and generates WHATEVER MAKES SENSE from your templates.
 
-The real magic of Metastructure is in the templates, which are NOT limited to Terraform code. Need to generate a GitHub Actions workflow based on your project config? No problem... just write another template!
+The true magic of Metastructure is in your templates, which really just the code you were going to write anyway... only DRY as a bone and driven by a common config because, at long last, you CAN.
 
 See the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo for a working example of a Metastructure project!
 
@@ -243,4 +257,3 @@ Stay tuned for WAY more documentation!
 
 See more great templates and other tools on
 [my GitHub Profile](https://github.com/karmaniverous)!
-
