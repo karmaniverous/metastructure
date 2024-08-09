@@ -280,7 +280,7 @@ These include:
 
 ### Artifact Generation
 
-Each `workspace` defined in your project cnfig file contains an optional `generators` object. If present, each key of this object should specify a file path relative to the project root, and the associated value should specify the location of a Handlebars template, also relative to the project root.
+Each `workspace` defined in your project config file contains an optional `generators` object. If present, each key of this object should specify a file path relative to the project root, and the associated value should specify the location of a Handlebars template, also relative to the project root.
 
 When you run Metastructure with the `-g` or `--generate` flag, it will generate (or replace) the files specified in the `generators` keys by processing the associated Handlebars templates with the expanded project config data object for the workspace provided with the `-w` or `--workspace` flag.
 
@@ -294,15 +294,15 @@ See the [Handlebars Templates](#handlebars-templates) section below for more inf
 
 There are two ways use Metastructure to generate AWS credentials, depending how your [CLI overrides](#cli-overrides) resolve.
 
-If `assume_role` and `aws_profile` are populated, then Metastructure will attempt to authenticate with the indicated profile from your local [AWS credentials file](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html). These credentials will generally take the form of an AWS Access Key Id and an AWS Secret Access Key. Once authenticated, Metastructure will attempt to assume the indicated role. It is up to you to ensure that the credentials you provide have the necessary permissions to assume the role on all affected accounts.
+If `assume_role` and `aws_profile` are populated, then Metastructure will attempt to authenticate with the indicated profile from your local [AWS credentials file](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html). These credentials will generally take the form of an AWS Access Key Id and an AWS Secret Access Key. Once authenticated, Metastructure will attempt to assume the indicated role. It is up to you to ensure that the credentials you provide have the necessary permissions to assume that role on all affected accounts.
 
-If `permission_set` is populated, then there are a few more moving parts, which are best understoof using the Metastructure Template repo as an example:
+If `permission_set` is populated, then there are a few more moving parts, which are best understood using the Metastructure Template repo as an example:
 
 - The [`shared_config template`](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/shared_config.hbs) generates an SSO credentials config file at the location specified in your project config file at `workspaces.<workspace>.shared_config_path`.
 
 - Metastructure leverages this file to launch a browser window initiate the SSO login process. You should log in as a user that has access to the indicted permission set.
 
-- The [backend](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/backend.hbs) and [providers](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/providers.hbs) templates leverage the same shared config file to provide access to your Terraform state and account resources.
+- The [backend](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/backend.hbs) and [providers](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/providers.hbs) templates leverage the same shared config file to provide access to your Terraform state and account resources. #6
 
 Note that these steps assume code generation has taken place in the indicted workspace with a `permission_set` argumet, otherwise the shared config file will not be populated and the `backend` and `providers` files will be configured for key credential access rather than SSO.
 
