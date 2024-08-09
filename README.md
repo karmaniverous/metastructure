@@ -364,7 +364,7 @@ Metastructure validates defined elements to ensure relational consistency. For e
 
 ### Config Format
 
-For you motivated developers Metastructure Config schema (a Zod schema) and the associated Typescript type, as well as all schema validations and expansions, are defined in [this source file](./src/Config.ts).
+For you motivated developers, the Metastructure Config schema (a [Zod](https://github.com/colinhacks/zod) schema) and the associated Typescript type, as well as all schema validations and expansions, are defined in [this source file](./src/Config.ts).
 
 For everybody else, please explore the [Metastructure Template repo project config file](https://github.com/karmaniverous/metastructure-template/blob/main/src/metastructure.yml). This file is heavily annotated and tracks current development, so it should tell you everything you need to know!
 
