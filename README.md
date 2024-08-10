@@ -2,7 +2,7 @@
 
 # Metastructure
 
-Metastructure is a command-line tool that can generate & manage a complex AWS infrastructure, DevOps pipeline, etc., with a single YAML config file and a handful of Handlebars templates.
+Metastructure is a command-line tool that can generate & manage a complex AWS infrastructure, DevOps pipeline, etc., with a simple YAML config file and a handful of Handlebars templates.
 
 ## The Trouble With Terraform
 
