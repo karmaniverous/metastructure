@@ -34,7 +34,11 @@ And in an ENTERPRISE environment—with multiple interdependent accounts, centra
 
 Metastructure addresses Terraform's issues from a different direction.
 
+---
+
 **Where other tools use an improved syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful set of templating features to GENERATE Terraform code.**
+
+---
 
 Once you've generated your code, there it is: Terraform code, in all its WET glory! (You know: not DRY. 🤣) It leverages whatever features you built into your templates, and is hooked into the same linters & IDE extensions you already use.
 
