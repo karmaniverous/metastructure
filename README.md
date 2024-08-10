@@ -360,7 +360,7 @@ Your Metastructure project config serves several purposes:
 
 Wherever possible, the config file format will accept data in a condensed form. See [Format Expansion](#format-expansion) above for more information.
 
-Metastructure validates defined elements to ensure relational consistency. For example, it will validate that the account key assigned to an application environment actually exists. Feel free to create new elements of any complexity as you see fit, anywhere in the config file. Just know that validating the internal consistency of these elememts is up to you! See [Throwing Exceptions](#throwing-exceptions) below for more information.
+Metastructure validates defined elements to ensure relational consistency. For example, it will validate that the account key assigned to an application environment actually exists. Feel free to create new elements of any complexity as you see fit, anywhere in the config file. Just know that validating the internal consistency of these elememts is up to you! See `throwif` in [Handlebars Helpers](#handlebars-helpers) below for more information.
 
 ### Config Schema
 
@@ -532,19 +532,57 @@ Each key in the `workspaces` object is the name of a Terraform workspace. Each v
 
 ## Handlebars Templates
 
-TODO
+[Handlebars](https://handlebarsjs.com/) is a powerful template engine that was developed to support dynamic HTML generation in web applications.
 
-### Throwing Exceptions
+A Handlebars template is driven by a data object (like your [expanded config object](#config-expansion)) and can generate ANY kind of text... including Terraform code!
 
-TODO
+In a Metastructure project, Metastructure's job is to generate this expanded data object from your project config file and present it to your templates. YOUR job is to write DRY, compact Handlebars templates that consume this data object & generate the code you need!
 
-## Metastructure In Action
+### Handlebars Helpers
+
+Vanilla Handlebars expresses only a limited set of logical and data operations, FAR less capability than Metastructure requires!
+
+Fortunately, Handlebars is easily extensible, so Metastructure includes an enhanced handlebars variant with a VERY powerful set of helper functions!
+
+Note that Handlebars helpers are composable, so you can use them together to create complex logic in your templates.
+
+Here are some examples:
+
+- [`lodash`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#lodash--numeral) exposes the entire [Lodash](https://lodash.com/) library to your templates.
+
+- [`params`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#params) converts a set of Handlebars parameters into an array that can be consumed by a `lodash` helper.
+
+- [`logic`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#logic) provides the boolean logic functions that are missing from vanilla Handlebars and can easily be combined with `lodash` comparison function like `eq` and `isEqual`.
+
+- [`ifelse`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#ifelse) provides a [ternary operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator).
+
+- [`json2tf`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#json2tf) converts a JSON object into a Terraform literal. The Metastructure Template repo's global module [outputs template](https://github.com/karmaniverous/metastructure-template/blob/main/src/modules/global/outputs.hbs) uses this function to expose your entire project config directly to your Terraform code!
+
+- [`namify`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#namify) transforms a string to force it into compatibility with a given naming convention (e.g. an S3 bucket name).
+
+- [`throwif`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#throwif) will throw an exception if its condition is met, halting template generation & presenting an error message in your console.
+
+## So What Next?
+
+This VERY long README doesn't seem to tell the whole story, does it?
 
 Metastructure is a powerful IDEA, but the tool itself is fairly simple. The real magic is in the templates you create to generate your infrastructure code.
 
 The [Metastructure Template repo](https://github.com/karmaniverous/metastructure-template) aims to provide an enterprise-grade reference infrastructure that can serve as a robust starting point for your own projects.
 
-Stay tuned!
+At the moment...
+
+- I'm adding a critical mass of key features to the Metastructure Template repo to make it a more useful reference. At a minimum this will include the existing SSO implementation, full cross-account CloudWatch audit logging, and a GitHub Actions-based DevOps pipeline.
+
+- I'm developing a course on Udemy to present Metastructure and work organically through the process of developing the Metastructure Template repo.
+
+So stay tuned!
+
+## I Love Metastructure! How Can I Help?
+
+You are AWESOME! 👊
+
+The best way to help is to clone the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) and start building your own infrastructure with it! I'd be delighted to help you create new generic patterns and features that can be added to the template implementation.
 
 ---
 
