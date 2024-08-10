@@ -66,7 +66,7 @@ Instead, Metastructure provides:
 
 The true magic of Metastructure is in your templates, which are really just the code you were going to write anyway... only DRY as a bone and driven by a common config because, at long last, you CAN.
 
-See the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo for a working example of a Metastructure project!
+See the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) for a working example of a Metastructure project!
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ If you like, you can install Metastructure as a dev dependency:
 npm i -D metastructure
 ```
 
-... in which case you would run it like `npx metastructure...`. That's what you will see in the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo.
+... in which case you would run it like `npx metastructure...`. That's what you will see in the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template).
 
 Otherwise, you'll want to install it as a global dependency:
 
@@ -112,7 +112,7 @@ configPath: src/metastructure.yml
 
 The purpose of this file is to tell Metastructure where to find your project configuration file, which you can name whatever you like and put wherever you want. The path is relative to the project root, and doesn't even have to be in the same project!
 
-For example, to support testing this repository has a [`.metastructure.yml`](./.metastructure.yml) file that points to a config file in the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo.
+For example, to support testing this repository has a [`.metastructure.yml`](./.metastructure.yml) file that points to a config file in the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template).
 
 When you run Metastructure, it looks for a `.metastructure.yml` file in the current directory's project root, which points to a config file as described above. All subsequent activity will take place in that config file's project directory.
 
@@ -134,7 +134,7 @@ If you choose to use this feature, place a `license-checker-config.json` file in
 
 This package is a little quirky, particularly in how it processes ignore patterns, but it's the best solution I've found that supports configurably managing license headers across multiple file formats. If you have a better idea, [please share](https://github.com/karmaniverous/metastructure/discussions)!
 
-See the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) repo for a working example.
+See the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) for a working example.
 
 ## Running Metastructure
 
@@ -290,7 +290,7 @@ When you run Metastructure with the `-g` or `--generate` flag, it will generate 
 
 To visualize this data object, use the `-d` or `--debug` flag when running Metastructure.
 
-Neither templates nor destination files need be located in any specific directory, so it is perfectly reasonable to collect global templates in a common directory and reference them from multiple workspaces. This is the approach taken in the [Metastructure Template repo](https://github.com/karmaniverous/metastructure-template).
+Neither templates nor destination files need be located in any specific directory, so it is perfectly reasonable to collect global templates in a common directory and reference them from multiple workspaces. This is the approach taken in the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template).
 
 See the [Handlebars Templates](#handlebars-templates) section below for more information on how to write templates.
 
@@ -370,7 +370,7 @@ Metastructure validates defined elements to ensure relational consistency. For e
 
 For you motivated developers, the Metastructure Config schema (a [Zod](https://github.com/colinhacks/zod) schema) and the associated Typescript type, as well as all schema validations and expansions, are defined in [this source file](./src/Config.ts).
 
-For everybody else, please explore the [Metastructure Template repo project config file](https://github.com/karmaniverous/metastructure-template/blob/main/src/metastructure.yml). This is a working implementation and tracks current development, so it's a great example to follow!
+For everybody else, please explore the Metastructure Template Repo [project config file](https://github.com/karmaniverous/metastructure-template/blob/main/src/metastructure.yml). This is a working implementation and tracks current development, so it's a great example to follow!
 
 The sections below briefly describe each section of the config file.
 
@@ -418,7 +418,7 @@ Each account object contains the following significant keys:
 
 `id` is the AWS account id. If you add this value manually, Terraform will attempt to import your account and add it to your Organization. It's up to you to ensure the account and your permissions are properly configured to support this operation!
 
-If your project follows the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) pattern, `id` will be populated when you perform a [Config Update](#config-updates).
+If your project follows the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) pattern, `id` will be populated when you perform a [Config Update](#config-updates).
 
 If `id` is populated and you add `action: remove` to the account object, when you run `terraform apply` the account will be removed from your Terraform state and your Organization. If you add `action: destroy`, the account will be removed from your Organization and destroyed. As always, this assumes you have already met the necessary conditions to perform these operations!
 
@@ -482,7 +482,7 @@ sso:
 
 `permission_sets` is an object whose properties define the SSO permission sets in your organization. Each permission set is defined by a key, which is used to reference the permission set in other parts of the configuration, and a value, which is an object that defines the permission set's properties.
 
-The point of this section is to connect permission sets with assigned policies in the relevant accounts. It's up to you and your templates to actually CREATE those policies using the expanded config object. See the Metastructure Template repo's [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) for a working example.
+The point of this section is to connect permission sets with assigned policies in the relevant accounts. It's up to you and your templates to actually CREATE those policies using the expanded config object. See the Metastructure Template Repo's [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) for a working example.
 
 Here's an annotated example of this section:
 
@@ -506,7 +506,7 @@ sso:
 
 This section defines the applications that your organization uses, the environments each application runs in, and the accounts that host those environments.
 
-The `applications` section is a little lean at the moment: Metastructure evaluates it for referential integrity, but it is not yet consumed by any templates in the Metastructure Template repo.
+The `applications` section is a little lean at the moment: Metastructure evaluates it for referential integrity, but it is not yet consumed by any templates in the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template).
 
 More to come!
 
@@ -560,7 +560,7 @@ Here are some examples:
 
 - [`ifelse`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#ifelse) provides a [ternary operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator).
 
-- [`json2tf`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#json2tf) converts a JSON object into a Terraform literal. The Metastructure Template repo's global module [outputs template](https://github.com/karmaniverous/metastructure-template/blob/main/src/modules/global/outputs.hbs) uses this function to expose your entire project config directly to your Terraform code!
+- [`json2tf`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#json2tf) converts a JSON object into a Terraform literal. The Metastructure Template Repo's global module [outputs template](https://github.com/karmaniverous/metastructure-template/blob/main/src/modules/global/outputs.hbs) uses this function to expose your entire project config directly to your Terraform code!
 
 - [`namify`](https://github.com/karmaniverous/handlebars?tab=readme-ov-file#namify) transforms a string to force it into compatibility with a given naming convention (e.g. an S3 bucket name).
 
@@ -572,13 +572,13 @@ This VERY long README doesn't seem to tell the whole story, does it?
 
 Metastructure is a powerful IDEA, but the tool itself is fairly simple. The real magic is in the templates you create to generate your infrastructure code.
 
-The [Metastructure Template repo](https://github.com/karmaniverous/metastructure-template) aims to provide an enterprise-grade reference infrastructure that can serve as a robust starting point for your own projects.
+The [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) aims to provide an enterprise-grade reference infrastructure that can serve as a robust starting point for your own projects.
 
 At the moment...
 
-- I'm adding a critical mass of key features to the Metastructure Template repo to make it a more useful reference. At a minimum this will include the existing SSO implementation, full cross-account CloudWatch audit logging, and a GitHub Actions-based DevOps pipeline.
+- I'm adding a critical mass of key features to the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template) to make it a more useful reference. At a minimum this will include the existing SSO implementation, full cross-account CloudWatch audit logging, and a GitHub Actions-based DevOps pipeline.
 
-- I'm developing a course on Udemy to present Metastructure and work organically through the process of developing the Metastructure Template repo.
+- I'm developing a course on Udemy to present Metastructure and work organically through the process of developing the [Metastructure Template Repo](https://github.com/karmaniverous/metastructure-template).
 
 So stay tuned!
 
