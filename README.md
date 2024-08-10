@@ -1,3 +1,5 @@
+> **Where other tools use special syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful template engine to GENERATE Terraform code.**
+
 # Metastructure
 
 Metastructure is a command-line tool that can generate & manage a complex AWS infrastructure, DevOps pipeline, etc., with a single YAML config file and a handful of Handlebars templates.
@@ -36,7 +38,7 @@ Metastructure addresses Terraform's issues from a different direction.
 
 ---
 
-**Where other tools use an improved syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful set of templating features to GENERATE Terraform code.**
+**Where other tools use special syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful template engine to GENERATE Terraform code.**
 
 ---
 
