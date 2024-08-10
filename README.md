@@ -209,7 +209,7 @@ On loading, your project config file is expanded in several ways as described in
 
 When you run Metastructure, use the `-d` or `--debug` flag to see the expanded config object in your console!
 
-#### Handlebars Recursion
+#### Config Recursion
 
 Your project config file is processed recursively as a Handlebars template, using itself as a data object. If your config file has this:
 
@@ -362,11 +362,173 @@ Wherever possible, the config file format will accept data in a condensed form. 
 
 Metastructure validates defined elements to ensure relational consistency. For example, it will validate that the account key assigned to an application environment actually exists. Feel free to create new elements of any complexity as you see fit, anywhere in the config file. Just know that validating the internal consistency of these elememts is up to you! See [Throwing Exceptions](#throwing-exceptions) below for more information.
 
-### Config Format
+### Config Schema
 
 For you motivated developers, the Metastructure Config schema (a [Zod](https://github.com/colinhacks/zod) schema) and the associated Typescript type, as well as all schema validations and expansions, are defined in [this source file](./src/Config.ts).
 
-For everybody else, please explore the [Metastructure Template repo project config file](https://github.com/karmaniverous/metastructure-template/blob/main/src/metastructure.yml). This file is heavily annotated and tracks current development, so it should tell you everything you need to know!
+For everybody else, please explore the [Metastructure Template repo project config file](https://github.com/karmaniverous/metastructure-template/blob/main/src/metastructure.yml). This is a working implementation and tracks current development, so it's a great example to follow!
+
+The sections below briefly describe each section of the config file.
+
+**_REMEMBER: You can add any data you like to your config file, anywhere you like, and use it in your Handlebars templates!_**
+
+#### `organization`
+
+This section defines values that apply globally across your AWS Organization. It contains the following significant keys:
+
+`id` is the AWS Organization ID. AWS Organizations must be created through the AWS Management Console, so you will need to enter this value manually, and your Organization will be imported into Terraform.
+
+`key_accounts` is an object whose keys identify key functional roles within your organization and whose values identify the accounts that play them. For example, consider the following snippet:
+
+```yml
+organization:
+  key_accounts:
+    master: master
+    terraform_state: shared_services
+```
+
+This indicates that the the account with key `master` plays the master account role in your organization, and the account with key `shared_services` houses your Terraform state.
+
+If your templates are suitably generic, this gives you the ability to assign key roles to accounts in your configuration, without having to make any template changes.
+
+`tokens` is an object whose keys are used as tokens in your templates. For example, consider the following snippet:
+
+```yml
+organization:
+  tokens:
+    namespace: metastructure-001
+accounts:
+  dev:
+    email: karmaniverous+{{#if organization.tokens.namespace}}{{organization.tokens.namespace}}-{{/if}}dev@gmail.com
+```
+
+Thanks to the [Config Recursion](#config-recursion) feature described above, the `dev` account email will resolve to `karmaniverous+metastructure-001@gmail.com`.
+
+Organization tokens can be used throughout your configuration to provide a single source of truth for values that are used in multiple places.
+
+#### `accounts`
+
+This section identifies the AWS accounts in your organization. Each account is defined by a key, which is used to reference the account in other parts of the configuration, and a value, which is an object that defines the account's properties.
+
+Each account object contains the following significant keys:
+
+`id` is the AWS account id. If you add this value manually, Terraform will attempt to import your account and add it to your Organization. It's up to you to ensure the account and your permissions are properly configured to support this operation!
+
+If your project follows the [Metastructure Template](https://github.com/karmaniverous/metastructure-template) pattern, `id` will be populated when you perform a [Config Update](#config-updates).
+
+If `id` is populated and you add `action: remove` to the account object, when you run `terraform apply` the account will be removed from your Terraform state and your Organization. If you add `action: destroy`, the account will be removed from your Organization and destroyed. As always, this assumes you have already met the necessary conditions to perform these operations!
+
+`name` is the name of the account. This is used in the AWS Management Console and in other places where human-readable account names are required.
+
+`email` is the email address to be associated with the account. Metastructure validates that each account has a unique email, and remember that AWS requires every account to have a globally unique email address, which can't be reused on another account.
+
+`organizational_unit` is optional, and is the key of the OU to which the account belongs. This key must match the key of an OU in the [`organizational_units`](#organizational_units) section. To move an account to a new OU, simply update this value, regenerate your code & run `terraform apply`!
+
+#### `organizational_units`
+
+This section identifies the Organizational Units (OUs) in your organization. Each OU is defined by a key, which is used to reference the OU in other parts of the configuration, and a value, which is an object that defines the OU's properties.
+
+Each OU object contains the following significant keys:
+
+`id` & `action` work just like their `account` counterparts. See the [`accounts` section](#accounts) above for details.
+
+`name` is the name of the OU. This is used in the AWS Management Console and in other places where human-readable OU names are required.
+
+`parent` is optional, and is the key of the parent OU. This key must match the key of another OU in the same section. To move an OU to a new parent, simply update this value, regenerate your code & run `terraform apply`!
+
+#### `sso`
+
+This section defines the SSO groups, permission sets, and SSO-related policies in your organization.
+
+The SSO section contains the following significant keys:
+
+`start_url` is the URL of the AWS SSO login page. This is used by the shared config template to generate the SSO credentials file.
+
+`groups` is an object whose properties define the SSO groups in your organization. Each group is defined by a key, which is used to reference the group in other parts of the configuration, and a value, which is an object that defines the group's properties.
+
+There's some special expansion behavior here that is best illustrated by example:
+
+```yaml
+sso:
+  groups:
+    # This is the key used to reference the SSO Group in other parts of the configuration.
+    terraform_admin:
+      # These are the SSO Group name & description that appear in the IAM Identity Center console.
+      name: TerraformAdmin
+      description: Terraform administrators can create & manage all resources in all accounts.
+      # These are the keys of the SSO Permission Sets (see below) assigned to the SSO Group. In this example, the terraform_admin permission set will be assigned to all accounts.
+      account_permission_sets: terraform_admin
+    audit_reader:
+      name: AuditReader
+      # In this example, both of the indicated permission sets will be assigned to all accounts.
+      account_permission_sets:
+        - audit_log_reader
+        - app_log_reader
+    non_prod_audit_reader:
+      name: NonProdAuditReader
+      # In this example, both of the indicated permission sets will be assigned to the designated accounts.
+      account_permission_sets:
+        dev:
+          - audit_log_reader
+          - app_log_reader
+        test:
+          - audit_log_reader
+          - app_log_reader
+```
+
+`permission_sets` is an object whose properties define the SSO permission sets in your organization. Each permission set is defined by a key, which is used to reference the permission set in other parts of the configuration, and a value, which is an object that defines the permission set's properties.
+
+The point of this section is to connect permission sets with assigned policies in the relevant accounts. It's up to you and your templates to actually CREATE those policies using the expanded config object. See the Metastructure Template repo's [bootstrap workspace SSO template](https://github.com/karmaniverous/metastructure-template/blob/main/src/bootstrap/templates/sso.hbs) for a working example.
+
+Here's an annotated example of this section:
+
+```yml
+sso:
+  permission_sets:
+    # This is the key used to reference the SSO Permission Set in other parts of the configuration.
+    terraform_admin:
+      # These are the SSO Permission Set name & description that appear in the IAM Identity Center console.
+      name: TerraformAdmin
+      description: Permits creation & management of all resources.
+      # These are the keys of the AWS IAM Policies (see below) assigned to the SSO Permission Set. IMPORTANT: AWS Managed Policies (like AdministratorAccess below) should be referenced by name.
+      policies:
+        - AdministratorAccess
+        - sso_terraform_state_writer
+```
+
+`policies` is an object whose keys represent the user-defined IAM Policies that will support SSO in each relevant account, and whose value represents the name of that policy. Only user-defined policies should be referenced here. AWS Managed Policies should be referenced by name in the `permission_sets` section.
+
+#### `applications`
+
+This section defines the applications that your organization uses, the environments each application runs in, and the accounts that host those environments.
+
+The `applications` section is a little lean at the moment: Metastructure evaluates it for referential integrity, but it is not yet consumed by any templates in the Metastructure Template repo.
+
+More to come!
+
+#### `terraform`
+
+This section defines global values that apply specifically to Terraform and Terraform state.
+
+Mostly its keys are consumed by templates, notably to generate [backend](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/backend.hbs) & [provider](https://github.com/karmaniverous/metastructure-template/blob/main/src/templates/providers.hbs) resources.
+
+The one important exception to this is the `paths` key, which is used to define the path or paths (if you use an array) to your Terraform state files. Metastructure invokes Terraform to format the files in these paths after it generates code from your templates.
+
+#### `workspaces`
+
+This is where the magic happens!
+
+Each key in the `workspaces` object is the name of a Terraform workspace. Each value is an object that defines the workspace's properties. These objects have the following significant properties:
+
+`cli_defaults` sets global CLI defaults for the workspace. See [CLI Overrides](#cli-overrides) above for more information.
+
+`cli_defaults_path` is the path (relative to the project root) to a local YAML file that contains CLI overrides for the workspace. See [CLI Overrides](#cli-overrides) above for more information.
+
+`path` identifies the path (relative to the project root) to the current working directory to be used when running Terraform for this workspace.
+
+`shared_config_path` is the path (relative to the project root) to the shared config file that will be used by backend & provider files for SSO authentication. [GH-6](https://github.com/karmaniverous/metastructure/issues/6)
+
+`generators` is an object whose keys identify the files to be generated by the workspace and whose values identify the Handlebars templates to be used to generate them. Both sets of paths should be expressed relative to the project root.
 
 ## Handlebars Templates
 

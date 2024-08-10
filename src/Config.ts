@@ -71,7 +71,6 @@ export const configSchema = z
     configPath: z.string().nullable().optional(),
     organization: z
       .object({
-        aws_region: z.string(),
         id: z.string().nullable().optional(),
         key_accounts: z
           .object({
