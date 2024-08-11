@@ -18,7 +18,8 @@ With **Metastructure** you can...
 
 Explore the [Metastructure Wiki](https://github.com/karmaniverous/metastructure/wiki) to learn more, or clone the [Template Repository](https://github.com/karmaniverous/metastructure-template) to get started!
 
+Got questions? [Start a discussion](https://github.com/karmaniverous/metastructure/discussions) and I'll help!
+
 ---
 
-Made with ❤️ on Bali. See more great templates and other tools on
-[my GitHub Profile](https://github.com/karmaniverous)!
+Built with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
