@@ -16,7 +16,7 @@ With **Metastructure** you can...
 
 **Metastructure** leverages the tools you already use to do the things you already do... just faster, smaller, and safer.
 
-Explore the [Metastructure Wiki](https://github.com/karmaniverous/metastructure/wiki) to learn more!
+Explore the [Metastructure Wiki](https://github.com/karmaniverous/metastructure/wiki) to learn more, or clone the [Template Repository](https://github.com/karmaniverous/metastructure-template) to get started!
 
 ---
 
