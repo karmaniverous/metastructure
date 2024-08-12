@@ -170,18 +170,27 @@ const cli = new Command()
       });
 
       // Check workspace & switch if necessary.
-      const { stdout } = await $`terraform workspace show`;
-      if (stdout !== workspace) {
-        console.log(chalk.black.bold('Switching workspace...\n'));
-        await $({
-          stdio: 'inherit',
-        })`terraform workspace select -or-create=true ${workspace}`;
+      const flatCmd = command.join(' ');
+
+      const cleanCmd = flatCmd.toLowerCase().replace(/\s+/g, ' ');
+
+      if (!cleanCmd.includes('terraform init')) {
+        const { stdout } = await $`terraform workspace show`;
+
+        if (stdout !== workspace) {
+          console.log(chalk.black.bold('Switching workspace...\n'));
+          await $({
+            stdio: 'inherit',
+          })`terraform workspace select -or-create=true ${workspace}`;
+        }
       }
 
       console.log(chalk.black.bold('Running command...\n'));
+
       await $({
         stdio: 'inherit',
-      })(command.join(' '));
+      })(flatCmd);
+
       console.log(chalk.green.bold('\nDone!\n'));
     } catch (error) {
       console.log(chalk.red.bold('\nCommand failed!\n'));
