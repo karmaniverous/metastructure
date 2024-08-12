@@ -140,6 +140,17 @@ export const configSchema = z
           .strict()
           .optional(),
         start_url: z.string(),
+        users: z
+          .record(
+            z
+              .object({
+                email: z.string().optional().nullable(),
+                groups: z.string().or(z.string().array()).nullable().optional(),
+              })
+              .catchall(z.any()),
+          )
+          .nullable()
+          .optional(),
       })
       .nullable()
       .optional(),
@@ -324,6 +335,29 @@ export const configSchema = z
       }
     }
 
+    // validate sso users
+    if (data.sso?.users) {
+      const groups = _.keys(data.sso.groups);
+
+      for (const userKey in data.sso.users) {
+        const user = data.sso.users[userKey];
+
+        if (user.groups) {
+          // TODO: validate no dupes
+
+          // validate user groups
+          for (const groupKey of _.castArray(user.groups))
+            if (!groups.includes(groupKey))
+              ctx.addIssue({
+                code: z.ZodIssueCode.invalid_enum_value,
+                message: `invalid group`,
+                options: groups,
+                path: ['sso', 'users', userKey, 'groups'],
+                received: groupKey,
+              });
+        }
+      }
+    }
     // validate name uniqueness across sso groups
     validateObjectPropertyUnique(data, ctx, 'sso.groups', 'group', 'name');
 
@@ -335,6 +369,9 @@ export const configSchema = z
       'permission_set',
       'name',
     );
+
+    // validate email uniqueness across sso users
+    validateObjectPropertyUnique(data, ctx, 'sso.users', 'user', 'email');
 
     // validate sso groups
     if (data.sso?.groups)
@@ -404,6 +441,13 @@ export const configSchema = z
   })
   .transform((data) => {
     const validAccounts = filterValid(data.accounts);
+
+    // expand sso user groups
+    if (data.sso?.users)
+      for (const userKey in data.sso.users) {
+        const user = data.sso.users[userKey];
+        if (user.groups) user.groups = _.castArray(user.groups);
+      }
 
     // expand account_permission_sets
     if (data.sso?.groups) {
