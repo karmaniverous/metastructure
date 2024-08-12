@@ -122,7 +122,6 @@
     "cli": "tsx src/cli/metastructure",
     "cli:dist": "node dist/metastructure.cli.mjs",
     "knip": "knip",
-    "license": "license-check-and-add",
     "lint": "eslint src/** && prettier -c src",
     "lint:fix": "eslint --fix src/** && prettier --write src",
     "release": "release-it",
