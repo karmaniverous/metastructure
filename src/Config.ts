@@ -142,8 +142,8 @@ export const configSchema = z
         start_url: z.string(),
         users: z
           .record(
-            z
-              .object({
+            actionableSchema
+              .extend({
                 email: z.string().optional().nullable(),
                 groups: z.string().or(z.string().array()).nullable().optional(),
               })
