@@ -2,8 +2,7 @@ import { Handlebars } from '@karmaniverous/handlebars';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import _ from 'lodash';
-import { dirname, resolve } from 'path';
-import { packageDirectory } from 'pkg-dir';
+import { resolve } from 'path';
 import { inspect } from 'util';
 import { parse } from 'yaml';
 
@@ -37,7 +36,6 @@ export const parseConfig = async ({
   useLocalState,
 }: ParseConfigParams) => {
   let config: Config;
-  let configPath: string;
   let pkgDir: string;
   let rawConfig: Config;
 
@@ -46,16 +44,13 @@ export const parseConfig = async ({
       process.stdout.write(chalk.black.bold('Parsing config file...'));
 
     // Load & parse config file.
-    ({ rawConfig, configPath } = await readConfig(path));
+    ({ pkgDir, rawConfig } = await readConfig(path));
 
     // Validate workspace.
     if (!rawConfig.workspaces?.[workspace]) {
       console.log(chalk.red.bold('Unknown workspace!\n'));
       throw new Error(`Unknown workspace: ${workspace}`);
     }
-
-    // Get CLI default overrides.
-    pkgDir = (await packageDirectory({ cwd: dirname(configPath) })) ?? '.';
 
     let cliDefaultOverrides: CliDefaultOverrides = {};
 

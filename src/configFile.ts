@@ -19,7 +19,7 @@ const resolveConfigPath = async (path?: string) => {
 
     if (await fs.exists(resolvedPath)) {
       try {
-        const { configPath } = parse(
+        const { config_path: configPath } = parse(
           await fs.readFile(resolvedPath, 'utf8'),
         ) as Partial<Config>;
 
@@ -46,7 +46,21 @@ export const readConfig = async (path?: string) => {
 
   const rawConfig = parse(await fs.readFile(configPath, 'utf8')) as Config;
 
-  return { rawConfig, configPath };
+  const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
+
+  if (rawConfig.config_override_path) {
+    const overridePath = resolve(pkgDir, rawConfig.config_override_path);
+
+    if (await fs.exists(overridePath)) {
+      const overrideConfig = parse(
+        await fs.readFile(overridePath, 'utf8'),
+      ) as Config;
+
+      _.merge(rawConfig, overrideConfig);
+    }
+  }
+
+  return { pkgDir, rawConfig, configPath };
 };
 
 export const writeConfig = async (config: Config, configPath: string) => {

@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import { execa } from 'execa';
 import _ from 'lodash';
 import { resolve } from 'path';
-import { packageDirectory } from 'pkg-dir';
 import { inspect } from 'util';
 
 import { awsCredentials } from './awsCredentials';
@@ -27,7 +26,7 @@ export const updateConfig = async ({
       process.stdout.write(chalk.black.bold(`Updating config file...`));
 
     // Load config file.
-    const { rawConfig: config, configPath } = await readConfig(path);
+    const { pkgDir, rawConfig: config, configPath } = await readConfig(path);
 
     // Validate workspace.
     if (!config.workspaces?.[workspace]) {
@@ -37,7 +36,6 @@ export const updateConfig = async ({
     }
 
     // Configure shell client.
-    const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
     const $ = execa({
       cwd: resolve(pkgDir, config.workspaces[workspace].path),
       env: {

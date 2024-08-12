@@ -68,7 +68,8 @@ export const configSchema = z
       .nullable()
       .optional(),
     cli_params: cliParamsSchema.optional(),
-    configPath: z.string().nullable().optional(),
+    config_path: z.string().nullable().optional(),
+    config_override_path: z.string().nullable().optional(),
     organization: z
       .object({
         id: z.string().nullable().optional(),
