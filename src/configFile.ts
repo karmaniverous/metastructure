@@ -48,19 +48,19 @@ export const readConfig = async (path?: string) => {
 
   const pkgDir = (await packageDirectory({ cwd: configPath })) ?? '.';
 
+  let rawOverride = {} as Config;
+
   if (rawConfig.config_override_path) {
     const overridePath = resolve(pkgDir, rawConfig.config_override_path);
 
     if (await fs.exists(overridePath)) {
-      const overrideConfig = parse(
-        await fs.readFile(overridePath, 'utf8'),
-      ) as Config;
+      rawOverride = parse(await fs.readFile(overridePath, 'utf8')) as Config;
 
-      _.merge(rawConfig, overrideConfig);
+      _.merge(rawConfig, rawOverride);
     }
   }
 
-  return { pkgDir, rawConfig, configPath };
+  return { pkgDir, rawConfig, rawOverride, configPath };
 };
 
 export const writeConfig = async (config: Config, configPath: string) => {

@@ -14,7 +14,7 @@ import { detectNull } from '../../detectNull';
 import { formatFiles } from '../../formatFiles';
 import { generateWorkspace } from '../../generateWorkspace';
 import { parseConfig } from '../../parseConfig';
-import { updateConfig } from '../../updateConfig';
+import { persistUpdate } from '../../persistUpdate';
 
 /**
  * Enables passing of values to lifecycle hooks & subcommands.
@@ -34,7 +34,16 @@ const cli = new Command()
   .passThroughOptions()
   .requiredOption('-w, --workspace <string>', 'Workspace name (required).')
   .option('-g, --generate', 'Generate workspace from config.')
-  .option('-u, --update', 'Update config from workspace output.')
+  .option(
+    '-u, --update-config',
+    'Update config from workspace output, conflicts with --update-override.',
+  )
+  .addOption(
+    new Option(
+      '-o, --update-override',
+      'Update config override from workspace output, conflicts with --update-config.',
+    ).conflicts('updateConfig'),
+  )
   .option(
     '-r, --assume-role <string>',
     'Role to assume on target accounts (requires --aws-profile, conflicts with --permission-set).',
@@ -182,27 +191,42 @@ const cli = new Command()
     }
   })
   .hook('postAction', async (cmd) => {
-    const { workspace, configPath, debug, generate, update } = cmd.opts();
+    const {
+      workspace,
+      configPath,
+      debug,
+      generate,
+      updateConfig,
+      updateOverride,
+    } = cmd.opts();
 
     const {
       metaValues: { pkgDir, terraformPaths: paths },
     } = cmd as unknown as MetaCommand;
 
-    // Update config with Terraform outputs.
-    if (update)
-      await updateConfig({
-        workspace,
-        debug,
-        configPath,
-        stdOut: true,
-      });
+    try {
+      // Update config with Terraform outputs.
+      if (updateConfig ?? updateOverride)
+        await persistUpdate({
+          workspace,
+          debug,
+          configPath,
+          stdOut: true,
+          updateOverride,
+        });
 
-    if (generate ?? update) {
-      // Apply license headers.
-      await applyLicenseHeaders({ pkgDir, stdOut: true });
+      if (generate ?? updateConfig ?? updateOverride) {
+        // Apply license headers.
+        await applyLicenseHeaders({ pkgDir, stdOut: true });
 
-      // Format files.
-      await formatFiles({ paths, pkgDir, stdOut: true });
+        // Format files.
+        await formatFiles({ paths, pkgDir, stdOut: true });
+      }
+    } catch (error) {
+      console.log(chalk.red.bold('\nPost-Command failed!\n'));
+
+      if (debug) throw error;
+      else process.exit(1);
     }
   });
 
