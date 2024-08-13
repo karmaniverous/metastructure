@@ -1,16 +1,55 @@
 import { isPlainObject } from 'is-what';
 import _ from 'lodash';
+import { inspect } from 'util';
 import { z } from 'zod';
 
 import { validateObjectPropertyUnique } from './validationHelpers';
 
-const actionEnum = z.enum(['destroy', 'remove']);
-type Action = z.infer<typeof actionEnum>;
+const destroyableAction = z.enum(['destroy', 'detach', 'remove']);
 
-const actionableSchema = z.object({
-  action: actionEnum.optional(),
-  id: z.string().optional(),
+type DestroyableAction = z.infer<typeof destroyableAction>;
+
+const destroyableSchema = z.object({
+  action: destroyableAction.nullable().optional(),
+  id: z.string().nullable().optional(),
 });
+
+type Destroyable = z.infer<typeof destroyableSchema>;
+
+const removableAction = z.enum(['remove']);
+
+type RemovableAction = z.infer<typeof removableAction>;
+
+const removableSchema = z.object({
+  action: removableAction.nullable().optional(),
+  id: z.string().nullable().optional(),
+});
+
+type Removable = z.infer<typeof removableSchema>;
+
+type Action = DestroyableAction | RemovableAction;
+
+type Actionable = Destroyable | Removable;
+
+const getActiveKeys = <T extends Actionable = Actionable>(
+  collection: Record<string, T> = {},
+) =>
+  _.entries(collection)
+    .filter(([, v]) => !v.action)
+    .map(([k]) => k);
+
+const actionErrorModifier = (action: Action) => {
+  switch (action) {
+    case 'destroy':
+      return 'destroyed';
+    case 'detach':
+      return 'detached';
+    case 'remove':
+      return 'removed';
+    default:
+      throw new Error(`Invalid action: ${inspect(action)}`);
+  }
+};
 
 const cliParamsSchema = z
   .object({
@@ -21,26 +60,10 @@ const cliParamsSchema = z
   })
   .catchall(z.any());
 
-export type Actionable = z.infer<typeof actionableSchema>;
-
-const filterValid = <T extends Actionable = Actionable>(
-  collection: Record<string, T> = {},
-) =>
-  _.entries(collection)
-    .filter(([, v]) => !v.action || !['destroy', 'remove'].includes(v.action))
-    .map(([k]) => k);
-
-const actionErrorModifier = (action?: Action) =>
-  action === 'destroy'
-    ? 'destroyed'
-    : action === 'remove'
-      ? 'removed'
-      : 'invalid';
-
 export const configSchema = z
   .object({
     accounts: z.record(
-      actionableSchema
+      destroyableSchema
         .extend({
           email: z.string(),
           name: z.string(),
@@ -83,10 +106,9 @@ export const configSchema = z
       .catchall(z.any()),
     organizational_units: z
       .record(
-        z
-          .object({
+        removableSchema
+          .extend({
             name: z.string(),
-            id: z.string().nullable().optional(),
             parent: z.string().nullable().optional(),
           })
           .catchall(z.any()),
@@ -142,7 +164,7 @@ export const configSchema = z
         start_url: z.string(),
         users: z
           .record(
-            actionableSchema
+            removableSchema
               .extend({
                 email: z.string().optional().nullable(),
                 groups: z.string().or(z.string().array()).nullable().optional(),
@@ -186,7 +208,7 @@ export const configSchema = z
       .optional(),
   })
   .superRefine((data, ctx) => {
-    const validAccounts = filterValid(data.accounts);
+    const activeAccountKeys = getActiveKeys(data.accounts);
     const validOus = _.keys(data.organizational_units);
 
     // validate email uniqueness across accounts
@@ -275,13 +297,13 @@ export const configSchema = z
 
         // validate account
         const account = environment?.account;
-        if (account && !validAccounts.includes(account)) {
-          const action = data.accounts[account].action;
+        if (account && !activeAccountKeys.includes(account)) {
+          const action = data.accounts[account].action!;
 
           ctx.addIssue({
             code: z.ZodIssueCode.invalid_enum_value,
             message: `${actionErrorModifier(action)} account`,
-            options: validAccounts,
+            options: activeAccountKeys,
             path: [
               'applications',
               applicationKey,
@@ -297,13 +319,13 @@ export const configSchema = z
 
     // validate organization.key_accounts
     for (const account of _.values(data.organization.key_accounts))
-      if (!validAccounts.includes(account)) {
-        const action = data.accounts[account].action;
+      if (!activeAccountKeys.includes(account)) {
+        const action = data.accounts[account].action!;
 
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
           message: `${actionErrorModifier(action)} account`,
-          options: validAccounts,
+          options: activeAccountKeys,
           path: ['organization', 'key_accounts', account],
           received: account,
         });
@@ -382,13 +404,13 @@ export const configSchema = z
             group.account_permission_sets,
           )) {
             // validate account key
-            if (!validAccounts.includes(accountKey)) {
-              const action = data.accounts[accountKey].action;
+            if (!activeAccountKeys.includes(accountKey)) {
+              const action = data.accounts[accountKey].action!;
 
               ctx.addIssue({
                 code: z.ZodIssueCode.invalid_enum_value,
                 message: `${actionErrorModifier(action)} account`,
-                options: validAccounts,
+                options: activeAccountKeys,
                 path: [
                   'sso',
                   'groups',
@@ -440,7 +462,7 @@ export const configSchema = z
       }
   })
   .transform((data) => {
-    const validAccounts = filterValid(data.accounts);
+    const activeAccountKeys = getActiveKeys(data.accounts);
 
     // expand sso user groups
     if (data.sso?.users)
@@ -460,7 +482,7 @@ export const configSchema = z
             );
           else
             group.account_permission_sets = _.fromPairs(
-              validAccounts.map((account) => [
+              activeAccountKeys.map((account) => [
                 account,
                 _.castArray(group.account_permission_sets as string | string[]),
               ]),
