@@ -115,6 +115,7 @@ export const configSchema = z
       )
       .nullable()
       .optional(),
+    partials: z.record(z.string()).nullable().optional(),
     sso: z
       .object({
         groups: z
@@ -200,6 +201,7 @@ export const configSchema = z
             cli_defaults: cliParamsSchema.nullable().optional(),
             cli_defaults_path: z.string().nullable().optional(),
             generators: z.record(z.string()).nullable().optional(),
+            partials: z.record(z.string()).nullable().optional(),
             path: z.string(),
             shared_config_path: z.string(),
           })
