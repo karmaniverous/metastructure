@@ -148,7 +148,10 @@ export const configSchema = z
           )
           .nullable()
           .optional(),
-        policies: z.record(z.string()).nullable().optional(),
+        policies: z
+          .record(z.object({ name: z.string() }).catchall(z.any()))
+          .nullable()
+          .optional(),
         reference: z
           .object({
             account_permission_sets: z.record(z.string().array()),
@@ -381,14 +384,23 @@ export const configSchema = z
       }
     }
     // validate name uniqueness across sso groups
-    validateObjectPropertyUnique(data, ctx, 'sso.groups', 'group', 'name');
+    validateObjectPropertyUnique(data, ctx, ['sso', 'groups'], 'group', 'name');
 
     // validate name uniqueness across sso permission sets
     validateObjectPropertyUnique(
       data,
       ctx,
-      'sso.permission_sets',
+      ['sso', 'permission_sets'],
       'permission_set',
+      'name',
+    );
+
+    // validate name uniqueness across sso policies
+    validateObjectPropertyUnique(
+      data,
+      ctx,
+      ['sso', 'policies'],
+      'policy',
       'name',
     );
 
