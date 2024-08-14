@@ -35,7 +35,7 @@ const getActiveKeys = <T extends Actionable = Actionable>(
   collection: Record<string, T> = {},
 ) =>
   _.entries(collection)
-    .filter(([, v]) => !v.action)
+    .filter(([, v]) => !v.action || v.action === 'detach')
     .map(([k]) => k);
 
 const actionErrorModifier = (action: Action) => {
