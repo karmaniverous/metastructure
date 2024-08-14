@@ -34,7 +34,47 @@ export const generateWorkspace = async ({
   if (
     config.workspaces[workspace].generators &&
     _.size(config.workspaces[workspace].generators)
-  )
+  ) {
+    // Load partials.
+    const partialsConfig = {
+      ...(config.partials ?? {}),
+      ...(config.workspaces[workspace].partials ?? {}),
+    };
+
+    const [partialKeys, partialPaths] = _.zip(..._.entries(partialsConfig));
+
+    if (_.size(partialKeys)) {
+      if (stdOut)
+        process.stdout.write(chalk.black.dim(`\nRegistering partials...`));
+
+      try {
+        const partials = await Promise.all(
+          partialPaths.map((partialPath) =>
+            fs.readFile(resolve(pkgDir, partialPath!), 'utf8'),
+          ),
+        );
+
+        Handlebars.registerPartial(
+          _.zipObject(
+            partialKeys as string[],
+            partials.map((partial) =>
+              Handlebars.compile(partial, { noEscape: true }),
+            ),
+          ),
+        );
+
+        if (stdOut) process.stdout.write(chalk.green(' Done!\n'));
+      } catch (error) {
+        if (stdOut) {
+          process.stdout.write(chalk.red(' Processing error!\n\n'));
+          console.log(chalk.red(getErrorMessage(error)), '\n');
+        }
+
+        throw error;
+      }
+    }
+
+    // Generate artifacts.
     for (const [targetPath, templatePath] of _.entries(
       config.workspaces[workspace].generators,
     )) {
@@ -61,7 +101,8 @@ export const generateWorkspace = async ({
         throw error;
       }
     }
-  else if (stdOut) process.stdout.write(chalk.black.dim(' No templates.\n\n'));
+  } else if (stdOut)
+    process.stdout.write(chalk.black.dim(' No templates.\n\n'));
 
   if (stdOut) process.stdout.write(chalk.green.bold('\nDone!\n\n'));
 };
