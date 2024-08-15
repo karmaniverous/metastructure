@@ -1,6 +1,6 @@
-> **_Where other tools use special syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful template engine to GENERATE Terraform code._**
-
 ![Metastructure in a Nutshell](https://raw.githubusercontent.com/wiki/karmaniverous/metastructure/images/nutshell.png)
+
+> **_Where other tools use special syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful template engine to GENERATE Terraform code._**
 
 ## Welcome to Metastructure!
 
