@@ -1,5 +1,7 @@
 > **_Where other tools use special syntax & structure to ENCAPSULATE Terraform code, Metastructure uses a powerful template engine to GENERATE Terraform code._**
 
+![Metastructure in a Nutshell](https://raw.githubusercontent.com/wiki/karmaniverous/metastructure/images/nutshell.png)
+
 ## Welcome to Metastructure!
 
 **Metastructure** is a command-line tool that works in conjunction with [Terraform](https://www.terraform.io/) and all the other things to generate & manage a complex AWS infrastructure.
